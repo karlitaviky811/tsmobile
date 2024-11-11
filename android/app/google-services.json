@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "106677594306",
+    "project_id": "testapp-c612e",
+    "storage_bucket": "testapp-c612e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106677594306:android:5e29d0f84ad9127e28735b",
+        "android_client_info": {
+          "package_name": "com.example.testapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk3Y1X9sG8DAgrauAOZCE1cDBCopDwSwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:106677594306:android:50e57084f1c5713528735b",
+        "android_client_info": {
+          "package_name": "com.example.tsmobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCk3Y1X9sG8DAgrauAOZCE1cDBCopDwSwU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
