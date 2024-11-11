@@ -12,41 +12,46 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+      final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: DecoratedBox(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-                fit: BoxFit.contain,
-                image: AssetImage("assets/images/daki-min-image.png")
-              ),
-          ),
-          child: SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 90,
-                    left: 83,
-                    child: Container(
-                      width: 209,
-                      height: 148,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("assets/images/daki-min-image"),
-                             fit: BoxFit.contain),
+      body: SizedBox(
+        width: screenWidth,
+        child: DecoratedBox(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage("assets/images/daki-min-image.png")
+                ),
+            ),
+            child: SizedBox(
+                width: double.infinity,
+                height: double.infinity,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 90,
+                      left: 83,
+                      child: Container(
+                        width: 209,
+                        height: 148,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage("assets/images/daki-min-image"),
+                               fit: BoxFit.contain),
+                        ),
+                        child: null,
                       ),
-                      child: null,
                     ),
-                  ),
-                  const Positioned(
-                    bottom: 51,
-                    left: 32,
-                    right: 32,
-                    child: ContainerButtons(),
-                  )
-                ],
-              ))),
+                    const Positioned(
+                      bottom: 51,
+                      left: 32,
+                      right: 32,
+                      child: ContainerButtons(),
+                    )
+                  ],
+                ))),
+      ),
     );
   }
 }
