@@ -12,6 +12,7 @@ import '../../../core/models/reservation.dart';
 import '../../../widgets/index.dart';
 
 class HomeScreen extends StatefulWidget {
+ static const String route = 'main-route';
   const HomeScreen({super.key});
 
   @override
@@ -19,15 +20,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: CustomAppBar(
-        title: Text('Home', style: TextStyle(color: Colors.white),),
-      ),
-      drawer: SideMenu(),
+        appBar: CustomAppBar(
+          title: Text(
+            'Home',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        drawer: SideMenu(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 23, top: 12),
@@ -110,20 +112,6 @@ class _ListScheduleReservationItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Reservation> reservations = [
-      Reservation(
-          id: '1',
-          courtName: 'Reparacion Aire Acondicionado',
-          reservationDate: '9 de julio 2024',
-          schedule: '2 horas',
-          user: 'Andrea Gómez'),
-      Reservation(
-          id: '1',
-          courtName: 'Instalación Tope de Cocina',
-          reservationDate: '9 de julio 2024',
-          schedule: '2 horas',
-          user: 'Andrea Gómez'),
-    ];
     return SingleChildScrollView(
       child: ListView.separated(
           shrinkWrap: true,
@@ -198,5 +186,3 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
-
-

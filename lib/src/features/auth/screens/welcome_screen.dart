@@ -6,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-
 import '../../../widgets/index.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -23,7 +22,6 @@ class WelcomeScreen extends StatelessWidget {
           width: double.infinity,
           height: double.infinity,
           child: Column(
-            
             children: [
               Container(
                 width: width,
@@ -31,9 +29,8 @@ class WelcomeScreen extends StatelessWidget {
                 margin: EdgeInsets.all(55),
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    
                       image: AssetImage('assets/images/daki-login.png'),
-                       fit: BoxFit.contain),
+                      fit: BoxFit.cover),
                 ),
                 child: null,
               ),

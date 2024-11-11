@@ -21,12 +21,11 @@ class ReservationScreen extends StatelessWidget {
       'court2_carousel.png',
       'court3_carousel.png'
     ];
-    return Scaffold(
+    return const Scaffold(
       body: Column(
         children: [
-          _CarouselCourt(carouselImagesPath: carouselImagesPath),
-          const _CourtDetail(),
-          const _FormReservation()
+          _CourtDetail(),
+          _FormReservation()
         ],
       ),
     );
@@ -251,7 +250,7 @@ class _CourtDetail extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: BoxDecoration(
-                    color: Color(0xff346BC3),
+                    color: const Color(0xff346BC3),
                     borderRadius: BorderRadius.circular(50)),
               ),
               const SizedBox(width: 8),
@@ -266,7 +265,7 @@ class _CourtDetail extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.location_on_outlined),
+              const Icon(Icons.location_on_outlined),
               const SizedBox(width: 4),
               Text(
                 'Vía Av. Caracas y Av. P.º Caroni',

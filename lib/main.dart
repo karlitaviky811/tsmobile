@@ -36,7 +36,6 @@ class MyApp extends StatelessWidget {
       ),
       routes: RouterApp.getRoutes(),
       initialRoute: RouterApp.initialRoute,
-      home: TabsPage(),
     );
   }
 }
