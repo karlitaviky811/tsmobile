@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
-import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
 
 import '../core/theme/app.styles.dart';
 
@@ -69,9 +68,7 @@ class ReservationItem extends StatelessWidget {
 }
 
 class _CardScheduledReservationToday extends StatelessWidget {
-  const _CardScheduledReservationToday({
-    super.key,
-  });
+  const _CardScheduledReservationToday();
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +90,6 @@ class _CardScheduledReservationToday extends StatelessWidget {
 
 class _CardScheduledReservationtImage extends StatelessWidget {
   const _CardScheduledReservationtImage({
-    super.key,
     required this.image,
   });
 
@@ -106,7 +102,7 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xffEEEFF1)),
+          border: Border.all(color: const Color(0xffEEEFF1)),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover)),
     );
   }

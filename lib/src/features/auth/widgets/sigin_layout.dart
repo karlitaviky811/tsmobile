@@ -5,8 +5,8 @@ class SiginLayoutScreen extends StatelessWidget {
   final Widget child;
   final Widget title;
 
-  const SiginLayoutScreen({Key? key, required this.child, required this.title})
-      : super(key: key);
+  const SiginLayoutScreen(
+      {super.key, required this.child, required this.title});
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,7 @@ import '../../../core/constants/color.constant.dart';
 class CarouselImages extends StatefulWidget {
   final List<String> imagesPath;
 
-  CarouselImages({Key? key, required this.imagesPath}) : super(key: key);
+  const CarouselImages({super.key, required this.imagesPath});
 
   @override
   State<CarouselImages> createState() => _CarouselImagesState();

@@ -1,14 +1,12 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import '../../../widgets/index.dart';
 
 class LoginScreen extends StatelessWidget {
   static const String route = 'login-route';
 
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +14,7 @@ class LoginScreen extends StatelessWidget {
       body: DecoratedBox(
           decoration: const BoxDecoration(
             image: DecorationImage(
-                fit: BoxFit.contain,
+                fit: BoxFit.cover,
                 image: AssetImage("assets/images/daki-min-image.png")
               ),
           ),
@@ -34,7 +32,7 @@ class LoginScreen extends StatelessWidget {
                       decoration: const BoxDecoration(
                         image: DecorationImage(
                             image: AssetImage("assets/images/daki-min-image"),
-                             fit: BoxFit.contain),
+                             fit: BoxFit.cover),
                       ),
                       child: null,
                     ),
@@ -69,7 +67,7 @@ class ContainerButtons extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               CustomElevatedButton(
-                color: Color(0xff1c2648),
+                color: const Color(0xff1c2648),
                 child: Text(
                   'Iniciar sesión',
                   style: AppStyle.txtPoppinsSemiBold18White,

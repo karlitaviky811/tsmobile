@@ -10,10 +10,10 @@ class CardScheduledReservation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(top: 13, left: 19),
+      padding: const EdgeInsets.only(top: 13, left: 19),
       width: double.infinity,
       height: 120,
-      color: Color(0xffF4F7FC),
+      color: const Color(0xffF4F7FC),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -42,12 +42,12 @@ class CardScheduledReservation extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.schedule_outlined,
                     size: 12,
                   ),
                   Text('2 horas', style: AppStyle.txtPoppinsRegular12Black),
-                  Text(' | '),
+                  const Text(' | '),
                   Text('50', style: AppStyle.txtPoppinsRegular12Black),
                 ],
               )
@@ -60,9 +60,7 @@ class CardScheduledReservation extends StatelessWidget {
 }
 
 class _CardScheduledReservationToday extends StatelessWidget {
-  const _CardScheduledReservationToday({
-    super.key,
-  });
+  const _CardScheduledReservationToday();
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +82,6 @@ class _CardScheduledReservationToday extends StatelessWidget {
 
 class _CardScheduledReservationtImage extends StatelessWidget {
   const _CardScheduledReservationtImage({
-    super.key,
     required this.image,
   });
 
@@ -97,7 +94,7 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xffEEEFF1)),
+          border: Border.all(color: const Color(0xffEEEFF1)),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover)),
     );
   }

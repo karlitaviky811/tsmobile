@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
+import 'package:tsmobile/src/features/main/screens/custom_navigation_bar.dart';
+import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
+import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
+import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/widget.constant.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -12,7 +17,6 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   bool showEvents = true;
-
 
   final List<NeatCleanCalendarEvent> _eventList = [
     NeatCleanCalendarEvent(
@@ -85,12 +89,67 @@ class _CalendarScreenState extends State<CalendarScreen> {
         child: Text('Calendar Event: ${event.summary} from $start to $end'));
   }
 
+  void _onChangeTab(int index) {
+    // bottomNavigationMain.setSelectedItem(index);
+
+    switch (index) {
+      case 0:
+        Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const HomeScreen(),
+              transitionDuration:
+                  Duration.zero, // Quitar animación de transición
+              reverseTransitionDuration: Duration.zero,
+            ),
+            (Route<dynamic> route) => false);
+        break;
+      case 1:
+        Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const ReservationsScreenCLient(),
+              transitionDuration:
+                  Duration.zero, // Quitar animación de transición
+              reverseTransitionDuration: Duration.zero,
+            ),
+            (Route<dynamic> route) => false);
+        break;
+      case 2:
+        Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const CalendarScreen(),
+              transitionDuration:
+                  Duration.zero, // Quitar animación de transición
+              reverseTransitionDuration: Duration.zero,
+            ),
+            (Route<dynamic> route) => false);
+        break;
+      case 3:
+        Navigator.of(context).pushAndRemoveUntil(
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const CalendarScreen(),
+              transitionDuration:
+                  Duration.zero, // Quitar animación de transición
+              reverseTransitionDuration: Duration.zero,
+            ),
+            (Route<dynamic> route) => false);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
-        title: Text('Calendario'),
-        leading: IconButton( icon: Icon(Icons.arrow_back), onPressed: () { Navigator.pop(context); }),
+      appBar: AppBar(
+        title: const Text('Calendario'),
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+                Navigator.push( context, MaterialPageRoute(builder: (context) => const TabsPage()), );
+            }),
       ),
       body: SafeArea(
         child: Calendar(

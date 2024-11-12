@@ -1,18 +1,12 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
 import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
 import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
 import 'package:tsmobile/src/features/main/screens/side_menu.dart';
-import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/widgets/CardPreviewCourt.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-import '../../../core/models/reservation.dart';
 import '../../../widgets/index.dart';
 
 class HomeScreen extends StatefulWidget {
- static const String route = 'main-route';
+  static const String route = 'main-tabs-route';
   const HomeScreen({super.key});
 
   @override
@@ -22,14 +16,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
-        appBar: CustomAppBar(
+        appBar: const CustomAppBar(
           title: Text(
             'Home',
             style: TextStyle(color: Colors.white),
           ),
         ),
-        drawer: SideMenu(),
+        drawer: const SideMenu(),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(left: 23, top: 12),
@@ -55,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-        ));
+        ),
+      );
   }
 }
 
@@ -106,9 +103,7 @@ class _ListCourt extends StatelessWidget {
 }
 
 class _ListScheduleReservationItems extends StatelessWidget {
-  const _ListScheduleReservationItems({
-    super.key,
-  });
+  const _ListScheduleReservationItems();
 
   @override
   Widget build(BuildContext context) {
@@ -117,12 +112,17 @@ class _ListScheduleReservationItems extends StatelessWidget {
           shrinkWrap: true,
           itemCount: 2,
           itemBuilder: (context, index) {
-            return Container(
-                padding: EdgeInsets.only(top: 13, left: 19),
-                width: double.infinity,
-                height: 180,
-                color: Color(0xffF4F7FC),
-                child: ReservationItem());
+            return GestureDetector(
+              onTap: ()=>{
+                Navigator.push( context, MaterialPageRoute(builder: (context) => const ReservationsScreenCLient()), )
+              },
+              child: Container(
+                  padding: const EdgeInsets.only(top: 13, left: 19),
+                  width: double.infinity,
+                  height: 180,
+                  color: const Color(0xffF4F7FC),
+                  child: const ReservationItem()),
+            );
           },
           separatorBuilder: (context, index) => const SizedBox(height: 8)),
     );
@@ -131,12 +131,12 @@ class _ListScheduleReservationItems extends StatelessWidget {
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
-    Key? key,
+    super.key,
     this.title,
     this.leading,
     this.actions,
     this.elevation = 2.0,
-  }) : super(key: key);
+  });
   final Widget? title;
   final Widget? leading;
   final double elevation;
@@ -171,8 +171,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           toolbarHeight: 64,
           title: title,
           backgroundColor: Colors.transparent,
-          actions: [
-            const Icon(
+          actions: const [
+            Icon(
               Icons.thunderstorm_outlined,
               size: 30,
               color: Colors.white,

@@ -25,7 +25,7 @@ class CardPreviewCourt extends StatelessWidget {
     return Container(
       width: 260,
       decoration: BoxDecoration(
-        border: Border.all(color: Color(0xffEEEFF1)),
+        border: Border.all(color: const Color(0xffEEEFF1)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -71,7 +71,7 @@ class CardPreviewCourt extends StatelessWidget {
                   width: 8,
                   height: 8,
                   decoration: BoxDecoration(
-                      color: Color(0xff346BC3),
+                      color: const Color(0xff346BC3),
                       borderRadius: BorderRadius.circular(50)),
                 ),
                 const SizedBox(width: 8),
@@ -86,7 +86,7 @@ class CardPreviewCourt extends StatelessWidget {
               CustomElevatedButton(
                   height: 32,
                   onChange: onTap,
-                  color: Color(0xffe4c404),
+                  color: const Color(0xffe4c404),
                   child: Text(
                     'Detalle',
                     style: AppStyle.txtPoppinsRegular14White,
@@ -100,9 +100,7 @@ class CardPreviewCourt extends StatelessWidget {
 }
 
 class _CardPreviewCourtToday extends StatelessWidget {
-  const _CardPreviewCourtToday({
-    super.key,
-  });
+  const _CardPreviewCourtToday();
 
   @override
   Widget build(BuildContext context) {
@@ -124,7 +122,6 @@ class _CardPreviewCourtToday extends StatelessWidget {
 
 class _CardPrevieCourtImage extends StatelessWidget {
   const _CardPrevieCourtImage({
-    super.key,
     required this.image,
   });
 
@@ -137,7 +134,7 @@ class _CardPrevieCourtImage extends StatelessWidget {
       height: 200,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xffEEEFF1)),
+          border: Border.all(color: const Color(0xffEEEFF1)),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover)),
     );
   }

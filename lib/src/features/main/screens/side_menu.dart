@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 
 class SideMenu extends StatelessWidget {
@@ -13,23 +12,22 @@ class SideMenu extends StatelessWidget {
         children: [
           const _DrawerHeader(),
           ListTile(
-            leading: Icon(Icons.pages_outlined),
+            leading: const Icon(Icons.pages_outlined),
             title: const Text('Home'),
             onTap: (){
               //Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, ProfileUser.route);
-
+              Navigator.push( context, MaterialPageRoute(builder: (context) => const ProfileUser()), );
             },
           ),
             ListTile(
-            leading: Icon(Icons.people_outline),
+            leading: const Icon(Icons.people_outline),
             title: const Text('People'),
             onTap: (){
               
             },
           ),
             ListTile(
-            leading: Icon(Icons.settings),
+            leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: (){
               

@@ -1,10 +1,14 @@
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/auth/screens/index.dart';
+import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:tsmobile/src/providers/login_form_provider.dart';
+import 'package:tsmobile/src/ui/input_decoration.dart';
 
 import '../../../widgets/index.dart';
 
@@ -18,113 +22,122 @@ class WelcomeScreen extends StatelessWidget {
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: SizedBox(
-          width: double.infinity,
-          height: double.infinity,
-          child: Column(
-            children: [
-              Container(
-                width: width,
-                height: 200,
-                margin: EdgeInsets.all(55),
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/daki-login.png'),
-                      fit: BoxFit.cover),
-                ),
-                child: null,
+      body: AuthBackgorund(
+          child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text('Hoooolaaa'),
+            const SizedBox(
+              height: 250,
+            ),
+            CardContainer(
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text('Login',
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 30),
+                  ChangeNotifierProvider(
+                    create: (_) => LoginFormProvider(),
+                    child: _LoginForm(),
+                  )
+                ],
               ),
-              Container(
-                padding: EdgeInsets.only(left: 33),
-                width: double.infinity,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    RichText(
-                      text: TextSpan(children: [
-                        TextSpan(
-                          text: 'Iniciar ',
-                          style: AppStyle.txtPoppinsSemiBold24Black.copyWith(
-                            decoration: TextDecoration.underline,
-                            decorationColor: Color(0xff346BC3),
-                            decorationThickness: 2,
-                          ),
-                        ),
-                        TextSpan(
-                            text: 'Sesión',
-                            style: AppStyle.txtPoppinsSemiBold24Black)
-                      ]),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 46),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 33),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Email'),
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      onChanged: (value) {},
-                    ),
-                    const SizedBox(height: 26),
-                    TextFormField(
-                      decoration: const InputDecoration(
-                          label: Text('contraseña'),
-                          prefixIcon: Icon(Icons.lock_outlined),
-                          suffixIcon: Icon(Icons.visibility_outlined)),
-                      onChanged: (value) {},
-                    ),
-                    const SizedBox(height: 12),
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.all(0),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: false,
-                      onChanged: (value) {},
-                      title: Text('Recordar contraseña',
-                          style: AppStyle.txtPoppinsRegular12Black),
-                    ),
-                    Text(
-                      '¿Olvidaste tu contraseña?',
-                      style: AppStyle.txtPoppinsRegular14Blue,
-                    ),
-                    const SizedBox(height: 40),
-                    CustomElevatedButton(
-                      onChange: () {
-                        Navigator.pushNamed(context, TabsPage.route);
-                      },
-                      color: Color(0xff1c2648),
-                      child: Text(
-                        'Iniciar sesión',
-                        style: AppStyle.txtPoppinsSemiBold18White,
-                      ),
-                    ),
-                    const SizedBox(height: 64),
-                    RichText(
-                        text: TextSpan(children: [
-                      TextSpan(
-                          text: '¿Aun no tienes cuenta?',
-                          style: AppStyle.txtPoppinsRegular14Black),
-                      TextSpan(
-                          text: ' Regístrate',
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.pushNamed(
-                                  context, RegisterScreen.route);
-                              // Single tapped.
-                            },
-                          style: AppStyle.txtPoppinsRegular14Blue)
-                    ]))
-                  ],
-                ),
-              )
-            ],
-          )),
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            const Text('Crear una nueva cuenta',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(
+              height: 50,
+            ),
+          ],
+        ),
+      )),
     );
   }
 }
+
+class _LoginForm extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final loginForm = Provider.of<LoginFormProvider>(context);
+
+    return Container(
+        child: Form(
+            key: loginForm.formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            //Mantener la referencia al key
+            child: Column(
+              children: [
+                TextFormField(
+                  autocorrect: false,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecorations.authInputDecoration(
+                      hintText: 'john.doe@gmail.com',
+                      labelText: 'Correo electrónico',
+                      prefixIcon: Icons.alternate_email),
+                  onChanged: (value) => loginForm.email = value,
+                  validator: (value) {
+                    String pattern =
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+
+                    RegExp regExp = new RegExp(pattern);
+
+                    return regExp.hasMatch(value ?? '')
+                        ? null
+                        : 'El correo no es correcto';
+                  },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                TextFormField(
+                  autocorrect: false,
+                  obscureText: true,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecorations.authInputDecoration(
+                      hintText: '*****',
+                      labelText: 'Contraseña',
+                      prefixIcon: Icons.lock_outline),
+                  onChanged: (value) => loginForm.password = value,
+                  validator: (value) {
+                    if (value != null && value.length >= 6) return null;
+
+                    return 'La contraseña debe ser al menos de 6 caracteres';
+                  },
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                MaterialButton(
+                  onPressed: () {
+                    if (loginForm.isValidForm()) {
+                      Navigator.pushReplacementNamed(context, TabsPage.route);
+                    }
+                  },
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  disabledColor: Colors.grey,
+                  elevation: 0,
+                  color: Colors.deepPurple,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 80, vertical: 15),
+                      child: const Text('Ingresar',
+                          style: const TextStyle(color: Colors.white))),
+                )
+              ],
+            )));
+  }
+}
+
+
+/*
+String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+ 
+RegExp regExp  = new RegExp(pattern);
+
+
+ */

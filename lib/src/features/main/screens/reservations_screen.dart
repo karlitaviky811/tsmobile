@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../../../core/constants/color.constant.dart';
-import '../../../core/theme/app.styles.dart';
-import '../../../widgets/index.dart';
 import '../../../widgets/index.dart';
 
 
@@ -22,7 +18,7 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
     Item("Item 3", ["En proceso", "tag3"]),
     Item("Item 4", ["tag1", "tag3"]),
   ];
-  
+
   List<String> selectedTags = [];
   List<Item> filteredItems = [];
 
@@ -38,55 +34,60 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Servicios'),
-        leading: IconButton( icon: Icon(Icons.arrow_back), onPressed: () { Navigator.pop(context); }),
-      ),
-      body: Column(
-        children: [
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 4.0,
-            children: ["Nuevos", "En proceso", "Historico"].map((tag) {
-              return FilterChip(
-                label: Text(tag),
-                selected: selectedTags.contains(tag),
-                onSelected: (bool selected) {
-                  setState(() {
-                    if (selected) {
-                      selectedTags.add(tag);
-                    } else {
-                      selectedTags.remove(tag);
-                    }
-                    updateFilteredItems();
-                  });
-                },
-              );
-            }).toList(),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredItems.length,
-              itemBuilder: (context, index) {
-                 return Container(
-                          padding: const EdgeInsets.only(
-                              left: 18.25, top: 14, bottom: 14, right: 15.75),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Color(0xffEEEFF1)),
-                          ),
-                          child: const ReservationItem(),
-                        );
-              },
+        appBar: AppBar(
+          title: const Text('Servicios'),
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+        ),
+        body: Column(
+          children: [
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 4.0,
+              children: ["Nuevos", "En proceso", "Historico"].map((tag) {
+                return FilterChip(
+                  label: Text(tag),
+                  selected: selectedTags.contains(tag),
+                  onSelected: (bool selected) {
+                    setState(() {
+                      if (selected) {
+                        selectedTags.add(tag);
+                      } else {
+                        selectedTags.remove(tag);
+                      }
+                      updateFilteredItems();
+                    });
+                  },
+                );
+              }).toList(),
             ),
-          ),
-        ],
-      ),
-    );
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredItems.length,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: const EdgeInsets.only(
+                        left: 18.25, top: 14, bottom: 14, right: 15.75),
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xffEEEFF1)),
+                    ),
+                    child: const ReservationItem(),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+);
   }
 }
 

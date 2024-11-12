@@ -23,10 +23,7 @@ class ReservationScreen extends StatelessWidget {
     ];
     return const Scaffold(
       body: Column(
-        children: [
-          _CourtDetail(),
-          _FormReservation()
-        ],
+        children: [_CourtDetail(), _FormReservation()],
       ),
     );
   }
@@ -289,10 +286,10 @@ class _CourtDetail extends StatelessWidget {
                 style: AppStyle.txtPoppinsRegular14Black,
                 items: const [
                   DropdownMenuItem(
-                    child: Text('Item 1'),
                     value: 1.0,
+                    child: Text('Item 1'),
                   ),
-                  DropdownMenuItem(child: Text('Item 1'), value: 2.0),
+                  DropdownMenuItem(value: 2.0, child: Text('Item 1')),
                 ],
                 onChanged: (value) {}),
           ),
@@ -303,7 +300,6 @@ class _CourtDetail extends StatelessWidget {
 
 class _CarouselCourt extends StatelessWidget {
   const _CarouselCourt({
-    super.key,
     required this.carouselImagesPath,
   });
 

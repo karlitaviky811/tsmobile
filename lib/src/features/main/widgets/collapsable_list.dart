@@ -8,7 +8,7 @@ class CollapsibleList extends StatefulWidget {
 }
 
 class _CollapsibleListState extends State<CollapsibleList> {
-  List<Item> _data = generateItems(5);
+  final List<Item> _data = generateItems(5);
 
   @override
   Widget build(BuildContext context) {

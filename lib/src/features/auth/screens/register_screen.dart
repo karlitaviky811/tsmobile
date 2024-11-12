@@ -9,7 +9,7 @@ import '../../../widgets/index.dart';
 class RegisterScreen extends StatelessWidget {
   static const String route = 'register-route';
 
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class RegisterScreen extends StatelessWidget {
                   text: 'Registrar',
                   style: AppStyle.txtPoppinsSemiBold24Black.copyWith(
                     decoration: TextDecoration.underline,
-                    decorationColor: Color(0xff346BC3),
+                    decorationColor: const Color(0xff346BC3),
                     decorationThickness: 2,
                   ),
                 ),
@@ -78,7 +78,7 @@ class RegisterScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 CustomElevatedButton(
-                  color: Color(0xff82BC00),
+                  color: const Color(0xff82BC00),
                   child: Text(
                     'Iniciar sesión',
                     style: AppStyle.txtPoppinsSemiBold18White,
