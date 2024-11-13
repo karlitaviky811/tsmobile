@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tsmobile/src/features/main/screens/accept_decline_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
+import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 
 import '../core/theme/app.styles.dart';
 
@@ -10,7 +12,7 @@ class ReservationItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, ExpandableOptions.route);
+      Navigator.push( context, MaterialPageRoute(builder: (context) =>  TicketDetailPageView()));
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +60,8 @@ class ReservationItem extends StatelessWidget {
                   Text('Vía Av. Caracas y Av. P.º Caroni',
                       style: AppStyle.txtPoppinsRegular12Black),
                 ],
-              )
+              ),
+              //TicketDetailPage()
             ],
           ),
         ],

@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
-        scaffoldBackgroundColor: Colors.grey[100]
+        scaffoldBackgroundColor: Color(0xffF3F5FD)
       ),
       home: const TabsPage(),
       routes: RouterApp.getRoutes(),

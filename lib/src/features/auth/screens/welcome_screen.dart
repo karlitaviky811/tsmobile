@@ -47,8 +47,8 @@ class WelcomeScreen extends StatelessWidget {
             const SizedBox(
               height: 50,
             ),
-            const Text('Crear una nueva cuenta',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            /*const Text('Crear una nueva cuenta',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),*/
             const SizedBox(
               height: 50,
             ),
@@ -121,23 +121,17 @@ class _LoginForm extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                   disabledColor: Colors.grey,
                   elevation: 0,
-                  color: Colors.deepPurple,
+                  color: Color(0xffF4BC1C),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 80, vertical: 15),
                       child: const Text('Ingresar',
-                          style: const TextStyle(color: Colors.white))),
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold))),
                 )
               ],
             )));
   }
 }
-
-
-/*
-String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
- 
-RegExp regExp  = new RegExp(pattern);
-
-
- */

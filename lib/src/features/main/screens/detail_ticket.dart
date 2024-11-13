@@ -7,13 +7,15 @@ class ExpandableOptions extends StatelessWidget {
   static const String route = 'detail-ticket-route';
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-       appBar: AppBar(
-        title: const Text('Detalle ticket'),
-        leading: IconButton( icon: const Icon(Icons.arrow_back), onPressed: () { Navigator.pop(context); }),
-      ),
-        body: const CollapsibleList()
-
-      );
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text('Detalle ticket'),
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+        ),
+        body: Stack(children: [Container(), const CollapsibleList()]));
   }
 }

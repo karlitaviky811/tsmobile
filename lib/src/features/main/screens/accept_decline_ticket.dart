@@ -9,10 +9,12 @@ import 'package:intl/intl.dart';
 
 import '../../../core/theme/app.styles.dart';
 
-class ReservationScreen extends StatelessWidget {
-  static const String route = 'reservation-route';
+class AcceptDeclineTicket extends StatelessWidget {
+  static const String route = 'accept-decline-ticket-route';
 
-  const ReservationScreen({Key? key}) : super(key: key);
+  final dynamic ticketId;
+
+  const AcceptDeclineTicket({super.key, required this.ticketId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ class ReservationScreen extends StatelessWidget {
       'court3_carousel.png'
     ];
     return const Scaffold(
+      backgroundColor: Colors.white,
       body: Column(
         children: [_CourtDetail(), _FormReservation()],
       ),
@@ -208,59 +211,57 @@ class _CourtDetail extends StatelessWidget {
           padding:
               const EdgeInsets.only(left: 32, right: 31, top: 24, bottom: 22),
           width: double.infinity,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Epic Box',
-                  style: AppStyle.txtPoppinsSemiBold20Black,
-                ),
-                Text(
-                  '\$25',
-                  style: AppStyle.txtPoppinsSemiBold20Blue,
-                )
-              ],
-            ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 4),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Cancha Tipo A',
-                  style: AppStyle.txtPoppinsRegular12Black,
-                ),
-                Text(
-                  'Por hora',
-                  style: AppStyle.txtPoppinsRegular12Gray,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Creación',
+                      style: AppStyle.txtPoppinsRegular12Black,
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          color: const Color(0xff346BC3),
+                          borderRadius: BorderRadius.circular(50)),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Fecha',
+                      style: AppStyle.txtPoppinsRegular12Black,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '13 -11-2024',
+                      style: AppStyle.txtPoppinsRegular12Black,
+                    ),
+                    const Icon(Icons.schedule_outlined, size: 12),
+                    Text(
+                      '7:00 am a 4:00 pm',
+                      style: AppStyle.txtPoppinsRegular12Black,
+                    )
+                  ],
                 )
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                Text(
-                  'Disponible',
-                  style: AppStyle.txtPoppinsRegular12Black,
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                      color: const Color(0xff346BC3),
-                      borderRadius: BorderRadius.circular(50)),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.schedule_outlined, size: 12),
+                const Icon(Icons.location_on_outlined),
                 const SizedBox(width: 4),
                 Text(
-                  '7:00 am a 4:00 pm',
+                  'Vía Av. Caracas y Av. P.º Caroni',
                   style: AppStyle.txtPoppinsRegular12Black,
                 )
               ],
             ),
-            const SizedBox(height: 12),
             Row(
               children: [
                 const Icon(Icons.location_on_outlined),
@@ -295,6 +296,7 @@ class _CourtDetail extends StatelessWidget {
                   onChanged: (value) {}),
             ),
             const SizedBox(height: 22),
+            TicketDetailPage()
           ])),
     );
   }
@@ -336,6 +338,195 @@ class _CarouselCourt extends StatelessWidget {
               Icons.favorite_border_outlined,
               color: ColorConstant.whiteFC,
             )),
+      ],
+    );
+  }
+}
+
+Widget getStatusChip(String status) {
+  Color color;
+  String text;
+  switch (status) {
+    case 'pending':
+      color = Colors.orange;
+      text = 'Pendiente';
+      break;
+    case 'new':
+      color = const Color.fromARGB(255, 167, 126, 245);
+      text = 'En Proceso';
+      break;
+    case 'in_progress':
+      color = Colors.blue;
+      text = 'En Proceso';
+      break;
+    case 'completed':
+      color = Colors.green;
+      text = 'Completado';
+      break;
+    case 'canceled':
+      color = Colors.red;
+      text = 'Cancelado';
+      break;
+    default:
+      color = Colors.grey;
+      text = 'Desconocido';
+  }
+  return Chip(
+    label: Text(
+      text,
+      style: const TextStyle(fontStyle: FontStyle.normal, color: Colors.white),
+    ),
+    shadowColor: Colors.grey[350],
+    backgroundColor: color,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8.0),
+      side: BorderSide.none, // Quitar el borde
+    ),
+  );
+}
+
+class TicketDetailPage extends StatefulWidget {
+  @override
+  _TicketDetailPageState createState() => _TicketDetailPageState();
+}
+
+class _TicketDetailPageState extends State<TicketDetailPage> {
+  String _status = 'pending';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Detalle del Ticket',  style: AppStyle.txtPoppinsRegular18Black,),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined),
+                const SizedBox(width: 4),
+                Text(
+                  'Vía Av. Caracas y Av. P.º Caroni',
+                  style: AppStyle.txtPoppinsRegular12Black,
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Reparación de aire acondicionado',
+                  style: AppStyle.txtPoppinsRegular12Black,
+                ),
+                getStatusChip('new')
+              ],
+            ),
+             Row(
+              children: <Widget>[
+                ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.purple,
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                textStyle: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold)),
+                  onPressed: () {
+                    setState(() {
+                      _status = 'accepted';
+                    });
+                    
+                  },
+                  child: const Text('Aceptar'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _status = 'rejected';
+                    });
+                  },
+                  child: const Text('Rechazar'),
+                ),
+              ],
+            ),
+            const Text('ID del Ticket: 12345', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
+            const Text('Descripción: Problema con el software.',
+                style: TextStyle(fontSize: 16)),
+            const SizedBox(height: 20),
+            Row(
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _status = 'accepted';
+                    });
+                  },
+                  style: ElevatedButton.styleFrom( backgroundColor: Colors.red, // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón 
+                  ),
+                  child: const Text('Aceptar'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _status = 'rejected';
+                    });
+                  },
+                  child: const Text('Rechazar'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            if (_status == 'accepted') buildAcceptedForm(),
+            if (_status == 'rejected') buildRejectedForm(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildAcceptedForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const Text('Información adicional para tickets aceptados:',
+            style: TextStyle(fontSize: 16)),
+        TextFormField(
+          decoration: const InputDecoration(labelText: 'Fecha de inicio'),
+        ),
+        TextFormField(
+          decoration: const InputDecoration(labelText: 'Notas adicionales'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            // Lógica para guardar los detalles del ticket aceptado
+          },
+          child: const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+
+  Widget buildRejectedForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+
+        TextFormField(
+          decoration: const InputDecoration(labelText: 'Razón del rechazo'),
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: () {
+            // Lógica para guardar el motivo del rechazo
+          },
+          child: const Text('Guardar'),
+        ),
       ],
     );
   }

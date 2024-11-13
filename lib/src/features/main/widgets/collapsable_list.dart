@@ -12,17 +12,20 @@ class _CollapsibleListState extends State<CollapsibleList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: _data.map<Widget>((Item item) {
-        return ExpansionTile(
-          title: Text(item.headerValue),
-          children: item.expandedValue.map<Widget>((String value) {
-            return ListTile(
-              title: Text(value),
-            );
-          }).toList(),
-        );
-      }).toList(),
+    return Container(
+      color: Colors.white,
+      child: ListView(
+        children: _data.map<Widget>((Item item) {
+          return ExpansionTile(
+            title: Text(item.headerValue),
+            children: item.expandedValue.map<Widget>((String value) {
+              return ListTile(
+                title: Text(value),
+              );
+            }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
 }

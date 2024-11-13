@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/custom_navigation_bar.dart';
 import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
@@ -144,11 +145,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendario'),
+        title: Text(
+          'Calendario',
+          style: AppStyle.txtPoppinsRegular18Black,
+        ),
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-                Navigator.push( context, MaterialPageRoute(builder: (context) => const TabsPage()), );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TabsPage()),
+              );
             }),
       ),
       body: SafeArea(

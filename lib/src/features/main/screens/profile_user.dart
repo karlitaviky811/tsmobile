@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 
@@ -29,7 +30,8 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Perfil'),
+        backgroundColor: Colors.white,
+        title: Text('Editar Perfil', style: AppStyle.txtPoppinsSemiBold20Black,),
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -38,55 +40,119 @@ class _EditProfileWidgetState extends State<ProfileUser> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Nombre',
-                  prefixIcon: Icon(Icons.person),
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Text('Hola, Andrea',
+                      style: AppStyle.txtPoppinsRegular18Black),
                 ),
-                onSaved: (value) => _name = value!,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa tu nombre';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  prefixIcon: Icon(Icons.email),
+                SizedBox(height: 30,),
+                Form(
+            
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          'Información de la cuenta',
+                          style:
+                            AppStyle.txtPoppinsRegular18Black,
+                        ),
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre',
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        onSaved: (value) => _name = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu nombre';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Email',
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        onSaved: (value) => _email = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu email';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Dirección',
+                          prefixIcon: Icon(Icons.room),
+                        ),
+                        onSaved: (value) => _email = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu email';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Empresa',
+                          prefixIcon: Icon(Icons.apartment_sharp),
+                        ),
+                        onSaved: (value) => _email = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu email';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Sucursal',
+                          prefixIcon: Icon(Icons.email),
+                        ),
+                        onSaved: (value) => _email = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu email';
+                          }
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Teléfono',
+                          prefixIcon: Icon(Icons.phone),
+                        ),
+                        onSaved: (value) => _phone = value!,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, ingresa tu teléfono';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _updateProfile,
+                        child: const Text('Guardar'),
+                      ),
+                    ],
+                  ),
                 ),
-                onSaved: (value) => _email = value!,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa tu email';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Teléfono',
-                  prefixIcon: Icon(Icons.phone),
-                ),
-                onSaved: (value) => _phone = value!,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingresa tu teléfono';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _updateProfile,
-                child: const Text('Guardar'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -94,6 +160,6 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   }
 }
 
-void main() => runApp(MaterialApp(
+void main() => runApp(const MaterialApp(
       home: ProfileUser(),
     ));
