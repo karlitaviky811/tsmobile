@@ -1,4 +1,5 @@
 import 'package:tsmobile/src/features/main/screens/accept_decline_ticket.dart';
+import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
@@ -40,7 +41,9 @@ class MainRouter {
       TicketAcceptedProgressDetailPage.route: (BuildContext context) =>
           TicketAcceptedProgressDetailPage(
             ticket: tickets[0],
-          )
+          ),
+      ChatScreen.route : (BuildContext context) =>
+          ChatScreen(),
     });
 
     return routes;
