@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/constants/color.constant.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 
 class TicketDetailPageView extends StatefulWidget {
   static const String route = 'detail-view-ticket-route';
@@ -23,6 +24,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   ];
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -31,122 +33,26 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
         ),
       ),
       body: Container(
-        width: double.infinity,
+
         color: Colors.white,
         child: Stack(children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'ID del Ticket: ',
-                              style: AppStyle.txtPoppinsBold18Black,
-                            ),
-                            Text(
-                              '#12345',
-                              style: AppStyle.txtPoppinsRegular14BlueDaka,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        getStatusChip('new'),
-                      ],
+                TicketDetails(
+                      status: 'new',
+                      title: 'Reparación de Aire Acondicionado',
+                      description:
+                          'El aire acondicionado no enfría adecuadamente.',
+                      ticketType: 'Reparación',
+                      product: 'Aire Acondicionado',
+                      scheduledDate: '2024-11-15',
+                      customerLocation: 'Caracas, Venezuela',
+                      customerName: 'Juan Pérez',
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          'Fecha: ',
-                          style:   AppStyle.txtPoppinsBold18Black,
-                        ),
-                          Text(
-                          '11/10/2024',
-                          style:  AppStyle.txtPoppinsRegular18Black,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('Tipo: ', style: AppStyle.txtPoppinsBold18Black),
-                      const SizedBox(height: 10),
-                      Text('Reparación',
-                          style: AppStyle.txtPoppinsRegular18Black),
-                    ]),
-                const SizedBox(height: 10),
-                Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('Título:  ', style: AppStyle.txtPoppinsBold18Black),
-                      const SizedBox(height: 10),
-                      Text('Problema con el software.',
-                          style: AppStyle.txtPoppinsRegular18Black),
-                    ]),
-                const SizedBox(height: 10),
-                Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text('Producto:  ',
-                          style: AppStyle.txtPoppinsBold18Black),
-                      const SizedBox(height: 10),
-                      Text('REFRIGERADOR 19 PIE TF  ...',
-                          style: AppStyle.txtPoppinsRegular18Black),
-                    ]),
-                const SizedBox(height: 10),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Descripción:  ',
-                        style: AppStyle.txtPoppinsBold18Black),
-                    const SizedBox(height: 10),
-                    Text('Problema con el software.',
-                        style: AppStyle.txtPoppinsRegular18Black),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  
-                  children: [
-                                const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        
-                        const Icon(Icons.location_on_outlined),
-                        const SizedBox(width: 4),
-                        Text('Vía Av. Caracas y Av. P.º Caroni',
-                            style: AppStyle.txtPoppinsRegular18Black)
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.account_circle),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Andrea Suarez',
-                      style: AppStyle.txtPoppinsRegular18Black,
-                    )
-                  ],
-                ),
                 const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -183,8 +89,8 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                if (_status == 'accepted') buildAcceptedForm(),
-                if (_status == 'rejected') buildRejectedForm(),
+                if (_status == 'accepted') Expanded(child: buildAcceptedForm()),
+                if (_status == 'rejected') Expanded(child: buildRejectedForm()),
               ],
             ),
           ),
@@ -194,73 +100,81 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   }
 
   Widget buildAcceptedForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Programar visita ticket aceptado:',
-            style: AppStyle.txtPoppinsRegular18Black),
-        TextFormField(
-            decoration: const InputDecoration(
-              labelText: 'Fecha de inicio',
+    return SingleChildScrollView(
+      child: Container(
+        
+        child: Column(
+             
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('Programar visita ticket aceptado:',
+                style: AppStyle.txtPoppinsRegular18Black),
+            TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Fecha de inicio',
+                ),
+                style: AppStyle.txtPoppinsRegular14Black),
+            TextFormField(
+                decoration: const InputDecoration(labelText: 'Notas adicionales'),
+                style: AppStyle.txtPoppinsRegular14Black),
+            const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  icon: Icon(Icons.save ,size: 18, color: Colors.white),
+              onPressed: () {
+                // Lógica para guardar los detalles del ticket aceptado
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xff051937),
+                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+              ),
+              label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
             ),
-            style: AppStyle.txtPoppinsRegular14Black),
-        TextFormField(
-            decoration: const InputDecoration(labelText: 'Notas adicionales'),
-            style: AppStyle.txtPoppinsRegular14Black),
-        const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: Icon(Icons.save ,size: 18, color: Colors.white),
-          onPressed: () {
-            // Lógica para guardar los detalles del ticket aceptado
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xff051937),
-            // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
-          ),
-          label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
+          ],
         ),
-      ],
+      ),
     );
   }
 
   Widget buildRejectedForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Motivo del rechazo:', style: AppStyle.txtPoppinsRegular18Black),
-        DropdownButton<String>(
-          value: _selectedReason,
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedReason = newValue!;
-            });
-          },
-          items:
-              _rejectionReasons.map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-        TextFormField(
-          decoration: const InputDecoration(labelText: 'Razón del rechazo'),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        ElevatedButton.icon(
-              icon: Icon(Icons.save ,size: 18, color: Colors.white),
-          onPressed: () {
-            // Lógica para guardar los detalles del ticket aceptado
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xff051937),
-            // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text('Motivo del rechazo:', style: AppStyle.txtPoppinsRegular18Black),
+          DropdownButton<String>(
+            value: _selectedReason,
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedReason = newValue!;
+              });
+            },
+            items:
+                _rejectionReasons.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
-          label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
-        )
-      ],
+          TextFormField(
+            decoration: const InputDecoration(labelText: 'Razón del rechazo'),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          ElevatedButton.icon(
+                icon: Icon(Icons.save ,size: 18, color: Colors.white),
+            onPressed: () {
+              // Lógica para guardar los detalles del ticket aceptado
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Color(0xff051937),
+              // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+            ),
+            label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
+          )
+        ],
+      ),
     );
   }
 }

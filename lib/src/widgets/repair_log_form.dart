@@ -34,14 +34,14 @@ class _RepairLogFormTestState extends State<RepairLogFormTest> {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: _addRepairEntry,
-              child: Text('Añadir nueva entrada'),
+              child: const Text('Añadir nueva entrada'),
             ),
           );
         }
         return _repairEntries[index];
       },
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
     );
   }
 }
@@ -91,15 +91,17 @@ class _RepairEntryState extends State<RepairEntry> {
 
   void _saveEntry() {
     // Lógica para guardar la información del formulario
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Información guardada')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Información guardada')));
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(8.0),
+      color: Colors.white,
+      margin: const EdgeInsets.all(8.0),
       child: ExpansionTile(
-        title: Text('Formulario de Reparación'),
+        backgroundColor: Colors.white,
+        title: const Text('Formulario de Reparación'),
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -111,29 +113,30 @@ class _RepairEntryState extends State<RepairEntry> {
                   decoration: InputDecoration(
                     labelText: 'Fecha',
                     suffixIcon: IconButton(
-                      icon: Icon(Icons.calendar_today),
+                      icon: const Icon(Icons.calendar_today),
                       onPressed: () => _pickDate(context),
                     ),
                   ),
                   readOnly: true,
                 ),
+                const SizedBox(height: 10,),
                 MultiSelectDialogField(
                   items: _services.map((service) => MultiSelectItem(service, service)).toList(),
-                  title: Text("Servicios realizados"),
-                  selectedColor: Colors.blue,
+                  title: const Text("Servicios realizados"),
+                  selectedColor: const Color(0xff051937),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: Colors.blue, width: 1),
+                    border: Border.all(color: const Color(0xff051937), width: 1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  buttonIcon: Icon(
+                  buttonIcon: const Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.blue,
+                    color: Color(0xff051937),
                   ),
-                  buttonText: Text(
+                  buttonText: const Text(
                     "Seleccionar Servicios",
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: Color(0xff051937),
                       fontSize: 16,
                     ),
                   ),
@@ -144,24 +147,24 @@ class _RepairEntryState extends State<RepairEntry> {
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 MultiSelectDialogField(
                   items: _parts.map((part) => MultiSelectItem(part, part)).toList(),
-                  title: Text("Insumos utilizados"),
-                  selectedColor: Colors.blue,
+                  title: const Text("Insumos utilizados"),
+                  selectedColor: const Color(0xff051937),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: Colors.blue, width: 1),
+                    border: Border.all(color: const Color(0xff051937), width: 1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  buttonIcon: Icon(
+                  buttonIcon: const Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.blue,
+                    color: const Color(0xff051937),
                   ),
-                  buttonText: Text(
+                  buttonText: const Text(
                     "Seleccionar Insumos",
                     style: TextStyle(
-                      color: Colors.blue,
+                      color: Color(0xff051937),
                       fontSize: 16,
                     ),
                   ),
@@ -172,9 +175,9 @@ class _RepairEntryState extends State<RepairEntry> {
                     });
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 CheckboxListTile(
-                  title: Text('¿Necesita repuesto?'),
+                  title: const Text('¿Necesita repuesto?'),
                   value: _needsReplacement,
                   onChanged: (bool? value) {
                     setState(() {
@@ -185,12 +188,12 @@ class _RepairEntryState extends State<RepairEntry> {
                 if (_needsReplacement)
                   TextField(
                     controller: _replacementController,
-                    decoration: InputDecoration(labelText: 'Detalle del repuesto'),
+                    decoration: const InputDecoration(labelText: 'Detalle del repuesto'),
                   ),
                 if (_needsReplacement)
                   ElevatedButton(
                     onPressed: _pickImages,
-                    child: Text('Cargar imágenes'),
+                    child: const Text('Cargar imágenes'),
                   ),
                 if (_needsReplacement && _images != null)
                   Column(
@@ -200,7 +203,7 @@ class _RepairEntryState extends State<RepairEntry> {
                   ),
                 ElevatedButton(
                   onPressed: _saveEntry,
-                  child: Text('Guardar Información'),
+                  child: const Text('Guardar Información'),
                 ),
               ],
             ),

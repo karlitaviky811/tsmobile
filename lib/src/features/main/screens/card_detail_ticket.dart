@@ -91,7 +91,7 @@ class TicketDetails extends StatelessWidget {
               children: [
                 Flexible(
                   child: Text('Ticket: #35941 ',
-                      style: AppStyle.txtPoppinsBold18Black),
+                      style: AppStyle.txtPoppinsSemiBold18Black),
                 ),
                 getStatusChip(status),
               ],
@@ -101,43 +101,43 @@ class TicketDetails extends StatelessWidget {
               'Titulo:',
                      style: AppStyle.txtPoppinsBold18Black,
             ),
-            Text(title,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(title, style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Descripción:',
                   style: AppStyle.txtPoppinsBold18Black,
             ),
-            Text(description,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(description,  style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Tipo de Ticket:',
                    style: AppStyle.txtPoppinsBold18Black
             ),
-            Text(ticketType,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(ticketType, style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Producto:',
                      style: AppStyle.txtPoppinsBold18Black,
             ),
-            Text(product,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(product,  style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Fecha Programada:',
                     style: AppStyle.txtPoppinsBold18Black,
             ),
-            Text(scheduledDate,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(scheduledDate, style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Ubicación del Cliente:',
                       style: AppStyle.txtPoppinsBold18Black
             ),
-            Text(customerLocation, style: AppStyle.txtPoppinsRegular18Black),
+            Text(customerLocation,style: AppStyle.txtPoppinsSemiBold18Black),
             const SizedBox(height: 10),
              Text(
               'Nombre del Cliente:',
                       style: AppStyle.txtPoppinsBold18Black,
             ),
-            Text(customerName,  style: AppStyle.txtPoppinsRegular18Black),
+            Text(customerName, style: AppStyle.txtPoppinsSemiBold18Black),
           ],
         ),
       ),

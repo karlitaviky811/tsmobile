@@ -36,83 +36,88 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomLeft,
-                  end: Alignment.bottomRight,
-                  stops: [
-                    0.1,
-                    1.0,
-                  ],
-                  colors: [
-                    Color(0xff051937),
-                    Color(0XFF131314),
-                  ],
-                ),
+        child: SafeArea(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              SizedBox(
+                height: 30,
               ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
+              ListTile(
+                leading: const Icon(Icons.account_circle_rounded),
+                title: const Text('Perfil'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileUser()),
+                  );
+                },
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                      Navigator.push( context, MaterialPageRoute(builder: (context) => const ProfileUser()), );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.search),
-              title: Text('Search'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile'),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
+              ListTile(
+                leading: const Icon(Icons.star),
+                title: const Text('Calificaciones'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfileUser()),
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.settings),
+                title: const Text('Configuración'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              ListTile(
+                leading: const Icon(Icons.exit_to_app),
+                title: const Text('Salir'),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
       body: SingleChildScrollView(
-        child: Container(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 23, top: 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text('Hola Andrea!', style: AppStyle.txtPoppinsSemiBold20Black),
-                const SizedBox(height: 31),
-                Text(
-                  'Servicios',
-                  style: AppStyle.txtPoppinsMedium18Black,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 23, top: 12),
+              child: Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text('Hola Andrea!',
+                        style: AppStyle.txtPoppinsSemiBold20Black),
+                    const SizedBox(height: 31),
+                    Text(
+                      'Servicios',
+                      style: AppStyle.txtPoppinsMedium18Black,
+                    ),
+                    const SizedBox(height: 16),
+                    const _ListCourt(),
+                    const SizedBox(height: 40),
+                    Text(
+                      'Servicios programados',
+                      style: AppStyle.txtPoppinsMedium18Black,
+                    ),
+                    const SizedBox(height: 20),
+                    const _ListScheduleReservationItems(),
+                    const SizedBox(height: 40),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                const _ListCourt(),
-                const SizedBox(height: 40),
-                Text(
-                  'Servicios programados',
-                  style: AppStyle.txtPoppinsMedium18Black,
-                ),
-                const SizedBox(height: 20),
-                const _ListScheduleReservationItems(),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -136,7 +141,8 @@ class _ListCourt extends StatelessWidget {
             rainyPercentage: '30',
             image: 'assets/images/court1.png',
             onTap: () {
-              Navigator.pushNamed(context, TicketAcceptedProgressDetailPage.route);
+              Navigator.pushNamed(
+                  context, TicketAcceptedProgressDetailPage.route);
             },
           ),
           const SizedBox(width: 20),
@@ -184,9 +190,8 @@ class _ListScheduleReservationItems extends StatelessWidget {
                 )
               },
               child: Container(
-                  padding: const EdgeInsets.only(top: 13, left: 19),
                   width: double.infinity,
-                  height: 180,
+                  height: 150,
                   color: const Color(0xffF4F7FC),
                   child: const ReservationItem()),
             );
@@ -251,3 +256,57 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
+
+Widget _buildGradientCard({
+  required String title,
+  required IconData icon,
+  required List<Color> gradientColors,
+  required int count,
+  required String imageUrl,
+}) {
+  return Card(
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    child: InkWell(
+      onTap: () {
+        // Acción al presionar la tarjeta
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: gradientColors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(imageUrl, width: 100, height: 100),
+            SizedBox(height: 10),
+            Icon(icon, size: 50, color: Colors.white),
+            SizedBox(height: 10),
+            Text(
+              title,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '$count',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+

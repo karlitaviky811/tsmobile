@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/custom_navigation_bar.dart';
 import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/features/main/screens/widget.constant.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -98,7 +96,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         Navigator.of(context).pushAndRemoveUntil(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  const HomeScreen(),
+                   HomeScreen(),
               transitionDuration:
                   Duration.zero, // Quitar animación de transición
               reverseTransitionDuration: Duration.zero,

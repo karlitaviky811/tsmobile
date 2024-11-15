@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

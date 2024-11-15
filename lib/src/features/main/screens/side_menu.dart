@@ -10,10 +10,10 @@ class SideMenu extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const _DrawerHeader(),
+        
           ListTile(
             leading: const Icon(Icons.pages_outlined),
-            title: const Text('Home'),
+            title: const Text('Perfil'),
             onTap: (){
               //Navigator.pop(context);
               Navigator.push( context, MaterialPageRoute(builder: (context) => const ProfileUser()), );
@@ -21,14 +21,14 @@ class SideMenu extends StatelessWidget {
           ),
             ListTile(
             leading: const Icon(Icons.people_outline),
-            title: const Text('People'),
+            title: const Text('Configuración'),
             onTap: (){
               
             },
           ),
             ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            title: const Text('Salir'),
             onTap: (){
               
             },

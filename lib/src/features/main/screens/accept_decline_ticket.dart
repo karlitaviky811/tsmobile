@@ -1,9 +1,8 @@
 import 'package:tsmobile/src/core/constants/color.constant.dart';
+import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 import 'package:tsmobile/src/features/main/widgets/carousel_images.dart';
 import 'package:tsmobile/src/widgets/CustomElevatedButton.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:intl/intl.dart';
 
@@ -404,26 +403,17 @@ class _TicketDetailPageState extends State<TicketDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined),
-                const SizedBox(width: 4),
-                Text(
-                  'Vía Av. Caracas y Av. P.º Caroni',
-                  style: AppStyle.txtPoppinsRegular12Black,
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Reparación de aire acondicionado',
-                  style: AppStyle.txtPoppinsRegular12Black,
-                ),
-                getStatusChip('new')
-              ],
-            ),
+              TicketDetails(
+                      status: 'in_progress',
+                      title: 'Reparación de Aire Acondicionado',
+                      description:
+                          'El aire acondicionado no enfría adecuadamente.',
+                      ticketType: 'Reparación',
+                      product: 'Aire Acondicionado',
+                      scheduledDate: '2024-11-15',
+                      customerLocation: 'Caracas, Venezuela',
+                      customerName: 'Juan Pérez',
+                    ),
              Row(
               children: <Widget>[
                 ElevatedButton(

@@ -42,7 +42,7 @@ class _TestLogFormState extends State<TestLogForm> {
         ),
         ElevatedButton(
           onPressed: agregarFormulario,
-          child: Text("Agregar nueva fila"),
+          child: const Text("Agregar nueva fila"),
         ),
       ],
     );
@@ -73,16 +73,16 @@ class RepairForm {
 
   Widget buildForm(BuildContext context, StateSetter setState) {
     return Card(
-      margin: EdgeInsets.all(10.0),
+      margin: const EdgeInsets.all(10.0),
       child: Padding(
-        padding: EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             ListTile(
-              title: Text("Fecha:"),
+              title: const Text("Fecha:"),
               trailing: IconButton(
-                icon: Icon(Icons.calendar_today),
+                icon: const Icon(Icons.calendar_today),
                 onPressed: () async {
                   final DateTime? picked = await showDatePicker(
                     context: context,
@@ -102,9 +102,9 @@ class RepairForm {
                       "Selecciona una fecha"),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Servicios",
                   border: OutlineInputBorder(),
                 ),
@@ -124,9 +124,9 @@ class RepairForm {
               ),
             ),
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Insumos",
                   border: OutlineInputBorder(),
                 ),
@@ -146,7 +146,7 @@ class RepairForm {
               ),
             ),
             CheckboxListTile(
-              title: Text("¿Necesita repuesto?"),
+              title: const Text("¿Necesita repuesto?"),
               value: necesitaRepuesto,
               onChanged: (bool? value) {
                 setState(() {
@@ -157,12 +157,12 @@ class RepairForm {
             if (necesitaRepuesto) ...[
               TextField(
                 controller: repuestoController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Describa el repuesto",
                   border: OutlineInputBorder(),
                 ),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               ElevatedButton(
                 onPressed: () async {
                   final ImagePicker _picker = ImagePicker();
@@ -172,7 +172,7 @@ class RepairForm {
                     if (pickedFiles != null) imagenes = pickedFiles;
                   });
                 },
-                child: Text("Subir imágenes"),
+                child: const Text("Subir imágenes"),
               ),
               imagenes != null
                   ? Column(
@@ -188,7 +188,7 @@ class RepairForm {
             ],
             ElevatedButton(
               onPressed: guardarFormulario,
-              child: Text("Guardar"),
+              child: const Text("Guardar"),
             ),
           ],
         ),

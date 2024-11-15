@@ -21,20 +21,20 @@ class _HeaderIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+        child: Container(
+      margin: const EdgeInsets.only(top: 30),
+      width: double.infinity,
       child: Container(
-          margin: const EdgeInsets.only(top: 30),
-          width: double.infinity,
-          child:  Container(
-                width: 130,
-                height: 130,
-                margin: EdgeInsets.all(55),
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/daki-login.png'),
-                      fit: BoxFit.contain),
-                ),
-                child: null,
-              ),
+        width: 130,
+        height: 130,
+        margin: EdgeInsets.all(55),
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/images/daki-login.png'),
+              fit: BoxFit.contain),
+        ),
+        child: null,
+      ),
     ));
   }
 }
@@ -64,8 +64,8 @@ class _PurpleBox extends StatelessWidget {
   BoxDecoration _purpleBackground() {
     return const BoxDecoration(
         gradient: LinearGradient(colors: [
-      Color(0XFF06274D),
-      Color(0XFF06274D),
+      const Color(0xff051937),
+      const Color(0xff051937),
     ]));
   }
 }

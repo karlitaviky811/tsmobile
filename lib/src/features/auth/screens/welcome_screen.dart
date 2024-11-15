@@ -1,12 +1,6 @@
 import 'package:provider/provider.dart';
-import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/auth/screens/index.dart';
-import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:tsmobile/src/providers/login_form_provider.dart';
 import 'package:tsmobile/src/ui/input_decoration.dart';
 
@@ -28,7 +22,7 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             const Text('Hoooolaaa'),
             const SizedBox(
-              height: 250,
+              height: 280,
             ),
             CardContainer(
               child: Column(
@@ -65,6 +59,7 @@ class _LoginForm extends StatelessWidget {
     final loginForm = Provider.of<LoginFormProvider>(context);
 
     return Container(
+        height: 300,
         child: Form(
             key: loginForm.formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -109,7 +104,7 @@ class _LoginForm extends StatelessWidget {
                   },
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 60,
                 ),
                 MaterialButton(
                   onPressed: () {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
+import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import '../../../widgets/index.dart';
 
 
@@ -41,11 +43,14 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
     return Scaffold(
         appBar: AppBar(
           title: Text('Servicios',  style: AppStyle.txtPoppinsRegular18Black,),
-          leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
+            leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TabsPage()),
+              );
+            }),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
