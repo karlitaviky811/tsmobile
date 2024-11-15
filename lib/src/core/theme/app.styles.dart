@@ -44,13 +44,12 @@ class AppStyle {
     fontWeight: FontWeight.w400,
   );
 
-   static TextStyle txtPoppinsRegular14BlueDaka = const TextStyle(
+  static TextStyle txtPoppinsRegular14BlueDaka = const TextStyle(
     color: Color(0xff051937),
     fontSize: 16,
     fontFamily: 'Poppins',
     fontWeight: FontWeight.w600,
   );
-
 
   static TextStyle txtPoppinsSemiBold18White = const TextStyle(
     color: Colors.white,
@@ -66,8 +65,7 @@ class AppStyle {
     fontWeight: FontWeight.w600,
   );
 
-
-    static TextStyle txtPoppinsBold18Black = const TextStyle(
+  static TextStyle txtPoppinsBold18Black = const TextStyle(
     color: Color(0xff3D3D3D),
     fontSize: 18,
     fontFamily: 'Poppins',
@@ -87,6 +85,21 @@ class AppStyle {
     fontFamily: 'Poppins',
     fontWeight: FontWeight.w500,
   );
+
+  static TextStyle txtPoppinsSemiBold14Black = const TextStyle(
+    color: Color(0xff3D3D3D),
+    fontSize: 14,
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w500,
+  );
+
+  static TextStyle txtPoppinsBold14Black = const TextStyle(
+    color: Color(0xff3D3D3D),
+    fontSize: 14,
+    fontFamily: 'Poppins',
+    fontWeight: FontWeight.w600,
+  );
+
   static TextStyle txtPoppinsSemiBold16Black = TextStyle(
     color: ColorConstant.black3D,
     fontSize: 16,

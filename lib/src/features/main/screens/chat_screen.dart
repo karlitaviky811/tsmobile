@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 
 
 
@@ -12,7 +13,8 @@ class ChatScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+             backgroundColor: Color(0xffF3F5FD),
+        title: Text('Chat',style: AppStyle.txtPoppinsRegular18Black),
       ),
       body: StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {

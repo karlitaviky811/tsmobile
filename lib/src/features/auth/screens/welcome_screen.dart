@@ -116,13 +116,13 @@ class _LoginForm extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                   disabledColor: Colors.grey,
                   elevation: 0,
-                  color: Color(0xffF4BC1C),
+                  color: const Color(0xff051937),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 80, vertical: 15),
                       child: const Text('Ingresar',
                           style: const TextStyle(
-                              color: Colors.black,
+                              color: Colors.white,
                               fontSize: 16,
                               fontWeight: FontWeight.bold))),
                 )

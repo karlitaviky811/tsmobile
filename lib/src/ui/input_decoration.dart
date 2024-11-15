@@ -5,12 +5,12 @@ class InputDecorations {
       {required String hintText, required String labelText, IconData? prefixIcon }) {
     return InputDecoration(
         enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: Color(0xffFFB921C))),
+            borderSide: BorderSide(color:const Color(0xff051937))),
         focusedBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color:Color(0xffFFB921), width: 2)),
+            borderSide: BorderSide(color:const Color(0xff051937), width: 2)),
         hintText: hintText,
         labelText: labelText,
         labelStyle: const TextStyle(color: Colors.grey),
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: Color(0xffFFB921)) : null);
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: const Color(0xff051937)) : null);
   }
 }

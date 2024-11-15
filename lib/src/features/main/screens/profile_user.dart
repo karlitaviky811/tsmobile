@@ -31,7 +31,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Text('Editar Perfil', style: AppStyle.txtPoppinsSemiBold20Black,),
+         title: Text('Perfil', style: AppStyle.txtPoppinsRegular18Black),
         leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -99,7 +99,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         onSaved: (value) => _email = value!,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu email';
+                            return 'Por favor, ingresa tu dirección';
                           }
                           return null;
                         },
@@ -112,7 +112,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         onSaved: (value) => _email = value!,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu email';
+                            return 'Por favor, ingresa tu empresa';
                           }
                           return null;
                         },
@@ -125,7 +125,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         onSaved: (value) => _email = value!,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu email';
+                            return 'Por favor, ingresa tu sucursal';
                           }
                           return null;
                         },
@@ -160,6 +160,3 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   }
 }
 
-void main() => runApp(const MaterialApp(
-      home: ProfileUser(),
-    ));

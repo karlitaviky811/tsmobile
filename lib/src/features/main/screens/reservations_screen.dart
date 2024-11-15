@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/utils/size.utils.dart';
 import '../../../widgets/index.dart';
-
 
 class ReservationsScreenCLient extends StatefulWidget {
   static const String route = 'technician-route';
@@ -37,13 +37,16 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Servicios',  style: AppStyle.txtPoppinsRegular18Black,),
-            leading: IconButton(
+      appBar: AppBar(
+        backgroundColor: Color(0xffF3F5FD),
+        title: Text(
+          'Servicios',
+          style: AppStyle.txtPoppinsRegular18Black,
+        ),
+        leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.push(
@@ -51,8 +54,10 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
                 MaterialPageRoute(builder: (context) => const TabsPage()),
               );
             }),
-        ),
-        body: Padding(
+      ),
+      body: Container(
+        color: Colors.white,
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
@@ -80,15 +85,24 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
                 child: ListView.builder(
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                      padding: const EdgeInsets.only(
-                          left: 18.25, top: 14, bottom: 14, right: 15.75),
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xffEEEFF1)),
-                      ),
-                      child: const ReservationItem(),
+                    return Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.only(
+                              left: 18.25, top: 14, bottom: 14, right: 15.75),
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xffEEEFF1)),
+                          ),
+                          child: const ReservationItem(),
+                        ),
+                        if (index < items.length - 1)
+                          const SizedBox(
+                            height: 10,
+                          )
+                        // Cambia el color del separador thickness: 1.0, // Cambia el grosor del separador
+                      ],
                     );
                   },
                 ),
@@ -96,7 +110,8 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
             ],
           ),
         ),
-);
+      ),
+    );
   }
 }
 

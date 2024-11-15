@@ -30,11 +30,11 @@ class _CollapsibleListState extends State<CollapsibleList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista Colapsable'),
+        title: const Text('Lista Colapsable'),
       ),
       body: SingleChildScrollView(
         child: ExpansionPanelList(
-          expandedHeaderPadding: EdgeInsets.all(10),
+          expandedHeaderPadding: const EdgeInsets.all(10),
           expansionCallback: (int index, bool isExpanded) {
             setState(() {
               _data[index].isExpanded = !isExpanded;
@@ -117,7 +117,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         ),
         TextField(
           controller: _observationsController,
-          decoration: InputDecoration(labelText: 'Observaciones'),
+          decoration: const InputDecoration(labelText: 'Observaciones'),
         ),
         DropdownButton<String>(
           value: _selectedArticle,
@@ -170,12 +170,12 @@ class _RepairDateFormState extends State<RepairDateForm> {
       children: [
         ElevatedButton(
           onPressed: _addRepairForm,
-          child: Text('Añadir Fecha de Reparación'),
+          child: const Text('Añadir Fecha de Reparación'),
         ),
-        TextField(
+        const TextField(
           decoration: InputDecoration(labelText: 'Servicios realizados'),
         ),
-        TextField(
+        const TextField(
           decoration: InputDecoration(labelText: 'Repuestos implementados'),
         ),
         DropdownButton<String>(
@@ -191,12 +191,12 @@ class _RepairDateFormState extends State<RepairDateForm> {
             );
           }).toList(),
         ),
-        TextField(
+        const TextField(
           decoration: InputDecoration(labelText: 'Otros repuestos'),
         ),
         ElevatedButton(
           onPressed: _pickImages,
-          child: Text('Subir Fotos'),
+          child: const Text('Subir Fotos'),
         ),
       ],
     );

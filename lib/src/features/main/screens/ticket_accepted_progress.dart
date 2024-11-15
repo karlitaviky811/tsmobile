@@ -31,7 +31,8 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalles del Ticket'),
+             backgroundColor: Color(0xffF3F5FD),
+        title: Text('Detalles del Ticket', style: AppStyle.txtPoppinsRegular18Black),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -40,8 +41,8 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
             MaterialPageRoute(builder: (context) => ChatScreen()),
           );
         },
-        child: Icon(Icons.chat),
-        backgroundColor: Colors.blue,
+        child: Icon(Icons.chat_rounded, color: Colors.blueAccent,),
+        backgroundColor: Colors.white,
       ),
       body: Container(
         color: Colors.white,
@@ -321,9 +322,17 @@ class _RepairLogFormContentState extends State<RepairLogFormContent> {
       child: Column(
         children: [
           ..._repairEntries,
-          ElevatedButton(
+
+          
+          ElevatedButton.icon(
             onPressed: _addRepairEntry,
-            child: const Text('Añadir nueva entrada'),
+            label: const Text('Añadir nueva entrada'),
+               style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xff051937),
+              
+                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+              ),
+          icon: const Icon(Icons.save ,size: 18, color: Colors.white),
           ),
         ],
       ),

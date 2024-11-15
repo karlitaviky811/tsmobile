@@ -2,7 +2,6 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
 import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
-import 'package:tsmobile/src/features/main/screens/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import '../../../widgets/index.dart';
@@ -36,11 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       drawer: Drawer(
+        backgroundColor: Color(0xffF3F5FD),
         child: SafeArea(
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               ListTile(
@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.pop(context);
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               ListTile(
@@ -87,37 +87,40 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 23, top: 12),
-              child: Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text('Hola Andrea!',
-                        style: AppStyle.txtPoppinsSemiBold20Black),
-                    const SizedBox(height: 31),
-                    Text(
-                      'Servicios',
-                      style: AppStyle.txtPoppinsMedium18Black,
-                    ),
-                    const SizedBox(height: 16),
-                    const _ListCourt(),
-                    const SizedBox(height: 40),
-                    Text(
-                      'Servicios programados',
-                      style: AppStyle.txtPoppinsMedium18Black,
-                    ),
-                    const SizedBox(height: 20),
-                    const _ListScheduleReservationItems(),
-                    const SizedBox(height: 40),
-                  ],
+        child: Container(
+          color: Colors.white,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 23, top: 12),
+                child: Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text('Hola Andrea!',
+                          style: AppStyle.txtPoppinsSemiBold20Black),
+                      const SizedBox(height: 31),
+                      Text(
+                        'Servicios',
+                        style: AppStyle.txtPoppinsMedium18Black,
+                      ),
+                      const SizedBox(height: 16),
+                      const _ListCourt(),
+                      const SizedBox(height: 40),
+                      Text(
+                        'Servicios programados',
+                        style: AppStyle.txtPoppinsMedium18Black,
+                      ),
+                      const SizedBox(height: 20),
+                      const _ListScheduleReservationItems(),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -189,11 +192,7 @@ class _ListScheduleReservationItems extends StatelessWidget {
                       builder: (context) => const ReservationsScreenCLient()),
                 )
               },
-              child: Container(
-                  width: double.infinity,
-                  height: 150,
-                  color: const Color(0xffF4F7FC),
-                  child: const ReservationItem()),
+              child: const ReservationItem(),
             );
           },
           separatorBuilder: (context, index) => const SizedBox(height: 8)),
@@ -284,21 +283,21 @@ Widget _buildGradientCard({
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.network(imageUrl, width: 100, height: 100),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Icon(icon, size: 50, color: Colors.white),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               '$count',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
               ),

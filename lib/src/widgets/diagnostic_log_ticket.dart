@@ -53,12 +53,19 @@ class DiagnosticForm extends StatelessWidget {
           ),
         ),
         SizedBox(height: 30,),
-        ElevatedButton(
+      
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xff051937),
+              
+                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+              ),
+          icon: Icon(Icons.save ,size: 18, color: Colors.white),
           onPressed: () {
             final DateTime? selectedDate = DateTime.tryParse(_dateController.text);
             onSave(selectedDate, _observationsController.text, _commentsController.text);
           },
-          child: Text('Guardar Información'),
+          label: Text('Guardar Información', style: TextStyle(color: Colors.white),),
         ),
         SizedBox(height: 20,)
       ],

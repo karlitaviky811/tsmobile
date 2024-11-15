@@ -143,6 +143,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Color(0xffF3F5FD),
         title: Text(
           'Calendario',
           style: AppStyle.txtPoppinsRegular18Black,

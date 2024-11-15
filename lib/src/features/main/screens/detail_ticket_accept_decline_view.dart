@@ -27,6 +27,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
 
     return Scaffold(
       appBar: AppBar(
+             backgroundColor: Color(0xffF3F5FD),
         title: Text(
           'Detalle del Ticket',
           style: AppStyle.txtPoppinsRegular18Black,

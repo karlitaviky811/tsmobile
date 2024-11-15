@@ -396,6 +396,7 @@ class _TicketDetailPageState extends State<TicketDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+                backgroundColor: Color(0xffF3F5FD),
         title: Text('Detalle del Ticket',  style: AppStyle.txtPoppinsRegular18Black,),
       ),
       body: Padding(
