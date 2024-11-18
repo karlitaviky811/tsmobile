@@ -25,7 +25,6 @@ class TicketDetails extends StatelessWidget {
   Widget getStatusChip(String status) {
     Color color;
     String text;
-    Color colorIcon;
 
     switch (status) {
       case 'pending':

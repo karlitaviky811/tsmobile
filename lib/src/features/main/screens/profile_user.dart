@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 
 class ProfileUser extends StatefulWidget {
   static const String route = 'profile-ticket-route';

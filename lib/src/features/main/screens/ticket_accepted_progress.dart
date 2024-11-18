@@ -7,7 +7,7 @@ import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-import 'package:tsmobile/src/features/main/screens/page_test.dart';
+
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/widgets/diagnostic_log_ticket.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
@@ -15,18 +15,18 @@ import 'package:tsmobile/src/widgets/repair_log_form.dart';
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
   final Ticket ticket;
   static const String route = 'ticket-accepted-decline-ticket-route';
-  TicketAcceptedProgressDetailPage({required this.ticket});
+  const TicketAcceptedProgressDetailPage({super.key, required this.ticket});
 
   @override
   _TicketDetailPageState createState() => _TicketDetailPageState();
 }
 
 class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
-  bool _needsReplacement = false;
+  // bool _needsReplacement = false;
   DateTime? _selectedDate;
-  final _inputController1 = TextEditingController();
-  final _inputController2 = TextEditingController();
-  final _replacementCodeController = TextEditingController();
+  //final _inputController1 = TextEditingController();
+  //final _inputController2 = TextEditingController();
+  //final _replacementCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -180,8 +180,7 @@ class _RepaisLogForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return 
-       RepairLogForm();
+    return RepairLogForm();
   }
 }
 
@@ -321,6 +320,8 @@ class _detailTicketInfo extends StatelessWidget {
 }
 
 class RepairLogForm extends StatelessWidget {
+  const RepairLogForm({super.key});
+
   @override
   Widget build(BuildContext context) {
     return RepairLogFormContent();
@@ -328,6 +329,8 @@ class RepairLogForm extends StatelessWidget {
 }
 
 class RepairLogFormContent extends StatefulWidget {
+  const RepairLogFormContent({super.key});
+
   @override
   _RepairLogFormContentState createState() => _RepairLogFormContentState();
 }
@@ -370,6 +373,8 @@ class _RepairLogFormContentState extends State<RepairLogFormContent> {
 }
 
 class RepairEntryForm extends StatefulWidget {
+  const RepairEntryForm({super.key});
+
   @override
   _RepairEntryFormState createState() => _RepairEntryFormState();
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/core/constants/color.constant.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 

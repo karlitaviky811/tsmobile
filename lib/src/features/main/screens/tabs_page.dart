@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
-import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
+
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
+import 'package:tsmobile/src/features/main/screens/tab2_page.dart';
+
 
 class TabsPage extends StatelessWidget {
   const TabsPage({Key? key}) : super(key: key);
@@ -61,7 +63,7 @@ class _Pages extends StatelessWidget {
       //physics: BouncingScrollPhysics(),
       children: const <Widget>[
         HomeScreen(),
-        ReservationsScreenCLient(),
+        TicketsListFiltered(),
         CalendarScreen(),
         CalendarScreen(),
       ],

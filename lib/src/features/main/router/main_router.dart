@@ -1,10 +1,8 @@
-import 'package:tsmobile/src/features/main/screens/accept_decline_ticket.dart';
+
 import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
-import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
-import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
@@ -29,8 +27,6 @@ class MainRouter {
       ExpandableOptions.route: (BuildContext context) =>
           const ExpandableOptions(),
       ProfileUser.route: (BuildContext context) => const ProfileUser(),
-      AcceptDeclineTicket.route: (BuildContext context) =>
-          const AcceptDeclineTicket(ticketId: 0),
       TicketDetailPageView.route: (BuildContext context) =>
           TicketDetailPageView(),
       TicketAcceptedProgressDetailPage.route: (BuildContext context) =>

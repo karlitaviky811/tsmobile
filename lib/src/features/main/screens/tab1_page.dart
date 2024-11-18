@@ -1,10 +1,7 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/accept_decline_ticket.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
-import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
-import 'package:tsmobile/src/features/main/screens/reservations_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:tsmobile/src/features/main/screens/tab2_page.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import '../../../widgets/index.dart';
 
@@ -156,7 +153,7 @@ class _ListCourt extends StatelessWidget {
             image: 'assets/images/court1.png',
             gradientColors: [Colors.blue.shade100, Colors.blue.shade200],
             onTap: () {
-              Navigator.pushNamed(context, ReservationScreen.route);
+              Navigator.pushNamed(context, TicketsListFiltered.route);
             },
           ),
           const SizedBox(width: 20),
@@ -168,7 +165,7 @@ class _ListCourt extends StatelessWidget {
             image: 'assets/images/court1.png',
             gradientColors: [Colors.cyan.shade100, Colors.cyan.shade200],
             onTap: () {
-              Navigator.pushNamed(context, ReservationScreen.route);
+              Navigator.pushNamed(context, TicketsListFiltered.route);
             },
           ),
         ],
@@ -192,7 +189,7 @@ class _ListScheduleReservationItems extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ReservationsScreenCLient()),
+                  builder: (context) => const TicketsListFiltered()),
             )
           },
           child: ReservationItem(
