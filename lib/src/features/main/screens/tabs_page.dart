@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
-
-import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
-import 'package:tsmobile/src/features/main/screens/tab2_page.dart';
+import 'package:tsmobile/src/features/main/screens/home_page.dart';
+import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 
 
 class TabsPage extends StatelessWidget {
