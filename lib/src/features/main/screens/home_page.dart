@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(color: Colors.white),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.menu),
+          icon: const Icon(Icons.drag_indicator),
           color: Colors.white, // Cambiar color aquí
           onPressed: () {
             _scaffoldKey.currentState?.openDrawer();

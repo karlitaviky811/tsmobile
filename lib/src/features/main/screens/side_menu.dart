@@ -11,27 +11,41 @@ class SideMenu extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
         
-          ListTile(
-            leading: const Icon(Icons.pages_outlined),
-            title: const Text('Perfil'),
-            onTap: (){
-              //Navigator.pop(context);
-              Navigator.push( context, MaterialPageRoute(builder: (context) => const ProfileUser()), );
-            },
-          ),
-            ListTile(
-            leading: const Icon(Icons.people_outline),
-            title: const Text('Configuración'),
-            onTap: (){
-              
-            },
-          ),
-            ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Salir'),
-            onTap: (){
-              
-            },
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.pages_outlined),
+                    title: const Text('Perfil'),
+                    onTap: (){
+                      //Navigator.pop(context);
+                      Navigator.push( context, MaterialPageRoute(builder: (context) => const ProfileUser()), );
+                    },
+                  ),
+                    ListTile(
+                    leading: const Icon(Icons.people_outline),
+                    title: const Text('Configuración'),
+                    onTap: (){
+                      
+                    },
+                  ),
+                ],
+              ),
+                Column(
+                  children: [
+                    ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Salir'),
+                    onTap: (){
+                      
+                    },
+                                  ),
+                  ],
+                ),
+            ],
           )
         ],
       ),
