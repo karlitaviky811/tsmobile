@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 
 class DiagnosticForm extends StatelessWidget {
   final Function(DateTime?, String, String) onSave;
@@ -27,15 +28,20 @@ class DiagnosticForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              Text(
+                'Diagnóstico',
+                textAlign: TextAlign.left,
+              style: AppStyle.txtPoppinsMedium18Black,
+              ),
               TextField(
                 controller: _dateController,
                 decoration: InputDecoration(
                   labelText: 'Fecha',
                   prefixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
+                    icon: const Icon(Icons.calendar_today),
                     onPressed: () => _pickDate(context),
                   ),
                 ),
@@ -43,31 +49,40 @@ class DiagnosticForm extends StatelessWidget {
               ),
               TextField(
                 controller: _observationsController,
-                decoration: InputDecoration(labelText: 'Observaciones'),
+                decoration: const InputDecoration(labelText: 'Observaciones'),
               ),
               TextField(
                 controller: _commentsController,
-                decoration: InputDecoration(labelText: 'Comentarios'),
+                decoration: const InputDecoration(labelText: 'Comentarios'),
               ),
+
+
+               const SizedBox(
+          height: 30,
+        ),
+        ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xff051937),
+          ),
+          icon: const Icon(Icons.save, size: 18, color: Colors.white),
+          onPressed: () {
+            final DateTime? selectedDate =
+                DateTime.tryParse(_dateController.text);
+            onSave(selectedDate, _observationsController.text,
+                _commentsController.text);
+          },
+          label: const Text(
+            'Guardar Información',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        )
             ],
           ),
         ),
-        SizedBox(height: 30,),
-      
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff051937),
-              
-                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
-              ),
-          icon: Icon(Icons.save ,size: 18, color: Colors.white),
-          onPressed: () {
-            final DateTime? selectedDate = DateTime.tryParse(_dateController.text);
-            onSave(selectedDate, _observationsController.text, _commentsController.text);
-          },
-          label: Text('Guardar Información', style: TextStyle(color: Colors.white),),
-        ),
-        SizedBox(height: 20,)
+       
       ],
     );
   }

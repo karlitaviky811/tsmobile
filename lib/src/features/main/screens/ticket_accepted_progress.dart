@@ -7,6 +7,7 @@ import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:tsmobile/src/features/main/screens/page_test.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/widgets/diagnostic_log_ticket.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
@@ -29,83 +30,47 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-             backgroundColor: Color(0xffF3F5FD),
-        title: Text('Detalles del Ticket', style: AppStyle.txtPoppinsRegular18Black),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ChatScreen()),
-          );
-        },
-        child: Icon(Icons.chat_rounded, color: Colors.blueAccent,),
-        backgroundColor: Colors.white,
-      ),
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ChatScreen()),
+              );
+            },
+            // ignore: sort_child_properties_last
+            child: const Icon(
+              Icons.chat_rounded,
+              color: Colors.blueAccent,
+            ),
+            backgroundColor: Colors.white,
+          ),
+          appBar: AppBar(
+            leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            backgroundColor: const Color(0xffF3F5FD),
+            title: Text('Detalles del Ticket',
+                style: AppStyle.txtPoppinsRegular18Black),
+            bottom: const TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.directions_car)),
+                Tab(icon: Icon(Icons.directions_transit)),
+                Tab(icon: Icon(Icons.directions_bike)),
+              ],
+            ),
+          ),
+          body: TabBarView(
             children: [
-              Expanded(
-                child: ListView(
-                  children: [
-                    TicketDetails(
-                      status: 'in_progress',
-                      title: 'Reparación de Aire Acondicionado',
-                      description:
-                          'El aire acondicionado no enfría adecuadamente.',
-                      ticketType: 'Reparación',
-                      product: 'Aire Acondicionado',
-                      scheduledDate: '2024-11-15',
-                      customerLocation: 'Caracas, Venezuela',
-                      customerName: 'Juan Pérez',
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Bitácora ticket',
-                              style: AppStyle.txtPoppinsRegular18Black),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Column(
-                      children: [
-                        ExpansionTile(
-                          title: Text('Diagnóstico',
-                              style: AppStyle.txtPoppinsRegular18Black),
-                          children: [
-                            DiagnosticForm(
-                              onSave: (selectedDate, observations, comments) {
-                                // Lógica para guardar los datos del formulario
-                                print('Fecha: $selectedDate');
-                                print('Observaciones: $observations');
-                                print('Comentarios: $comments');
-                              },
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 20.0),
-                        ExpansionTile(
-                          title: Text('Reparación',
-                              style: AppStyle.txtPoppinsRegular18Black),
-                          children: [
-                            RepairLogFormTest(),
-                          ],
-                        ),
-                      ],
-                    ),
-                    // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
-                  ],
-                ),
-              ),
+              const _TicketDetailProgress(),
+              const _DiagnosticForm(),
+              RepairLogFormData(),
             ],
           ),
         ),
@@ -151,6 +116,72 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         // Lógica para manejar el cambio
       },
     );
+  }
+}
+
+class _TicketDetailProgress extends StatelessWidget {
+  const _TicketDetailProgress({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            children: [
+              TicketDetails(
+                status: 'in_progress',
+                title: 'Reparación de Aire Acondicionado',
+                description: 'El aire acondicionado no enfría adecuadamente.',
+                ticketType: 'Reparación',
+                product: 'Aire Acondicionado',
+                scheduledDate: '2024-11-15',
+                customerLocation: 'Caracas, Venezuela',
+                customerName: 'Juan Pérez',
+              ),
+              // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DiagnosticForm extends StatelessWidget {
+  const _DiagnosticForm({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DiagnosticForm(
+          onSave: (selectedDate, observations, comments) {
+            // Lógica para guardar los datos del formulario
+            print('Fecha: $selectedDate');
+            print('Observaciones: $observations');
+            print('Comentarios: $comments');
+          },
+        ),
+        const SizedBox(height: 20.0),
+      ],
+    );
+  }
+}
+
+class _RepaisLogForm extends StatelessWidget {
+  const _RepaisLogForm({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return 
+       RepairLogForm();
   }
 }
 
@@ -322,17 +353,15 @@ class _RepairLogFormContentState extends State<RepairLogFormContent> {
       child: Column(
         children: [
           ..._repairEntries,
-
-          
           ElevatedButton.icon(
             onPressed: _addRepairEntry,
             label: const Text('Añadir nueva entrada'),
-               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff051937),
-              
-                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
-              ),
-          icon: const Icon(Icons.save ,size: 18, color: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff051937),
+
+              // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+            ),
+            icon: const Icon(Icons.save, size: 18, color: Colors.white),
           ),
         ],
       ),

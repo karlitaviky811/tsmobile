@@ -1,274 +1,308 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'dart:io';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 
-import 'package:multi_select_flutter/util/multi_select_item.dart';
-class RepairLogFormTest extends StatelessWidget {
+class RepairLogFormData extends StatelessWidget {
+  final ValueNotifier<List<Map<String, dynamic>>> reparacionesNotifier;
+
+  RepairLogFormData(
+      {Key? key, List<Map<String, dynamic>> initialReparaciones = const []})
+      : reparacionesNotifier =
+            ValueNotifier<List<Map<String, dynamic>>>(initialReparaciones),
+        super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: _repairEntries.length + 1,
-      itemBuilder: (context, index) {
-        if (index == _repairEntries.length) {
-          return Padding(
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                _addRepairEntry(context);
-              },
-              label: const Text('Añadir nueva reparación',
-                  style: TextStyle(color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff051937),
-              ),
-              icon: const Icon(Icons.construction, size: 18, color: Colors.white),
+            child: Text(
+              'Bitácora de reparación',
+              textAlign: TextAlign.left,
+              style: AppStyle.txtPoppinsMedium18Black,
             ),
-          );
-        }
-        return _repairEntries[index];
-      },
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+          ),
+          ValueListenableBuilder<List<Map<String, dynamic>>>(
+            valueListenable: reparacionesNotifier,
+            builder: (context, reparaciones, _) {
+              return Column(
+                children: reparaciones.map((reparacion) {
+                  return _buildReparacionItem(context, reparacion);
+                }).toList(),
+              );
+            },
+          ),
+          ElevatedButton(
+            onPressed: _agregarNuevaReparacion,
+            child: const Text('Agregar una nueva reparación'),
+          ),
+        ],
+      ),
     );
   }
 
-  static List<RepairEntry> _repairEntries = [];
-
-  static void _addRepairEntry(BuildContext context) {
-    _repairEntries.add(RepairEntry());
-    (context as Element).markNeedsBuild();
+  Widget _buildReparacionItem(
+      BuildContext context, Map<String, dynamic> reparacion) {
+    return ExpansionTile(
+      title: Text(
+          'Reparación ${reparacionesNotifier.value.indexOf(reparacion) + 1}'),
+      children: [
+        _buildReparacionForm(context, reparacion),
+      ],
+    );
   }
-}
 
-class RepairEntry extends StatelessWidget {
-  RepairEntry({Key? key}) : super(key: key);
+  Widget _buildReparacionForm(
+      BuildContext context, Map<String, dynamic> reparacion) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Estado:'),
+                Chip(
+                  label: Text(reparacion['estado']),
+                  backgroundColor: _getChipColor(reparacion['estado']),
+                ),
+              ],
+            ),
+            ListTile(
+              title: const Text('Fecha de reparación'),
+              subtitle: Text(reparacion['selectedDate'] == null
+                  ? 'Seleccione una fecha'
+                  : reparacion['selectedDate'].toLocal().toString()),
+              trailing: const Icon(Icons.calendar_today),
+              onTap: () => _selectDate(context, reparacion),
+            ),
+            MultiSelectDialogField(
+              items: [
+                MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
+                MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
+                // Agrega más servicios aquí
+              ],
+              title: const Text('Servicios realizados'),
+              selectedColor: Colors.blue,
+              buttonIcon: const Icon(Icons.list),
+              buttonText: const Text('Seleccione uno o más servicios'),
+              initialValue: reparacion['selectedServicios'].cast<String>(),
+              onConfirm: (values) {
+                reparacion['selectedServicios'] = values.cast<String>();
+                reparacionesNotifier.notifyListeners();
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable:
+                  ValueNotifier<bool>(reparacion['necesitaRepuesto']),
+              builder: (context, necesitaRepuesto, child) {
+                return Column(
+                  children: [
+                    CheckboxListTile(
+                      title: const Text('¿Necesita repuesto?'),
+                      value: necesitaRepuesto,
+                      onChanged: (bool? value) {
+                        reparacion['necesitaRepuesto'] = value ?? false;
+                        if (value == true) {
+                          reparacion['estado'] = 'Solicitud de Repuesto';
+                        } else {
+                          reparacion['estado'] = 'Reparación';
+                        }
+                        reparacionesNotifier.notifyListeners();
+                      },
+                    ),
+                    if (necesitaRepuesto)
+                      Column(
+                        children: [
+                          MultiSelectDialogField(
+                            items: [
+                              MultiSelectItem<String>(
+                                  'Repuesto 1', 'Repuesto 1'),
+                              MultiSelectItem<String>(
+                                  'Repuesto 2', 'Repuesto 2'),
+                              // Agrega más repuestos aquí
+                            ],
+                            title: const Text('Repuestos necesarios'),
+                            selectedColor: Colors.blue,
+                            buttonIcon: const Icon(Icons.list),
+                            buttonText: const Text('Seleccione uno o más repuestos'),
+                            initialValue:
+                                reparacion['selectedRepuestos'].cast<String>(),
+                            onConfirm: (values) {
+                              reparacion['selectedRepuestos'] =
+                                  values.cast<String>();
+                              reparacionesNotifier.notifyListeners();
+                            },
+                          ),
+                          TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Observaciones'),
+                            onChanged: (value) {
+                              reparacion['observaciones'] = value;
+                              reparacionesNotifier.notifyListeners();
+                            },
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await _pickImage(
+                                  context, reparacion, 'solicitud');
+                            },
+                            child: const Text('Adjuntar imagen de solicitud'),
+                          ),
+                        ],
+                      ),
+                  ],
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable:
+                  ValueNotifier<bool>(reparacion['repuestoSolicitado']),
+              builder: (context, repuestoSolicitado, child) {
+                return repuestoSolicitado
+                    ? Column(
+                        children: [
+                          TextField(
+                            decoration: const InputDecoration(
+                                labelText: 'Presupuesto del repuesto'),
+                            onChanged: (value) {
+                              reparacion['presupuestoRepuesto'] = value;
+                              reparacion['estado'] =
+                                  'Presupuesto de compra de repuesto';
+                              reparacionesNotifier.notifyListeners();
+                            },
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              await _pickImage(
+                                  context, reparacion, 'presupuesto');
+                            },
+                            child: const Text('Adjuntar imagen de presupuesto'),
+                          ),
+                          TextField(
+                            decoration:
+                                const InputDecoration(labelText: 'Comentarios'),
+                            onChanged: (value) {
+                              reparacion['comentarios'] = value;
+                              reparacionesNotifier.notifyListeners();
+                            },
+                          ),
+                        ],
+                      )
+                    : Container();
+              },
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _pickImage(context, reparacion, 'reparacion');
+              },
+              child: const Text('Adjuntar imagen de reparación'),
+            ),
+            TextField(
+              decoration: const InputDecoration(labelText: 'Comentarios generales'),
+              onChanged: (value) {
+                reparacion['comentariosGenerales'] = value;
+                reparacionesNotifier.notifyListeners();
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (!reparacion['necesitaRepuesto'] ||
+                    (reparacion['necesitaRepuesto'] &&
+                        !reparacion['repuestoSolicitado'])) {
+                  // Implementación para guardar la reparación
+                  _guardarReparacion(context, reparacion);
+                }
+              },
+              child: const Text('Guardar reparación'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _replacementController = TextEditingController();
-  final TextEditingController _costController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
-  List<XFile>? _images;
-  XFile? _invoiceImage;
-  DateTime? _selectedDate;
-  String? _selectedRepuesto;
-  bool _needsReplacement = false;
-  final List<String> _services = ['Servicio 1', 'Servicio 2', 'Servicio 3'];
-  final List<String> _parts = ['Insumo 1', 'Insumo 2', 'Insumo 3'];
-  final List<String> _repuestos = ['Repuesto 1', 'Repuesto 2', 'Repuesto 3'];
-  final List<String> _selectedServices = [];
-  final List<String> _selectedParts = [];
-
-  Future<void> _pickDate(BuildContext context) async {
+  Future<void> _selectDate(
+      BuildContext context, Map<String, dynamic> reparacion) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _selectedDate) {
-      _selectedDate = picked;
-      _dateController.text =
-          "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}";
-      (context as Element).markNeedsBuild();
+    if (picked != null && picked != reparacion['selectedDate']) {
+      reparacion['selectedDate'] = picked;
+      reparacionesNotifier.notifyListeners();
     }
   }
 
-  Future<void> _pickImages(BuildContext context) async {
-    final List<XFile>? pickedImages = await _picker.pickMultiImage();
-    if (pickedImages != null && pickedImages.length <= 3) {
-      _images = pickedImages;
-      (context as Element).markNeedsBuild();
-    } else {
-      // Manejo del caso en que se seleccionen más de 3 imágenes
+  Future<void> _pickImage(BuildContext context, Map<String, dynamic> reparacion,
+      String tipo) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      if (tipo == 'solicitud') {
+        reparacion['imagenSolicitud'] = pickedFile.path;
+      } else if (tipo == 'presupuesto') {
+        reparacion['imagenPresupuesto'] = pickedFile.path;
+      } else if (tipo == 'reparacion') {
+        reparacion['imagenReparacion'] = pickedFile.path;
+      }
+      reparacionesNotifier.notifyListeners();
     }
   }
 
-  Future<void> _pickInvoiceImage(BuildContext context) async {
-    final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      _invoiceImage = pickedImage;
-      (context as Element).markNeedsBuild();
-    }
+  void _agregarNuevaReparacion() {
+    final newReparacion = {
+      'selectedDate': null,
+      'selectedServicios': <String>[],
+      'necesitaRepuesto': false,
+      'selectedRepuestos': <String>[],
+      'observaciones': '',
+      'repuestoSolicitado': false,
+      'presupuestoRepuesto': '',
+      'comentarios': '',
+      'estado': 'Reparación',
+      'comentariosGenerales': '',
+    };
+    reparacionesNotifier.value = List.from(reparacionesNotifier.value)
+      ..add(newReparacion);
   }
 
-  void _saveEntry(BuildContext context) {
-    // Lógica para guardar la información del formulario
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Información guardada')));
-  }
+  void _guardarReparacion(
+      BuildContext context, Map<String, dynamic> reparacion) {
+    // Implementación para guardar la reparación
+    // Aquí puedes agregar la lógica para guardar la reparación en la base de datos o enviarla a un servidor
+    print('Reparación guardada: $reparacion');
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      margin: const EdgeInsets.all(8.0),
-      child: ExpansionTile(
-        backgroundColor: Colors.white,
-        title: const Text('Formulario de Reparación'),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                    labelText: 'Fecha',
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.calendar_today),
-                      onPressed: () => _pickDate(context),
-                    ),
-                  ),
-                  readOnly: true,
-                ),
-                const SizedBox(height: 10),
-                MultiSelectDialogField(
-                  items: _services
-                      .map((service) => MultiSelectItem(service, service))
-                      .toList(),
-                  title: const Text("Servicios realizados"),
-                  selectedColor: const Color(0xff051937),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(bottom: BorderSide(color: Colors.grey)),
-                  ),
-                  buttonIcon: const Icon(
-                    Icons.arrow_drop_down,
-                    color: Color(0xff051937),
-                  ),
-                  buttonText: const Text(
-                    "Seleccionar Servicios",
-                    style: TextStyle(
-                      color: Color(0xff051937),
-                      fontSize: 16,
-                    ),
-                  ),
-                  onConfirm: (results) {
-                    _selectedServices.clear();
-                    _selectedServices.addAll(List<String>.from(results));
-                    (context as Element).markNeedsBuild();
-                  },
-                ),
-                const SizedBox(height: 10),
-                MultiSelectDialogField(
-                  items: _parts
-                      .map((part) => MultiSelectItem(part, part))
-                      .toList(),
-                  title: const Text("Insumos utilizados"),
-                  selectedColor: const Color(0xff051937),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(bottom: BorderSide(color: Colors.grey)),
-                  ),
-                  buttonIcon: const Icon(
-                    Icons.arrow_drop_down,
-                    color: Color(0xff051937),
-                  ),
-                  buttonText: const Text(
-                    "Seleccionar Insumos",
-                    style: TextStyle(
-                      color: Color(0xff051937),
-                      fontSize: 16,
-                    ),
-                  ),
-                  onConfirm: (results) {
-                    _selectedParts.clear();
-                    _selectedParts.addAll(List<String>.from(results));
-                    (context as Element).markNeedsBuild();
-                  },
-                ),
-                const SizedBox(height: 10),
-                CheckboxListTile(
-                  title: const Text('¿Necesita repuesto?'),
-                  value: _needsReplacement,
-                  onChanged: (bool? value) {
-                    _needsReplacement = value!;
-                    (context as Element).markNeedsBuild();
-                  },
-                ),
-                if (_needsReplacement) ...[
-                  DropdownButtonFormField<String>(
-                    decoration: const InputDecoration(
-                      labelText: 'Seleccionar Repuesto',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: _repuestos
-                        .map((repuesto) => DropdownMenuItem<String>(
-                              value: repuesto,
-                              child: Text(repuesto),
-                            ))
-                        .toList(),
-                    onChanged: (String? newValue) {
-                      _selectedRepuesto = newValue;
-                      (context as Element).markNeedsBuild();
-                    },
-                    value: _selectedRepuesto,
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Estado del Repuesto: Solicitado',
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () => _pickInvoiceImage(context),
-                    label: const Text('Subir Factura',
-                        style: TextStyle(color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff051937),
-                    ),
-                    icon: const Icon(Icons.attach_file,
-                        size: 18, color: Colors.white),
-                  ),
-                  if (_invoiceImage != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Image.file(File(_invoiceImage!.path), height: 100),
-                    ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: _costController,
-                    decoration: const InputDecoration(
-                      labelText: 'Monto de Costo del Repuesto',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
-                const SizedBox(height: 10),
-                ElevatedButton.icon(
-                  onPressed: () => _pickImages(context),
-                  label: const Text('Cargar imágenes',
-                      style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff051937),
-                  ),
-                  icon: const Icon(Icons.camera_alt_rounded,
-                      size: 18, color: Colors.white),
-                ),
-                if (_images != null)
-                  Column(
-                    children: _images!.map((image) {
-                      return Image.file(File(image.path),
-                          width: 100, height: 100);
-                    }).toList(),
-                  ),
-                ElevatedButton.icon(
-                  onPressed: () => _saveEntry(context),
-                  label: const Text('Guardar',
-                      style: TextStyle(color: Colors.white)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff051937),
-                  ),
-                  icon: const Icon(Icons.check, size: 18, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    // Mostrar un toast al guardar la reparación
+    Fluttertoast.showToast(
+      msg: "Reparación guardada",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
     );
+  }
+
+  Color _getChipColor(String estado) {
+    switch (estado) {
+      case 'Solicitud de Repuesto':
+        return Colors.orange;
+      case 'No hay stock':
+        return Colors.red;
+      case 'Presupuesto de compra de repuesto':
+        return Colors.blue;
+      default:
+        return Colors.green;
+    }
   }
 }
