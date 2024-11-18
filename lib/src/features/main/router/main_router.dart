@@ -1,6 +1,5 @@
 
 import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,6 @@ class MainRouter {
     ];
     routes.addAll({
       TabsPage.route: (BuildContext context) => const TabsPage(),
-      ExpandableOptions.route: (BuildContext context) =>
-          const ExpandableOptions(),
       ProfileUser.route: (BuildContext context) => const ProfileUser(),
       TicketDetailPageView.route: (BuildContext context) =>
           TicketDetailPageView(),

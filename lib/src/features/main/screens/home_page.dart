@@ -1,7 +1,7 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/tab2_page.dart';
+import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import '../../../widgets/index.dart';
 

@@ -10,8 +10,6 @@ class LoginFormProvider extends ChangeNotifier {
   GlobalKey<FormState> formKey = new GlobalKey<FormState>();
 
   bool isValidForm(){
-
-    print(formKey.currentState?.validate());
     return formKey.currentState?.validate() ?? false;
   }
 

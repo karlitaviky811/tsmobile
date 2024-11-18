@@ -14,7 +14,13 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   String _name = 'Andrea Torres';
   String _email = 'andreat@gmail.com';
   String _phone = '+5804244984474';
-
+  final _nameController = TextEditingController(text: 'Andrea Torres');
+  final _emailController = TextEditingController(text: 'andreat@gmail.com');
+  final _addressController = TextEditingController(text: 'Agencia Valencia');
+  final _companyController =
+      TextEditingController(text: 'Martínez y asociados');
+  final _ubicationController = TextEditingController(text: 'Agencia Valencia');
+  final _phoneController = TextEditingController(text: '+5804244984474');
   void _updateProfile() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
@@ -29,9 +35,9 @@ class _EditProfileWidgetState extends State<ProfileUser> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-         title: Text('Perfil', style: AppStyle.txtPoppinsRegular18Black),
+        title: Text('Perfil', style: AppStyle.txtPoppinsRegular18Black),
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios_new),
             onPressed: () {
               Navigator.pop(context);
             }),
@@ -46,24 +52,23 @@ class _EditProfileWidgetState extends State<ProfileUser> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  child: Text('Hola, Andrea',
-                      style: AppStyle.txtPoppinsRegular18Black),
+                Text('Hola, Andrea', style: AppStyle.txtPoppinsRegular18Black),
+                const SizedBox(
+                  height: 30,
                 ),
-                SizedBox(height: 30,),
                 Form(
-            
                   key: _formKey,
                   child: Column(
                     children: <Widget>[
                       Container(
                         child: Text(
                           'Información de la cuenta',
-                          style:
-                            AppStyle.txtPoppinsRegular18Black,
+                          style: AppStyle.txtPoppinsRegular18Black,
                         ),
                       ),
+                      SizedBox(height: 20,),
                       TextFormField(
+                        controller: _nameController,
                         decoration: const InputDecoration(
                           labelText: 'Nombre',
                           prefixIcon: Icon(Icons.person),
@@ -77,6 +82,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         },
                       ),
                       TextFormField(
+                        controller: _emailController,
                         decoration: const InputDecoration(
                           labelText: 'Email',
                           prefixIcon: Icon(Icons.email),
@@ -90,6 +96,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         },
                       ),
                       TextFormField(
+                        controller: _addressController,
                         decoration: const InputDecoration(
                           labelText: 'Dirección',
                           prefixIcon: Icon(Icons.room),
@@ -103,6 +110,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         },
                       ),
                       TextFormField(
+                        controller: _companyController,
                         decoration: const InputDecoration(
                           labelText: 'Empresa',
                           prefixIcon: Icon(Icons.apartment_sharp),
@@ -116,6 +124,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         },
                       ),
                       TextFormField(
+                        controller: _ubicationController,
                         decoration: const InputDecoration(
                           labelText: 'Sucursal',
                           prefixIcon: Icon(Icons.email),
@@ -129,6 +138,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         },
                       ),
                       TextFormField(
+                        controller: _phoneController,
                         decoration: const InputDecoration(
                           labelText: 'Teléfono',
                           prefixIcon: Icon(Icons.phone),
@@ -141,10 +151,20 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
+                      const SizedBox(height: 80),
+                      ElevatedButton.icon(
                         onPressed: _updateProfile,
-                        child: const Text('Guardar'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff051937),
+                          minimumSize: const Size(150, 50), // Tamaño del botón
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+                        ),
+                        label: const Text(
+                          'Guardar',
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ],
                   ),
@@ -157,4 +177,3 @@ class _EditProfileWidgetState extends State<ProfileUser> {
     );
   }
 }
-

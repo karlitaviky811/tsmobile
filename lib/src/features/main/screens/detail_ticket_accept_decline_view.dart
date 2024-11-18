@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
+import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 
 class TicketDetailPageView extends StatefulWidget {
   static const String route = 'detail-view-ticket-route';
@@ -23,37 +24,34 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   ];
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-             backgroundColor: Color(0xffF3F5FD),
+        backgroundColor: Color(0xffF3F5FD),
         title: Text(
           'Detalle del Ticket',
           style: AppStyle.txtPoppinsRegular18Black,
         ),
       ),
       body: Container(
-
         color: Colors.white,
         child: Stack(children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                TicketDetails(
-                      status: 'new',
-                      title: 'Reparación de Aire Acondicionado',
-                      description:
-                          'El aire acondicionado no enfría adecuadamente.',
-                      ticketType: 'Reparación',
-                      product: 'Aire Acondicionado',
-                      scheduledDate: '2024-11-15',
-                      customerLocation: 'Caracas, Venezuela',
-                      customerName: 'Juan Pérez',
-                    ),
-                const SizedBox(height: 30),
+                TicketDetailCard(
+                  headerTitle: 'Detalle de ticket',
+                  code: 'TICKET12345',
+                  clientName: 'Juan Pérez',
+                  status: 'En Proceso',
+                  type: 'Reparación',
+                  creationDate: '2024-11-18',
+                  title: 'Reparación del Aire Acondicionado',
+                  description:
+                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                ),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -102,9 +100,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   Widget buildAcceptedForm() {
     return SingleChildScrollView(
       child: Container(
-        
         child: Column(
-             
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text('Programar visita ticket aceptado:',
@@ -115,11 +111,12 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                 ),
                 style: AppStyle.txtPoppinsRegular14Black),
             TextFormField(
-                decoration: const InputDecoration(labelText: 'Notas adicionales'),
+                decoration:
+                    const InputDecoration(labelText: 'Notas adicionales'),
                 style: AppStyle.txtPoppinsRegular14Black),
             const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: Icon(Icons.save ,size: 18, color: Colors.white),
+            ElevatedButton.icon(
+              icon: Icon(Icons.save, size: 18, color: Colors.white),
               onPressed: () {
                 // Lógica para guardar los detalles del ticket aceptado
               },
@@ -163,7 +160,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
             height: 20,
           ),
           ElevatedButton.icon(
-                icon: Icon(Icons.save ,size: 18, color: Colors.white),
+            icon: Icon(Icons.save, size: 18, color: Colors.white),
             onPressed: () {
               // Lógica para guardar los detalles del ticket aceptado
             },
@@ -182,7 +179,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
 Widget getStatusChip(String status) {
   Color color;
   String text;
-  Color colorIcon;
+  //Color colorIcon;
 
   switch (status) {
     case 'pending':
@@ -218,7 +215,7 @@ Widget getStatusChip(String status) {
           fontFamily: 'Poppins'),
     ),
     avatar: const Icon(
-           Icons.sell, color: Colors.black, // Color del ícono
+      Icons.sell, color: Colors.black, // Color del ícono
     ),
     shadowColor: Colors.grey[350],
     backgroundColor: color,

@@ -11,6 +11,7 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/widgets/diagnostic_log_ticket.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
+import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
   final Ticket ticket;
@@ -60,9 +61,15 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                 style: AppStyle.txtPoppinsRegular18Black),
             bottom: const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.directions_car)),
-                Tab(icon: Icon(Icons.directions_transit)),
-                Tab(icon: Icon(Icons.directions_bike)),
+                Tab(
+                  text: 'General',
+                ),
+                Tab(
+                  text: 'Evaluación',
+                ),
+                Tab(
+                  text: 'Reparación',
+                ),
               ],
             ),
           ),
@@ -131,15 +138,29 @@ class _TicketDetailProgress extends StatelessWidget {
         Expanded(
           child: ListView(
             children: [
-              TicketDetails(
-                status: 'in_progress',
-                title: 'Reparación de Aire Acondicionado',
-                description: 'El aire acondicionado no enfría adecuadamente.',
-                ticketType: 'Reparación',
-                product: 'Aire Acondicionado',
-                scheduledDate: '2024-11-15',
-                customerLocation: 'Caracas, Venezuela',
-                customerName: 'Juan Pérez',
+              
+              TicketDetailCard(
+                headerTitle: 'Ticket de Servicio',
+                code: 'TICKET12345',
+                clientName: 'Juan Pérez',
+                status: 'En Proceso',
+                type: 'Reparación',
+                creationDate: '2024-11-18',
+                title: 'Reparación del Aire Acondicionado',
+                description:
+                    'El aire acondicionado no enfría adecuadamente y hace ruido.',
+              ),
+              const SizedBox(height: 20,),
+               TicketDetailCard(
+                headerTitle: 'Dirección del cliente',
+                code: 'TICKET12345',
+                clientName: 'Juan Pérez',
+                status: 'En Proceso',
+                type: 'Reparación',
+                creationDate: '2024-11-18',
+                title: 'Reparación del Aire Acondicionado',
+                description:
+                    'El aire acondicionado no enfría adecuadamente y hace ruido.',
               ),
               // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
             ],
@@ -180,7 +201,7 @@ class _RepaisLogForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepairLogForm();
+    return const RepairLogForm();
   }
 }
 
@@ -324,7 +345,7 @@ class RepairLogForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RepairLogFormContent();
+    return const RepairLogFormContent();
   }
 }
 
@@ -346,7 +367,7 @@ class _RepairLogFormContentState extends State<RepairLogFormContent> {
 
   void _addRepairEntry() {
     setState(() {
-      _repairEntries.add(RepairEntryForm());
+      _repairEntries.add(const RepairEntryForm());
     });
   }
 

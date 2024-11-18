@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/widgets/CustomElevatedButton.dart';
 import '../core/theme/app.styles.dart';
 
 class CardPreviewCourt extends StatelessWidget {
@@ -86,13 +85,13 @@ class _CardPreviewCourtToday extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return const Row(
       children: [
-        const Icon(
+        Icon(
           Icons.calendar_today,
           size: 13,
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
        
       ],
     );
@@ -114,7 +113,7 @@ class _CardPrevieCourtImage extends StatelessWidget {
         width: double.infinity,
         height: 100,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.contain),
         ),
       ),
