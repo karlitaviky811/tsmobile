@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/accept_decline_ticket.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 
 import '../core/theme/app.styles.dart';
 
-class ReservationItem extends StatelessWidget {
-  const ReservationItem({super.key});
+class ReservationItemElement extends StatelessWidget {
+  const ReservationItemElement({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,37 +18,24 @@ class ReservationItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const _CardScheduledReservationtImage(
-            image: 'assets/images/icon_soporte_dos.png',
+             image: 'assets/images/icon_soporte_dos.png',
           ),
           const SizedBox(width: 8),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
-              Row(
-          
-               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Aire no enfría',
-                    style: AppStyle.txtPoppinsSemiBold16Black,
-                  ),
-                    const SizedBox(width: 80),
-                  /* const Icon(
-                        Icons.edit,
-                        textDirection: TextDirection.ltr,
-                        size: 20,
-                      ),*/
-                ],
+              Text(
+                'Aire no enfría',
+                style: AppStyle.txtPoppinsSemiBold16Black,
               ),
               const SizedBox(height: 6),
               const _CardScheduledReservationToday(),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
-                  Text('Andrea Gómez',
-                      style: AppStyle.txtPoppinsRegular12Black)
+                  Text('Cliente: ',
+                      style: AppStyle.txtPoppinsRegular12Black),
+                  Text('Andrea Gómez', style: AppStyle.txtPoppinsRegular12Black)
                 ],
               ),
               const SizedBox(height: 10),
@@ -72,11 +57,11 @@ class ReservationItem extends StatelessWidget {
                     Icons.location_on_outlined,
                     size: 12,
                   ),
-                  Text('Vía Av. Caracas y Av. P.º Caroni',
-                      style: AppStyle.txtPoppinsRegular12Black),
+                  Text('Vía Av. Caracas y Av. P.º Caroni', style: AppStyle.txtPoppinsRegular12Black),
+                  const Text(' | '),
+                  Text('50', style: AppStyle.txtPoppinsRegular12Black),
                 ],
-              ),
-              //TicketDetailPage()
+              )
             ],
           ),
         ],
@@ -86,7 +71,9 @@ class ReservationItem extends StatelessWidget {
 }
 
 class _CardScheduledReservationToday extends StatelessWidget {
-  const _CardScheduledReservationToday();
+  const _CardScheduledReservationToday({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +95,7 @@ class _CardScheduledReservationToday extends StatelessWidget {
 
 class _CardScheduledReservationtImage extends StatelessWidget {
   const _CardScheduledReservationtImage({
+    super.key,
     required this.image,
   });
 
@@ -119,9 +107,8 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xffEEEFF1)),
+          border: Border.all(color: Color(0xffEEEFF1)),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.cover)),
     );
   }

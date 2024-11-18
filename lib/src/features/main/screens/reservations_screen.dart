@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tab1_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/utils/size.utils.dart';
 import '../../../widgets/index.dart';
+// import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
 
 class ReservationsScreenCLient extends StatefulWidget {
   static const String route = 'technician-route';
@@ -95,7 +95,7 @@ class _FilteredListScreenState extends State<ReservationsScreenCLient> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xffEEEFF1)),
                           ),
-                          child: const ReservationItem(),
+                          child:  ReservationItemElement(),
                         ),
                         if (index < items.length - 1)
                           const SizedBox(
