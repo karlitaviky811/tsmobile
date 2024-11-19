@@ -24,66 +24,68 @@ class DiagnosticForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text(
-                'Diagnóstico',
-                textAlign: TextAlign.left,
-              style: AppStyle.txtPoppinsMedium18Black,
-              ),
-              TextField(
-                controller: _dateController,
-                decoration: InputDecoration(
-                  labelText: 'Fecha',
-                  prefixIcon: IconButton(
-                    icon: const Icon(Icons.calendar_today),
-                    onPressed: () => _pickDate(context),
-                  ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Text(
+                  'Diagnóstico',
+                  textAlign: TextAlign.left,
+                style: AppStyle.txtPoppinsMedium18Black,
                 ),
-                readOnly: true,
-              ),
-              TextField(
-                controller: _observationsController,
-                decoration: const InputDecoration(labelText: 'Observaciones'),
-              ),
-              TextField(
-                controller: _commentsController,
-                decoration: const InputDecoration(labelText: 'Comentarios'),
-              ),
-
-
-               const SizedBox(
-          height: 30,
-        ),
-        ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xff051937),
+                TextField(
+                  controller: _dateController,
+                  decoration: InputDecoration(
+                    labelText: 'Fecha',
+                    prefixIcon: IconButton(
+                      icon: const Icon(Icons.calendar_today),
+                      onPressed: () => _pickDate(context),
+                    ),
+                  ),
+                  readOnly: true,
+                ),
+                TextField(
+                  controller: _observationsController,
+                  decoration: const InputDecoration(labelText: 'Observaciones'),
+                ),
+                TextField(
+                  controller: _commentsController,
+                  decoration: const InputDecoration(labelText: 'Comentarios'),
+                ),
+      
+      
+                 const SizedBox(
+            height: 30,
           ),
-          icon: const Icon(Icons.save, size: 18, color: Colors.white),
-          onPressed: () {
-            final DateTime? selectedDate =
-                DateTime.tryParse(_dateController.text);
-            onSave(selectedDate, _observationsController.text,
-                _commentsController.text);
-          },
-          label: const Text(
-            'Guardar Información',
-            style: TextStyle(color: Colors.white),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff051937),
+            ),
+            icon: const Icon(Icons.save, size: 18, color: Colors.white),
+            onPressed: () {
+              final DateTime? selectedDate =
+                  DateTime.tryParse(_dateController.text);
+              onSave(selectedDate, _observationsController.text,
+                  _commentsController.text);
+            },
+            label: const Text(
+              'Guardar Información',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
-        ),
-        const SizedBox(
-          height: 20,
-        )
-            ],
+          const SizedBox(
+            height: 20,
+          )
+              ],
+            ),
           ),
-        ),
-       
-      ],
+         
+        ],
+      ),
     );
   }
 }

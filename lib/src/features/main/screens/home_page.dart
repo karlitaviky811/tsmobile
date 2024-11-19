@@ -152,12 +152,13 @@ class _ListCourt extends StatelessWidget {
               Colors.lightBlue.shade200
             ],
             onTap: () {
-              Navigator.push(
+              
+                Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) =>
-                        TicketAcceptedProgressDetailPage(ticket: tickets[0])),
-              );
+                        const TicketsListFiltered(),
+              ));
             },
           ),
           const SizedBox(width: 20),
@@ -169,7 +170,12 @@ class _ListCourt extends StatelessWidget {
             image: 'assets/images/court1.png',
             gradientColors: [Colors.blue.shade100, Colors.blue.shade200],
             onTap: () {
-              Navigator.pushNamed(context, TicketsListFiltered.route);
+               Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        const TicketsListFiltered(),
+              ));
             },
           ),
           const SizedBox(width: 20),
@@ -195,6 +201,16 @@ class _ListScheduleReservationItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+       final List<Ticket> tickets = [
+      Ticket(
+          id: '1',
+          title: 'Problema con la conexión',
+          description: 'No puedo conectar a internet.'),
+      Ticket(
+          id: '2',
+          title: 'Error en la aplicación',
+          description: 'La aplicación se cierra inesperadamente.'),
+    ];
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -202,11 +218,12 @@ class _ListScheduleReservationItems extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const TicketsListFiltered()),
-            )
+          Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        TicketAcceptedProgressDetailPage(ticket: tickets[0])),
+              )
           },
           child: ReservationItem(
             title: 'Título del Ticket $index',

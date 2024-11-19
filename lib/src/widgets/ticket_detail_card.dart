@@ -30,7 +30,8 @@ class TicketDetailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(headerTitle, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(headerTitle,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 16),
             _buildDetailRow('Código:', code),
             _buildDetailRow('Cliente:', clientName),
@@ -51,7 +52,8 @@ class TicketDetailCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('$label ',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
         ],
       ),
@@ -62,67 +64,60 @@ class TicketDetailCard extends StatelessWidget {
     Color statusColor;
     switch (status) {
       case 'Creada':
-        statusColor = Colors.blue.shade100;
+        statusColor = const Color.fromARGB(255, 49, 145, 224);
+        break;
+      case 'Nuevo':
+        statusColor = const Color.fromARGB(108, 224, 49, 131);
         break;
       case 'Aprobada':
-        statusColor = Colors.green.shade100;
+        statusColor = const Color.fromARGB(188, 138, 140, 233);
         break;
-      case 'En proceso':
-        statusColor = Colors.orange.shade100;
+      case 'En Proceso':
+        statusColor = const Color.fromARGB(150, 230, 107, 36);
         break;
       case 'Resuelto':
-        statusColor = Colors.purple.shade100;
+        statusColor = const Color.fromARGB(143, 80, 37, 87);
         break;
       case 'Cerrado':
-        statusColor = Colors.red.shade100;
+        statusColor = const Color.fromARGB(148, 21, 201, 147);
         break;
       default:
         statusColor = Colors.grey.shade100;
+    }
+
+    IconData _getChipIcon(String estado) {
+      switch (estado) {
+        case 'Creada':
+          return Icons.create;
+        case 'Aprobada':
+          return Icons.check_circle;
+        case 'En proceso':
+          return Icons.work;
+        case 'Resuelto':
+          return Icons.done;
+        case 'Cerrado':
+          return Icons.close;
+        default:
+          return Icons.info;
+      }
     }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text('$label ',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Chip(
             label: Text(status),
             backgroundColor: statusColor,
+            avatar: Icon(
+              _getChipIcon(status),
+              color: Colors.white,
+            ),
+            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(25.0), side: BorderSide(color: Colors.transparent)),
           ),
         ],
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Detalle del Ticket',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Detalle del Ticket'),
-        ),
-        body: Center(
-          child: TicketDetailCard(
-            headerTitle: 'Información del Ticket',
-            code: 'TICKET12345',
-            clientName: 'Juan Pérez',
-            status: 'En proceso',
-            type: 'Reparación',
-            creationDate: '2024-11-18',
-            title: 'Reparación del Aire Acondicionado',
-            description: 'El aire acondicionado no enfría adecuadamente y hace ruido.',
-          ),
-        ),
       ),
     );
   }

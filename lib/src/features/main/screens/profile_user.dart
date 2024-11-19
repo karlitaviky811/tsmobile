@@ -43,8 +43,12 @@ class _EditProfileWidgetState extends State<ProfileUser> {
             }),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          elevation: 20,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
           color: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -66,7 +70,9 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                           style: AppStyle.txtPoppinsRegular18Black,
                         ),
                       ),
-                      SizedBox(height: 20,),
+                      SizedBox(
+                        height: 20,
+                      ),
                       TextFormField(
                         controller: _nameController,
                         decoration: const InputDecoration(

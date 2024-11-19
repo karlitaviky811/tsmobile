@@ -3,4 +3,3 @@ export 'package:tsmobile/src/widgets/auth_backgorund.dart';
 export 'package:tsmobile/src/widgets/card_preview_list.dart';
 export 'package:tsmobile/src/widgets/cardScheduledReservation.dart';
 export 'package:tsmobile/src/widgets/custom_elevated_button.dart';
-export 'package:tsmobile/src/widgets/reservation_item.dart';

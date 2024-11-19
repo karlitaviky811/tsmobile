@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
+import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 
 class TicketDetailPageView extends StatefulWidget {
@@ -40,17 +41,19 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                TicketDetailCard(
-                  headerTitle: 'Detalle de ticket',
-                  code: 'TICKET12345',
-                  clientName: 'Juan Pérez',
-                  status: 'En Proceso',
-                  type: 'Reparación',
-                  creationDate: '2024-11-18',
-                  title: 'Reparación del Aire Acondicionado',
-                  description:
-                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                ),
+                Center(
+                    child: NewTicketDetailCard(
+                        code: 'TICKET12345',
+                        clientName: 'Juan Pérez',
+                        status: 'En proceso',
+                        type: 'Reparación',
+                        title: 'Reparación del Aire Acondicionado',
+                        description:
+                            'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                              creationDateTime: DateTime.now(),
+                        location: 'Caracas, Venezuela',
+                        product: 'Aire Acondicionado',
+                        brand: 'Hyundai')),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

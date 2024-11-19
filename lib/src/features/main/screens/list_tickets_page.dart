@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/widgets/reservation_item.dart';
 import '../../../widgets/index.dart';
 // import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
 
@@ -46,7 +47,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
           style: AppStyle.txtPoppinsRegular18Black,
         ),
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back_ios_new),
             onPressed: () {
               Navigator.push(
                 context,

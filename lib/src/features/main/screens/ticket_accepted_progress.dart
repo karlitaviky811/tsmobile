@@ -9,9 +9,12 @@ import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'package:tsmobile/src/interfaces/ticket.dart';
-import 'package:tsmobile/src/widgets/diagnostic_log_ticket.dart';
+import 'package:tsmobile/src/widgets/cliente_direccion_card.dart';
+
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
+
+import '../../../widgets/diagnostic_log_ticket.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
   final Ticket ticket;
@@ -31,6 +34,54 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> reparaciones = [
+      // Ejemplo de datos iniciales provenientes del backend
+      {
+        'titulo': 'Cambio de pantalla',
+        'estado': 'Solicitud de Repuesto',
+        'selectedDate': DateTime.now(),
+        'selectedServicios': ['Revisión general'],
+        'necesitaRepuesto': true,
+        'selectedRepuestos': ['Pantalla'],
+        'presupuestoRepuesto': '',
+        'comentarios': '',
+        'imagenSolicitud': '',
+        'imagenPresupuesto': '',
+        'imagenReparacion': '',
+        'comentariosGenerales': '',
+        'presupuestoAceptado': false,
+        'nombreRepuesto': '',
+        'precioRepuesto': '',
+        'repuestoSolicitado': false,
+        'estadoCompraRepuesto': 'Enviada',
+      }
+    ];
+
+    void _agregarNuevaReparacion() {
+      setState(() {
+        reparaciones.add({
+          'titulo': '',
+          'estado': 'Solicitud de Repuesto',
+          'selectedDate': null,
+          'selectedServicios': <String>[],
+          'necesitaRepuesto': false,
+          'selectedRepuestos': <String>[],
+          'presupuestoRepuesto': '',
+          'comentarios': '',
+          'imagenSolicitud': '',
+          'imagenPresupuesto': '',
+          'imagenReparacion': '',
+          'comentariosGenerales': '',
+          'presupuestoAceptado': false,
+          'nombreRepuesto': '',
+          'precioRepuesto': '',
+          'repuestoSolicitado': false,
+          'estadoCompraRepuesto': 'Enviada',
+        });
+      });
+    }
+
+    final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -75,8 +126,14 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         body: TabBarView(
           children: [
             const _TicketDetailProgress(),
-            const _DiagnosticForm(),
-            RepairLogFormData(),
+            DiagnosticForm(
+              onSave: (DateTime? date, String observations, String comments) {
+                print('Fecha: $date');
+                print('Observaciones: $observations');
+                print('Comentarios: $comments');
+              },
+            ),
+            RepairLogFormData(initialReparaciones: reparaciones),
           ],
         ),
       ),
@@ -129,261 +186,47 @@ class _TicketDetailProgress extends StatelessWidget {
     super.key,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView(
-            children: [
-              
-              TicketDetailCard(
-                headerTitle: 'Ticket de Servicio',
-                code: 'TICKET12345',
-                clientName: 'Juan Pérez',
-                status: 'En Proceso',
-                type: 'Reparación',
-                creationDate: '2024-11-18',
-                title: 'Reparación del Aire Acondicionado',
-                description:
-                    'El aire acondicionado no enfría adecuadamente y hace ruido.',
-              ),
-              const SizedBox(height: 20,),
-               TicketDetailCard(
-                headerTitle: 'Dirección del cliente',
-                code: 'TICKET12345',
-                clientName: 'Juan Pérez',
-                status: 'En Proceso',
-                type: 'Reparación',
-                creationDate: '2024-11-18',
-                title: 'Reparación del Aire Acondicionado',
-                description:
-                    'El aire acondicionado no enfría adecuadamente y hace ruido.',
-              ),
-              // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DiagnosticForm extends StatelessWidget {
-  const _DiagnosticForm({
-    super.key,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        DiagnosticForm(
-          onSave: (selectedDate, observations, comments) {
-            // Lógica para guardar los datos del formulario
-            print('Fecha: $selectedDate');
-            print('Observaciones: $observations');
-            print('Comentarios: $comments');
-          },
-        ),
-        const SizedBox(height: 20.0),
-      ],
-    );
-  }
-}
 
-class _RepaisLogForm extends StatelessWidget {
-  const _RepaisLogForm({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const RepairLogForm();
-  }
-}
-
-class _detailTicketInfo extends StatelessWidget {
-  const _detailTicketInfo({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'ID del Ticket: ',
-                      style: AppStyle.txtPoppinsBold18Black,
-                    ),
-                    Text(
-                      '#12345',
-                      style: AppStyle.txtPoppinsRegular14BlueDaka,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                getStatusChip('in_progress'),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  'Fecha: ',
-                  style: AppStyle.txtPoppinsBold18Black,
-                ),
-                Text(
-                  '11/10/2024',
-                  style: AppStyle.txtPoppinsRegular18Black,
-                ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('Tipo: ', style: AppStyle.txtPoppinsBold18Black),
-              const SizedBox(height: 10),
-              Text('Reparación', style: AppStyle.txtPoppinsRegular18Black),
-            ]),
-        const SizedBox(height: 10),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('Título:  ', style: AppStyle.txtPoppinsBold18Black),
-              const SizedBox(height: 10),
-              Text('Problema con el software.',
-                  style: AppStyle.txtPoppinsRegular18Black),
-            ]),
-        const SizedBox(height: 10),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text('Producto:  ', style: AppStyle.txtPoppinsBold18Black),
-              const SizedBox(height: 10),
-              Text('REFRIGERADOR 19 PIE TF  ...',
-                  style: AppStyle.txtPoppinsRegular18Black),
-            ]),
-        const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text('Descripción:  ', style: AppStyle.txtPoppinsBold18Black),
-            const SizedBox(height: 10),
-            Text('Problema con el software.',
-                style: AppStyle.txtPoppinsRegular18Black),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          children: [
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(Icons.location_on_outlined),
-                const SizedBox(width: 4),
-                Text('Vía Av. Caracas y Av. P.º Caroni',
-                    style: AppStyle.txtPoppinsRegular18Black)
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            const Icon(Icons.account_circle),
-            const SizedBox(width: 4),
-            Text(
-              'Andrea Suarez',
-              style: AppStyle.txtPoppinsRegular18Black,
-            )
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            const Icon(Icons.lock_clock),
-            const SizedBox(width: 4),
-            Text(
-              'Visita: ',
-              style: AppStyle.txtPoppinsRegular18Black,
-            ),
-            Text(
-              '15/11/2024 - 5:30pm ',
-              style: AppStyle.txtPoppinsRegular18Black,
-            )
-          ],
-        ),
-        const SizedBox(height: 30),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-}
-
-class RepairLogForm extends StatelessWidget {
-  const RepairLogForm({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const RepairLogFormContent();
-  }
-}
-
-class RepairLogFormContent extends StatefulWidget {
-  const RepairLogFormContent({super.key});
-
-  @override
-  _RepairLogFormContentState createState() => _RepairLogFormContentState();
-}
-
-class _RepairLogFormContentState extends State<RepairLogFormContent> {
-  List<Widget> _repairEntries = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _addRepairEntry();
-  }
-
-  void _addRepairEntry() {
-    setState(() {
-      _repairEntries.add(const RepairEntryForm());
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
+      final String initialLocation = 'Calle 123, Ciudad, País';
+    return Container(
+      color: Colors.white,
       child: Column(
         children: [
-          ..._repairEntries,
-          ElevatedButton.icon(
-            onPressed: _addRepairEntry,
-            label: const Text('Añadir nueva entrada'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff051937),
-
-              // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+          Expanded(
+            child: ListView(
+              children: [
+                TicketDetailCard(
+                  headerTitle: 'Ticket de Servicio',
+                  code: 'TICKET12345',
+                  clientName: 'Juan Pérez',
+                  status: 'En Proceso',
+                  type: 'Reparación',
+                  creationDate: '2024-11-18',
+                  title: 'Reparación del Aire Acondicionado',
+                  description:
+                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                TicketDetailCard(
+                  headerTitle: 'Dirección del cliente',
+                  code: 'TICKET12345',
+                  clientName: 'Juan Pérez',
+                  status: 'En Proceso',
+                  type: 'Reparación',
+                  creationDate: '2024-11-18',
+                  title: 'Reparación del Aire Acondicionado',
+                  description:
+                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                ),
+                LocationHandler(initialLocation: initialLocation)
+                // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
+              ],
             ),
-            icon: const Icon(Icons.save, size: 18, color: Colors.white),
           ),
         ],
       ),
@@ -391,151 +234,50 @@ class _RepairLogFormContentState extends State<RepairLogFormContent> {
   }
 }
 
-class RepairEntryForm extends StatefulWidget {
-  const RepairEntryForm({super.key});
+
+
+
+
+class LocationHandler extends StatefulWidget {
+  final String initialLocation;
+
+  LocationHandler({required this.initialLocation});
 
   @override
-  _RepairEntryFormState createState() => _RepairEntryFormState();
+  _LocationHandlerState createState() => _LocationHandlerState();
 }
 
-class _RepairEntryFormState extends State<RepairEntryForm> {
-  DateTime? _selectedDate;
-  final List<String> _services = ['Servicio 1', 'Servicio 2', 'Servicio 3'];
-  final List<String> _parts = ['Insumo 1', 'Insumo 2', 'Insumo 3'];
-  final List<String> _selectedServices = [];
-  final List<String> _selectedParts = [];
-  bool _needsReplacement = false;
-  final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _replacementController = TextEditingController();
-  final ImagePicker _picker = ImagePicker();
-  List<XFile>? _images;
+class _LocationHandlerState extends State<LocationHandler> {
+  late String location;
 
-  Future<void> _pickDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        _dateController.text =
-            "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}";
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    location = widget.initialLocation;
   }
 
-  Future<void> _pickImages() async {
-    final List<XFile>? pickedImages = await _picker.pickMultiImage();
-    if (pickedImages != null && pickedImages.length <= 3) {
-      setState(() {
-        _images = pickedImages;
-      });
-    } else {
-      // Manejo del caso en que se seleccionen más de 3 imágenes
-    }
+  void _updateLocation(String newLocation) {
+    setState(() {
+      location = newLocation;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextField(
-            controller: _dateController,
-            decoration: InputDecoration(
-              labelText: 'Fecha',
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.calendar_today),
-                onPressed: () => _pickDate(context),
-              ),
-            ),
-            readOnly: true,
-          ),
-        ),
-        MultiSelectDialogField(
-          items: _services
-              .map((service) => MultiSelectItem(service, service))
-              .toList(),
-          title: const Text("Servicios realizados"),
-          selectedColor: const Color(0xff051937),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.transparent, width: 1),
-          ),
-          buttonIcon: const Icon(
-            Icons.arrow_drop_down,
-            color: Colors.deepPurple,
-          ),
-          buttonText: const Text(
-            "Seleccionar Servicios",
-            style: TextStyle(
-              color: Color(0xff051937),
-              fontSize: 16,
-            ),
-          ),
-          onConfirm: (results) {
-            setState(() {
-              _selectedServices.clear();
-              _selectedServices.addAll(List<String>.from(results));
-            });
-          },
-        ),
-        MultiSelectDialogField(
-          items: _parts.map((part) => MultiSelectItem(part, part)).toList(),
-          title: const Text("Insumos utilizados"),
-          selectedColor: const Color(0xff051937),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.transparent, width: 1),
-          ),
-          buttonIcon: const Icon(
-            Icons.arrow_drop_down,
-            color: Colors.deepPurple,
-          ),
-          buttonText: const Text(
-            "Seleccionar Insumos",
-            style: TextStyle(
-              color: Color(0xff051937),
-              fontSize: 16,
-            ),
-          ),
-          onConfirm: (results) {
-            setState(() {
-              _selectedParts.clear();
-              _selectedParts.addAll(List<String>.from(results));
-            });
-          },
-        ),
-        CheckboxListTile(
-          title: const Text('¿Necesita repuesto?'),
-          value: _needsReplacement,
-          onChanged: (bool? value) {
-            setState(() {
-              _needsReplacement = value!;
-            });
-          },
-        ),
-        if (_needsReplacement)
-          TextField(
-            controller: _replacementController,
-            decoration:
-                const InputDecoration(labelText: 'Detalle del repuesto'),
-          ),
-        if (_needsReplacement)
-          ElevatedButton(
-            onPressed: _pickImages,
-            child: const Text('Cargar imágenes'),
-          ),
-        if (_needsReplacement && _images != null)
-          Column(
-            children: _images!.map((image) {
-              return Image.file(File(image.path), width: 100, height: 100);
-            }).toList(),
-          ),
-        const Divider(),
-      ],
+    return Center(
+      child: EditTicketDetailCard(
+        code: 'TICKET12345',
+        clientName: 'Juan Pérez',
+        status: 'Creada',
+        type: 'Reparación',
+        title: 'Problema con el aire acondicionado',
+        description: 'El aire acondicionado no enfría adecuadamente.',
+        location: location,
+        product: 'Aire acondicionado',
+        brand: 'Samsung',
+        creationDateTime: DateTime.now(),
+        onLocationChanged: _updateLocation,
+      ),
     );
   }
 }
