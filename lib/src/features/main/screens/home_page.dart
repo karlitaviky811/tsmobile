@@ -3,6 +3,7 @@ import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
+import 'package:tsmobile/src/interfaces/ticket.dart';
 import '../../../widgets/index.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -125,6 +126,17 @@ class _ListCourt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<Ticket> tickets = [
+      Ticket(
+          id: '1',
+          title: 'Problema con la conexión',
+          description: 'No puedo conectar a internet.'),
+      Ticket(
+          id: '2',
+          title: 'Error en la aplicación',
+          description: 'La aplicación se cierra inesperadamente.'),
+    ];
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -140,8 +152,12 @@ class _ListCourt extends StatelessWidget {
               Colors.lightBlue.shade200
             ],
             onTap: () {
-              Navigator.pushNamed(
-                  context, TicketAcceptedProgressDetailPage.route);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        TicketAcceptedProgressDetailPage(ticket: tickets[0])),
+              );
             },
           ),
           const SizedBox(width: 20),
@@ -222,7 +238,9 @@ class ReservationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: const Image(image: AssetImage('assets/images/car-repair.png')), // Ícono de herramientas
+      leading: const Image(
+          image: AssetImage(
+              'assets/images/car-repair.png')), // Ícono de herramientas
       title: Text(title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,8 +262,8 @@ class ReservationItem extends StatelessWidget {
           Text(description),
         ],
       ),
-      trailing:
-          const Icon(Icons.edit, color: Colors.grey), // Ícono de lápiz para editar
+      trailing: const Icon(Icons.edit,
+          color: Colors.grey), // Ícono de lápiz para editar
     );
   }
 }

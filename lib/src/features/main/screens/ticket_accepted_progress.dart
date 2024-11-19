@@ -31,55 +31,53 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          floatingActionButton: FloatingActionButton(
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChatScreen()),
+            );
+          },
+          child: const Icon(
+            Icons.chat_rounded,
+            color: Colors.blueAccent,
+          ),
+          backgroundColor: Colors.white,
+        ),
+        appBar: AppBar(
+          /*leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ChatScreen()),
-              );
+              Navigator.pop(context);
             },
-            // ignore: sort_child_properties_last
-            child: const Icon(
-              Icons.chat_rounded,
-              color: Colors.blueAccent,
-            ),
-            backgroundColor: Colors.white,
-          ),
-          appBar: AppBar(
-            leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                }),
-            backgroundColor: const Color(0xffF3F5FD),
-            title: Text('Detalles del Ticket',
-                style: AppStyle.txtPoppinsRegular18Black),
-            bottom: const TabBar(
-              tabs: [
-                Tab(
-                  text: 'General',
-                ),
-                Tab(
-                  text: 'Evaluación',
-                ),
-                Tab(
-                  text: 'Reparación',
-                ),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              const _TicketDetailProgress(),
-              const _DiagnosticForm(),
-              RepairLogFormData(),
+          ),*/
+          backgroundColor: const Color(0xffF3F5FD),
+          title: Text('Detalles del Ticket',
+              style: TextStyle(
+                  fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
+          bottom: const TabBar(
+            tabs: [
+              Tab(
+                text: 'General',
+              ),
+              Tab(
+                text: 'Evaluación',
+              ),
+              Tab(
+                text: 'Reparación',
+              ),
             ],
           ),
+        ),
+        body: TabBarView(
+          children: [
+            const _TicketDetailProgress(),
+            const _DiagnosticForm(),
+            RepairLogFormData(),
+          ],
         ),
       ),
     );
