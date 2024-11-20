@@ -32,6 +32,11 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           'Detalle del Ticket',
           style: AppStyle.txtPoppinsRegular18Black,
         ),
+         leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
       ),
       body: Container(
         color: Colors.white,

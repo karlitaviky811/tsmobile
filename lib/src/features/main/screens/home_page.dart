@@ -1,7 +1,9 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
+import 'package:tsmobile/src/features/main/screens/tecnico_rating_card.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import '../../../widgets/index.dart';
@@ -26,6 +28,22 @@ class _HomeScreenState extends State<HomeScreen> {
           'Home',
           style: TextStyle(color: Colors.white),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // Acción de búsqueda
+              print('Buscar');
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {
+              // Acción de notificaciones
+              print('Notificaciones');
+            },
+          ),
+        ],
         leading: IconButton(
           icon: const Icon(Icons.drag_indicator),
           color: Colors.white, // Cambiar color aquí
@@ -61,16 +79,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const ProfileUser()),
+                        builder: (context) => TecnicoRatingCard(
+                              technicianName: 'Carlos Pérez',
+                              overallRating: 4.5,
+                              ticketRatings: const [
+                                const {
+                                  'ticketId': 'TICKET12345',
+                                  'rating': 5,
+                                  'date':
+                                      '2024-11-20', // Verifica que la clave sea 'date'
+                                  'clientName':
+                                      'Ana González', // Verifica que la clave sea 'clientName'
+                                  'comment': 'Servicio excelente y rápido',
+                                },
+                                {
+                                  'ticketId': 'TICKET12346',
+                                  'rating': 4,
+                                  'date':
+                                      '2024-11-18', // Verifica que la clave sea 'date'
+                                  'clientName':
+                                      'Luis Martínez', // Verifica que la clave sea 'clientName'
+                                  'comment':
+                                      'Buen servicio, pero podría mejorar la puntualidad',
+                                },
+                                {
+                                  'ticketId': 'TICKET12347',
+                                  'rating': 3,
+                                  'date':
+                                      '2024-11-15', // Verifica que la clave sea 'date'
+                                  'clientName':
+                                      'María Rodríguez', // Verifica que la clave sea 'clientName'
+                                  'comment':
+                                      'Servicio aceptable, pero hubo un retraso significativo',
+                                },
+                              ],
+                            )),
                   );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Configuración'),
-                onTap: () {
-                  Navigator.pop(context);
+                   onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>  SettingsView()),
+                  );
                 },
+              
               ),
               const SizedBox(
                 height: 30,
@@ -152,13 +209,11 @@ class _ListCourt extends StatelessWidget {
               Colors.lightBlue.shade200
             ],
             onTap: () {
-              
-                Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const TicketsListFiltered(),
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TicketsListFiltered(),
+                  ));
             },
           ),
           const SizedBox(width: 20),
@@ -170,12 +225,11 @@ class _ListCourt extends StatelessWidget {
             image: 'assets/images/court1.png',
             gradientColors: [Colors.blue.shade100, Colors.blue.shade200],
             onTap: () {
-               Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const TicketsListFiltered(),
-              ));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const TicketsListFiltered(),
+                  ));
             },
           ),
           const SizedBox(width: 20),
@@ -201,7 +255,7 @@ class _ListScheduleReservationItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-       final List<Ticket> tickets = [
+    final List<Ticket> tickets = [
       Ticket(
           id: '1',
           title: 'Problema con la conexión',
@@ -218,12 +272,12 @@ class _ListScheduleReservationItems extends StatelessWidget {
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () => {
-          Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        TicketAcceptedProgressDetailPage(ticket: tickets[0])),
-              )
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      TicketAcceptedProgressDetailPage(ticket: tickets[0])),
+            )
           },
           child: ReservationItem(
             title: 'Título del Ticket $index',

@@ -9,6 +9,7 @@ import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/widgets/client_detail_card.dart';
 import 'package:tsmobile/src/widgets/cliente_direccion_card.dart';
 
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
@@ -105,8 +106,13 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
               Navigator.pop(context);
             },
           ),*/
-          backgroundColor: const Color(0xffF3F5FD),
-          title: Text('Detalles del Ticket',
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
+          backgroundColor: Colors.white,
+          title: const Text('Detalles del Ticket',
               style: TextStyle(
                   fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
           bottom: const TabBar(
@@ -126,13 +132,15 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         body: TabBarView(
           children: [
             const _TicketDetailProgress(),
-            DiagnosticForm(
-              onSave: (DateTime? date, String observations, String comments) {
-                print('Fecha: $date');
-                print('Observaciones: $observations');
-                print('Comentarios: $comments');
-              },
-            ),
+           DiagnosticForm(
+                  onSave: (DateTime? date, String observations, String comments, List<File> images) {
+                    // Lógica para manejar los datos guardados del formulario
+                    print('Fecha: $date');
+                    print('Observaciones: $observations');
+                    print('Comentarios: $comments');
+                    print('Imágenes: $images');
+                  },
+                ),
             RepairLogFormData(initialReparaciones: reparaciones),
           ],
         ),
@@ -186,13 +194,10 @@ class _TicketDetailProgress extends StatelessWidget {
     super.key,
   });
 
-
   @override
   Widget build(BuildContext context) {
-
-      final String initialLocation = 'Calle 123, Ciudad, País';
     return Container(
-      color: Colors.white,
+      
       child: Column(
         children: [
           Expanded(
@@ -210,20 +215,10 @@ class _TicketDetailProgress extends StatelessWidget {
                       'El aire acondicionado no enfría adecuadamente y hace ruido.',
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 5,
                 ),
-                TicketDetailCard(
-                  headerTitle: 'Dirección del cliente',
-                  code: 'TICKET12345',
-                  clientName: 'Juan Pérez',
-                  status: 'En Proceso',
-                  type: 'Reparación',
-                  creationDate: '2024-11-18',
-                  title: 'Reparación del Aire Acondicionado',
-                  description:
-                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                ),
-                LocationHandler(initialLocation: initialLocation)
+                ClienteHandler(),
+
                 // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
               ],
             ),
@@ -234,49 +229,29 @@ class _TicketDetailProgress extends StatelessWidget {
   }
 }
 
-
-
-
-
-class LocationHandler extends StatefulWidget {
-  final String initialLocation;
-
-  LocationHandler({required this.initialLocation});
-
+class ClienteHandler extends StatefulWidget {
   @override
-  _LocationHandlerState createState() => _LocationHandlerState();
+  _ClienteHandlerState createState() => _ClienteHandlerState();
 }
 
-class _LocationHandlerState extends State<LocationHandler> {
-  late String location;
+class _ClienteHandlerState extends State<ClienteHandler> {
+  String address = 'Calle 123, Ciudad, País';
 
-  @override
-  void initState() {
-    super.initState();
-    location = widget.initialLocation;
-  }
-
-  void _updateLocation(String newLocation) {
+  void _updateAddress(String newAddress) {
     setState(() {
-      location = newLocation;
+      address = newAddress;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: EditTicketDetailCard(
-        code: 'TICKET12345',
-        clientName: 'Juan Pérez',
-        status: 'Creada',
-        type: 'Reparación',
-        title: 'Problema con el aire acondicionado',
-        description: 'El aire acondicionado no enfría adecuadamente.',
-        location: location,
-        product: 'Aire acondicionado',
-        brand: 'Samsung',
-        creationDateTime: DateTime.now(),
-        onLocationChanged: _updateLocation,
+      child: ClienteDetailCard(
+        address: address,
+        phoneNumber: '+58 0412 4838 327',
+        email: 'cliente@ejemplo.com',
+        geolocation: '10.123456, -64.123456', // Ejemplo de coordenadas
+        onAddressChanged: _updateAddress,
       ),
     );
   }

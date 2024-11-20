@@ -24,23 +24,37 @@ class TicketDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       margin: EdgeInsets.all(16.0),
       child: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
-            Text(headerTitle,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16),
-            _buildDetailRow('Código:', code),
-            _buildDetailRow('Cliente:', clientName),
-            _buildStatusChip('Estatus:', status),
-            _buildDetailRow('Tipo:', type),
-            _buildDetailRow('Fecha de Creación:', creationDate),
-            _buildDetailRow('Título:', title),
-            Text('Descripción:', style: TextStyle(fontSize: 16)),
-            Text(description, style: TextStyle(fontSize: 14)),
+            Positioned(
+              right: 0,
+              top: 0,
+              child: _buildStatusChip(status),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  headerTitle,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                _buildDetailRow('Código:', code),
+                _buildDetailRow('Cliente:', clientName),
+                _buildDetailRow('Tipo:', type),
+                _buildDetailRow('Fecha de Creación:', creationDate),
+                _buildDetailRow('Título:', title),
+                Text(
+                  'Descripción:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text(description, style: TextStyle(fontSize: 14)),
+              ],
+            ),
           ],
         ),
       ),
@@ -52,15 +66,17 @@ class TicketDetailCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            '$label ',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
           Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
         ],
       ),
     );
   }
 
-  Widget _buildStatusChip(String label, String status) {
+  Widget _buildStatusChip(String status) {
     Color statusColor;
     switch (status) {
       case 'Creada':
@@ -102,22 +118,16 @@ class TicketDetailCard extends StatelessWidget {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text('$label ',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Chip(
-            label: Text(status),
-            backgroundColor: statusColor,
-            avatar: Icon(
-              _getChipIcon(status),
-              color: Colors.white,
-            ),
-            shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(25.0), side: BorderSide(color: Colors.transparent)),
-          ),
-        ],
+    return Chip(
+      label: Text(status),
+      backgroundColor: statusColor,
+      avatar: Icon(
+        _getChipIcon(status),
+        color: Colors.white,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0),
+        side: BorderSide(color: Colors.transparent),
       ),
     );
   }

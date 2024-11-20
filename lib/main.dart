@@ -14,10 +14,17 @@ Future<void> main() async {
   OneSignal.initialize(oneSignalAppId as String);
 
 // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-  OneSignal.Notifications.requestPermission(true);
+
 
   OneSignal.User.addAlias('external_id', 'userId-test-1');
   OneSignal.login('userId-test-1');
+  if((OneSignal.User.pushSubscription.id== null)){
+      OneSignal.Notifications.requestPermission(true);
+  }
+  /*OneSignal.Notifications.addClickListener((event) {
+      print("all events:------------------------------------ $event");
+      print("body is: ${event.notification.additionalData}");
+    });*/
   runApp(const MyApp());
 }
 
@@ -44,3 +51,5 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
