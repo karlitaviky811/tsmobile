@@ -1,12 +1,8 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 
 import 'package:tsmobile/src/widgets/repair_card_log.dart';
-
 
 class RepairLogFormData extends StatefulWidget {
   final List<Map<String, dynamic>> initialReparaciones;
@@ -30,10 +26,10 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     setState(() {
       reparaciones.add({
         'titulo': '',
-        'estado': 'Solicitud de Repuesto',
+        'estado': 'Sin stock',
         'selectedDate': null,
         'selectedServicios': <String>[],
-        'necesitaRepuesto': false,
+        'necesitaRepuesto': true,
         'selectedRepuestos': <String>[],
         'presupuestoRepuesto': '',
         'comentarios': '',
@@ -50,7 +46,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     });
   }
 
-  Future<void> _selectDate(BuildContext context, Map<String, dynamic> reparacion) async {
+  Future<void> _selectDate(
+      BuildContext context, Map<String, dynamic> reparacion) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -64,7 +61,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     }
   }
 
-  Future<void> _pickImage(BuildContext context, Map<String, dynamic> reparacion, String tipo) async {
+  Future<void> _pickImage(BuildContext context, Map<String, dynamic> reparacion,
+      String tipo) async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -82,45 +80,72 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: reparaciones.length + 1,
-      itemBuilder: (context, index) {
-        if (index == reparaciones.length) {
-          return Center(
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff051937),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              onPressed: _agregarNuevaReparacion,
-              icon: Icon(Icons.add, color: Colors.white),
-              label: Text('Añadir nueva reparación', style: TextStyle(color: Colors.white)),
-            ),
-          );
-        }
-
-        final reparacion = reparaciones[index];
-
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ExpansionTile(
-            title: Text(reparacion['titulo'] == '' ? 'Nueva reparación' : reparacion['titulo']),
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          color: Colors.white,
+          elevation: 20,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              RepairLogCard(
-                reparacion: reparacion,
-                selectDate: _selectDate,
-                pickImage: _pickImage,
-                onSave: () {
-                  // Lógica para manejar el guardado de cada formulario
-                  print('Guardado reparación: ${reparacion['titulo']}');
-                },
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Bitácora',
+                        textAlign: TextAlign.left,
+                        style: AppStyle.txtPoppinsMedium18Black,
+                      ),
+                    ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: reparaciones.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == reparaciones.length) {
+                      return Column(
+                        children: [
+                 
+                          Center(
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xff051937),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                              onPressed: _agregarNuevaReparacion,
+                              icon: const Icon(Icons.add, color: Colors.white),
+                              label: const Text('Añadir nueva reparación',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                
+                    final reparacion = reparaciones[index];
+                
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ExpansionTile(
+                        title: Text(reparacion['titulo'] == ''
+                            ? 'Nueva reparación'
+                            : reparacion['titulo']),
+                        children: [
+                          RepairLogCard(
+                            reparacion: reparacion,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
-        );
-      },
-    );
+        ));
   }
 }

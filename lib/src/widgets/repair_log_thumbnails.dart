@@ -40,8 +40,8 @@ Widget buildImageThumbnails(Map<String, dynamic> reparacion) {
                   ],
                 ),
               ),
-            if (reparacion['imagenPresupuesto'] != '')
-              Padding(
+     
+            reparacion['imagenPresupuesto'] != '' ?   Padding(
                 padding: const EdgeInsets.all(4.0),
                 child: Stack(
                   children: [
@@ -65,7 +65,8 @@ Widget buildImageThumbnails(Map<String, dynamic> reparacion) {
                     ),
                   ],
                 ),
-              ),
+              ): Container()
+            ,
             if (reparacion['imagenReparacion'] != '')
               Padding(
                 padding: const EdgeInsets.all(4.0),

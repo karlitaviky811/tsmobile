@@ -59,7 +59,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+         padding: const EdgeInsets.all(8.0),
             child: Card(
               color: Colors.white,
               elevation: 20,

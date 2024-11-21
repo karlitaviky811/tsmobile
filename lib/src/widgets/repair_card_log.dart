@@ -1,72 +1,118 @@
-
-
 import 'package:flutter/material.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'dart:io';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 import 'package:tsmobile/src/widgets/repair_log_thumbnails.dart';
-
-Color _getChipColor(String estado) {
-  switch (estado) {
-    case 'Solicitud de Repuesto':
-      return Colors.yellow;
-    case 'En Proceso':
-      return Colors.orange;
-    case 'Completado':
-      return Colors.green;
-    case 'Enviada':
-      return Colors.blue;
-    case 'Aprobada':
-      return Colors.green;
-    case 'Rechazada':
-      return Colors.red;
-    default:
-      return Colors.grey;
-  }
-}
-
-IconData _getChipIcon(String estado) {
-  switch (estado) {
-    case 'Solicitud de Repuesto':
-      return Icons.assignment;
-    case 'En Proceso':
-      return Icons.hourglass_empty;
-    case 'Completado':
-      return Icons.check_circle;
-    case 'Enviada':
-      return Icons.send;
-    case 'Aprobada':
-      return Icons.thumb_up;
-    case 'Rechazada':
-      return Icons.thumb_down;
-    default:
-      return Icons.info;
-  }
-}
 
 class RepairLogCard extends StatefulWidget {
   final Map<String, dynamic> reparacion;
-  final Future<void> Function(BuildContext, Map<String, dynamic>) selectDate;
-  final Future<void> Function(BuildContext, Map<String, dynamic>, String) pickImage;
-  final VoidCallback onSave;
 
-  RepairLogCard({
-    required this.reparacion,
-    required this.selectDate,
-    required this.pickImage,
-    required this.onSave,
-  });
+  RepairLogCard({required this.reparacion});
 
   @override
   _RepairLogCardState createState() => _RepairLogCardState();
 }
 
 class _RepairLogCardState extends State<RepairLogCard> {
+  final ImagePicker _picker = ImagePicker();
+  List<String> imagePaths = [];
+  late Map<String, dynamic> reparacion;
+  TextEditingController _dateController = TextEditingController();
+
+
+  @override
+  void initState() {
+    super.initState();
+    reparacion = Map<String, dynamic>.from(widget.reparacion);
+    _dateController.text = reparacion['selectedDate'] != null
+        ? reparacion['selectedDate'].toLocal().toString().split(' ')[0]
+        : '';
+  }
+
+  Future<void> _pickImage(BuildContext context, String imageType) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        if (imagePaths.length < 5) {
+          imagePaths.add(pickedFile.path);
+          reparacion[imageType] = pickedFile.path;  // Actualizar el mapa mutable
+        } else {
+          _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
+        }
+      });
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: reparacion['selectedDate'] ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        reparacion['selectedDate'] = pickedDate;
+        _dateController.text = pickedDate.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  void _showToast(BuildContext context, String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  }
+
+  Color _getChipColor(String estado) {
+    switch (estado) {
+      case 'Reparación':
+        return Colors.lightBlue.shade300;
+      case 'Solicitud de repuesto':
+        return Colors.lightGreen.shade300;
+      case 'Sin stock':
+        return Colors.deepOrange.shade200;
+      case 'Envío de presupuesto':
+        return Colors.deepPurple.shade200;
+      case 'Compra externa':
+        return Colors.pink.shade200;
+      default:
+        return Colors.grey.shade300;
+    }
+  }
+
+  IconData _getChipIcon(String estado) {
+    switch (estado) {
+      case 'Reparación':
+        return Icons.build;
+      case 'Solicitud de repuesto':
+        return Icons.shopping_cart;
+      case 'Sin stock':
+        return Icons.warning;
+      case 'Envío de presupuesto':
+        return Icons.attach_money;
+      case 'Compra externa':
+        return Icons.shopping_bag;
+      default:
+        return Icons.info;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
+    return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             TextField(
@@ -74,66 +120,82 @@ class _RepairLogCardState extends State<RepairLogCard> {
                 labelText: 'Título de la reparación',
               ),
               onChanged: (value) {
-                widget.reparacion['titulo'] = value;
+                setState(() {
+                  reparacion['titulo'] = value;
+                });
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Estado:'),
                 Chip(
-                  label: Text(widget.reparacion['estado']),
-                  backgroundColor: _getChipColor(widget.reparacion['estado']),
+                  label: Text(reparacion['estado']),
+                  backgroundColor: _getChipColor(reparacion['estado']),
                   avatar: Icon(
-                    _getChipIcon(widget.reparacion['estado']),
+                    _getChipIcon(reparacion['estado']),
                     color: Colors.white,
                   ),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                      side: BorderSide(color: Colors.transparent)),
+                    borderRadius: BorderRadius.circular(25.0),
+                    side: const BorderSide(color: Colors.transparent),
+                  ),
                 ),
               ],
             ),
-            ListTile(
-              title: const Text('Fecha de reparación'),
-              subtitle: Text(widget.reparacion['selectedDate'] == null
-                  ? 'Seleccione una fecha'
-                  : widget.reparacion['selectedDate'].toLocal().toString()),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => widget.selectDate(context, widget.reparacion),
+            TextField(
+              controller: _dateController,
+              decoration: InputDecoration(
+                labelText: 'Fecha de reparación',
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+              ),
+              readOnly: true,
             ),
-            MultiSelectDialogField(
-              items: [
-                MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
-                MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
-                // Agrega más servicios aquí
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Servicios'),
+                MultiSelectDialogField(
+                  items: [
+                    MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
+                    MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
+                    // Agrega más servicios aquí
+                  ],
+                  title: const Text('Servicios realizados'),
+                  selectedColor: Colors.blue,
+                  buttonIcon: const Icon(Icons.list),
+                  buttonText: const Text('Seleccione uno o más servicios'),
+                  initialValue: reparacion['selectedServicios'].cast<String>(),
+                  onConfirm: (values) {
+                    setState(() {
+                      reparacion['selectedServicios'] = values.cast<String>();
+                    });
+                  },
+                ),
               ],
-              title: const Text('Servicios realizados'),
-              selectedColor: Colors.blue,
-              buttonIcon: const Icon(Icons.list),
-              buttonText: const Text('Seleccione uno o más servicios'),
-              initialValue: widget.reparacion['selectedServicios'].cast<String>(),
-              onConfirm: (values) {
-                widget.reparacion['selectedServicios'] = values.cast<String>();
-              },
             ),
             CheckboxListTile(
               title: const Text('¿Necesita repuesto?'),
-              value: widget.reparacion['necesitaRepuesto'],
+              value: reparacion['necesitaRepuesto'],
               onChanged: (bool? value) {
                 setState(() {
-                  widget.reparacion['necesitaRepuesto'] = value ?? false;
+                  reparacion['necesitaRepuesto'] = value ?? false;
                   if (value == true) {
-                    widget.reparacion['estado'] = 'Solicitud de Repuesto';
+                    reparacion['estado'] = 'Solicitud de Repuesto';
                   } else {
-                    widget.reparacion['estado'] = 'Reparación';
+                    reparacion['estado'] = 'Reparación';
                   }
                 });
               },
             ),
-            if (widget.reparacion['necesitaRepuesto'])
-              Column(
+            if (reparacion['necesitaRepuesto'])
+              ExpansionTile(
+                title: const Text('Solicitud de repuesto'),
                 children: [
                   MultiSelectDialogField(
                     items: [
@@ -145,160 +207,88 @@ class _RepairLogCardState extends State<RepairLogCard> {
                     selectedColor: Colors.blue,
                     buttonIcon: const Icon(Icons.list),
                     buttonText: const Text('Seleccione uno o más repuestos'),
-                    initialValue: widget.reparacion['selectedRepuestos'].cast<String>(),
+                    initialValue: reparacion['selectedRepuestos'].cast<String>(),
                     onConfirm: (values) {
-                      widget.reparacion['selectedRepuestos'] = values.cast<String>();
+                      setState(() {
+                        reparacion['selectedRepuestos'] = values.cast<String>();
+                      });
                     },
                   ),
                   TextField(
                     decoration: const InputDecoration(labelText: 'Observaciones'),
                     onChanged: (value) {
-                      widget.reparacion['observaciones'] = value;
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await widget.pickImage(context, widget.reparacion, 'solicitud');
-                    },
-                    child: const Text('Adjuntar imagen de solicitud'),
-                  ),
-                ],
-              ),
-            if (widget.reparacion['necesitaRepuesto'])
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Presupuesto del repuesto'),
-                    onChanged: (value) {
                       setState(() {
-                        widget.reparacion['presupuestoRepuesto'] = value;
-                        widget.reparacion['estadoCompraRepuesto'] = 'Enviada';
+                        reparacion['observaciones'] = value;
                       });
                     },
                   ),
                   ElevatedButton(
                     onPressed: () async {
-                      await widget.pickImage(context, widget.reparacion, 'presupuesto');
+                      if (imagePaths.length < 5) {
+                        await _pickImage(context, 'imagenPresupuestoRepuesto${imagePaths.length}');
+                      } else {
+                        _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
+                      }
                     },
-                    child: const Text('Adjuntar imagen de presupuesto'),
+                    child: const Text('Adjuntar imágenes de presupuesto'),
                   ),
-                  if (widget.reparacion['imagenPresupuesto'] != '')
-                    Image.file(
-                      File(widget.reparacion['imagenPresupuesto']),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Comentarios'),
-                    onChanged: (value) {
-                      widget.reparacion['comentarios'] = value;
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            widget.reparacion['estadoCompraRepuesto'] = 'Aprobada';
-                          });
-                        },
-                        child: const Text('Aprobar'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            widget.reparacion['estadoCompraRepuesto'] = 'Rechazada';
-                          });
-                        },
-                        child: const Text('Rechazar'),
-                      ),
-                    ],
-                  ),
-                  Chip(
-                    label: Text(widget.reparacion['estadoCompraRepuesto']),
-                    backgroundColor: _getChipColor(widget.reparacion['estadoCompraRepuesto']),
-                    avatar: Icon(
-                      _getChipIcon(widget.reparacion['estadoCompraRepuesto']),
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            if (widget.reparacion['estado'] == 'Sin Repuesto')
-              ExpansionTile(
-                title: Text('Detalles del Repuesto'),
-                children: [
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Nombre del repuesto'),
-                    onChanged: (value) {
-                      setState(() {
-                        widget.reparacion['nombreRepuesto'] = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Monto del repuesto'),
-                    onChanged: (value) {
-                      setState(() {
-                        widget.reparacion['montoRepuesto'] = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Presupuesto del repuesto'),
-                    onChanged: (value) {
-                      setState(() {
-                        widget.reparacion['presupuestoRepuesto'] = value;
-                      });
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await widget.pickImage(context, widget.reparacion, 'presupuestoRepuesto');
-                    },
-                    child: const Text('Adjuntar imagen de presupuesto'),
-                  ),
-                  if (widget.reparacion['imagenPresupuestoRepuesto'] != '')
-                    Image.file(
-                      File(widget.reparacion['imagenPresupuestoRepuesto']),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
+                  if (imagePaths.isNotEmpty)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text('Imágenes cargadas:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        Wrap(
+                          children: imagePaths.map((path) {
+                            return Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Image.file(
+                                File(path),
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
                     ),
                 ],
               ),
-            ElevatedButton(
-              onPressed: () async {
-                await widget.pickImage(context, widget.reparacion, 'reparacion');
-              },
-              child: const Text('Adjuntar imagen de reparación'),
-            ),
-            buildImageThumbnails(widget.reparacion),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: const InputDecoration(labelText: 'Comentarios generales'),
-              onChanged: (value) {
-                widget.reparacion['comentariosGenerales'] = value;
-              },
-            ),
-            const SizedBox(height: 16),
-             ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff051937),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+              if (widget.reparacion['estado'] == 'Sin stock')
+                BuySparePart(
+                  reparacion: const {
+                    'nombreRepuesto': '',
+                    'montoRepuesto': '',
+                    'presupuestoRepuesto': '',
+                  },
                 ),
+              //_MoreDetailsTicket(widget: widget),
+              TextField(
+            decoration:
+                const InputDecoration(labelText: 'Comentarios generales'),
+            onChanged: (value) {
+              widget.reparacion['comentariosGenerales'] = value;
+            },
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xff051937),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              onPressed: widget.onSave,
-              icon: Icon(Icons.save, color: Colors.white),
-              label: Text('Guardar', style: TextStyle(color: Colors.white)),
             ),
+            onPressed: (){},
+            icon: const Icon(Icons.save, color: Colors.white),
+            label: const Text('Guardar', style: TextStyle(color: Colors.white)),
+          )
           ],
         ),
       ),
     );
   }
 }
+

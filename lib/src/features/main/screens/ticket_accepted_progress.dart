@@ -55,30 +55,51 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         'precioRepuesto': '',
         'repuestoSolicitado': false,
         'estadoCompraRepuesto': 'Enviada',
+      },
+      {
+        'titulo': 'Cambio de antena',
+        'estado': 'Solicitud de Repuesto',
+        'selectedDate': DateTime.now(),
+        'selectedServicios': ['Revisión general'],
+        'necesitaRepuesto': true,
+        'selectedRepuestos': ['Pantalla'],
+        'presupuestoRepuesto': '',
+        'comentarios': '',
+        'imagenSolicitud': '',
+        'imagenPresupuesto': '',
+        'imagenReparacion': '',
+        'comentariosGenerales': '',
+        'presupuestoAceptado': false,
+        'nombreRepuesto': '',
+        'precioRepuesto': '',
+        'repuestoSolicitado': false,
+        'estadoCompraRepuesto': 'Enviada',
       }
     ];
 
     void _agregarNuevaReparacion() {
       setState(() {
-        reparaciones.add({
-          'titulo': '',
-          'estado': 'Solicitud de Repuesto',
-          'selectedDate': null,
-          'selectedServicios': <String>[],
-          'necesitaRepuesto': false,
-          'selectedRepuestos': <String>[],
-          'presupuestoRepuesto': '',
-          'comentarios': '',
-          'imagenSolicitud': '',
-          'imagenPresupuesto': '',
-          'imagenReparacion': '',
-          'comentariosGenerales': '',
-          'presupuestoAceptado': false,
-          'nombreRepuesto': '',
-          'precioRepuesto': '',
-          'repuestoSolicitado': false,
-          'estadoCompraRepuesto': 'Enviada',
-        });
+        reparaciones.add(
+          {
+            'titulo': '',
+            'estado': 'Solicitud de Repuesto',
+            'selectedDate': null,
+            'selectedServicios': <String>[],
+            'necesitaRepuesto': true,
+            'selectedRepuestos': <String>[],
+            'presupuestoRepuesto': '',
+            'comentarios': '',
+            'imagenSolicitud': '',
+            'imagenPresupuesto': '',
+            'imagenReparacion': '',
+            'comentariosGenerales': '',
+            'presupuestoAceptado': false,
+            'nombreRepuesto': '',
+            'precioRepuesto': '',
+            'repuestoSolicitado': false,
+            'estadoCompraRepuesto': 'Enviada',
+          },
+        );
       });
     }
 
@@ -107,10 +128,10 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
             },
           ),*/
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () {
-              Navigator.pop(context);
-            }),
+              icon: const Icon(Icons.arrow_back_ios_new),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
           backgroundColor: Colors.white,
           title: const Text('Detalles del Ticket',
               style: TextStyle(
@@ -132,15 +153,16 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         body: TabBarView(
           children: [
             const _TicketDetailProgress(),
-           DiagnosticForm(
-                  onSave: (DateTime? date, String observations, String comments, List<File> images) {
-                    // Lógica para manejar los datos guardados del formulario
-                    print('Fecha: $date');
-                    print('Observaciones: $observations');
-                    print('Comentarios: $comments');
-                    print('Imágenes: $images');
-                  },
-                ),
+            DiagnosticForm(
+              onSave: (DateTime? date, String observations, String comments,
+                  List<File> images) {
+                // Lógica para manejar los datos guardados del formulario
+                print('Fecha: $date');
+                print('Observaciones: $observations');
+                print('Comentarios: $comments');
+                print('Imágenes: $images');
+              },
+            ),
             RepairLogFormData(initialReparaciones: reparaciones),
           ],
         ),
@@ -197,7 +219,6 @@ class _TicketDetailProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
       child: Column(
         children: [
           Expanded(
