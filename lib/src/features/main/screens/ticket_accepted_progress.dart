@@ -41,7 +41,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         'titulo': 'Cambio de pantalla',
         'estado': 'Solicitud de Repuesto',
         'selectedDate': DateTime.now(),
-        'selectedServicios': ['Revisión general'],
+        'selectedServicios': ['Servicio 1'],
         'necesitaRepuesto': true,
         'selectedRepuestos': ['Pantalla'],
         'presupuestoRepuesto': '',
@@ -58,9 +58,28 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
       },
       {
         'titulo': 'Cambio de antena',
-        'estado': 'Solicitud de Repuesto',
+        'estado': 'Sin stock',
         'selectedDate': DateTime.now(),
-        'selectedServicios': ['Revisión general'],
+        'selectedServicios': ['Servicio 1'],
+        'necesitaRepuesto': true,
+        'selectedRepuestos': ['Pantalla'],
+        'presupuestoRepuesto': '',
+        'comentarios': '',
+        'imagenSolicitud': '',
+        'imagenPresupuesto': '',
+        'imagenReparacion': '',
+        'comentariosGenerales': '',
+        'presupuestoAceptado': false,
+        'nombreRepuesto': '',
+        'precioRepuesto': '',
+        'repuestoSolicitado': false,
+        'estadoCompraRepuesto': 'Enviada',
+      },
+      {
+        'titulo': 'Cambio de antena',
+        'estado': 'Sin stock',
+        'selectedDate': DateTime.now(),
+        'selectedServicios': ['Servicio 1', 'Servicio 2'],
         'necesitaRepuesto': true,
         'selectedRepuestos': ['Pantalla'],
         'presupuestoRepuesto': '',
@@ -77,31 +96,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
       }
     ];
 
-    void _agregarNuevaReparacion() {
-      setState(() {
-        reparaciones.add(
-          {
-            'titulo': '',
-            'estado': 'Solicitud de Repuesto',
-            'selectedDate': null,
-            'selectedServicios': <String>[],
-            'necesitaRepuesto': true,
-            'selectedRepuestos': <String>[],
-            'presupuestoRepuesto': '',
-            'comentarios': '',
-            'imagenSolicitud': '',
-            'imagenPresupuesto': '',
-            'imagenReparacion': '',
-            'comentariosGenerales': '',
-            'presupuestoAceptado': false,
-            'nombreRepuesto': '',
-            'precioRepuesto': '',
-            'repuestoSolicitado': false,
-            'estadoCompraRepuesto': 'Enviada',
-          },
-        );
-      });
-    }
+
 
     final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
     return DefaultTabController(

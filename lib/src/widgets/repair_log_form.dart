@@ -22,29 +22,31 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     reparaciones = widget.initialReparaciones;
   }
 
-  void _agregarNuevaReparacion() {
-    setState(() {
-      reparaciones.add({
-        'titulo': '',
-        'estado': 'Sin stock',
-        'selectedDate': null,
-        'selectedServicios': <String>[],
-        'necesitaRepuesto': true,
-        'selectedRepuestos': <String>[],
-        'presupuestoRepuesto': '',
-        'comentarios': '',
-        'imagenSolicitud': '',
-        'imagenPresupuesto': '',
-        'imagenReparacion': '',
-        'comentariosGenerales': '',
-        'presupuestoAceptado': false,
-        'nombreRepuesto': '',
-        'precioRepuesto': '',
-        'repuestoSolicitado': false,
-        'estadoCompraRepuesto': 'Enviada',
+    void _agregarNuevaReparacion() {
+      setState(() {
+        reparaciones.add(
+          {
+            'titulo': 'Cambio de Pantalla',
+            'estado': 'Solicitud de Repuesto',
+            'selectedDate': null,
+            'selectedServicios': <String>['Servicicio 1'],
+            'necesitaRepuesto': true,
+            'selectedRepuestos': <String>[],
+            'presupuestoRepuesto': '',
+            'comentarios': '',
+            'imagenSolicitud': '',
+            'imagenPresupuesto': '',
+            'imagenReparacion': '',
+            'comentariosGenerales': '',
+            'presupuestoAceptado': false,
+            'nombreRepuesto': '',
+            'precioRepuesto': '',
+            'repuestoSolicitado': false,
+            'estadoCompraRepuesto': 'Enviada',
+          },
+        );
       });
-    });
-  }
+    }
 
   Future<void> _selectDate(
       BuildContext context, Map<String, dynamic> reparacion) async {
@@ -92,14 +94,14 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Bitácora',
-                        textAlign: TextAlign.left,
-                        style: AppStyle.txtPoppinsMedium18Black,
-                      ),
-                    ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Bitácora',
+                  textAlign: TextAlign.left,
+                  style: AppStyle.txtPoppinsMedium18Black,
+                ),
+              ),
               Expanded(
                 child: ListView.builder(
                   itemCount: reparaciones.length + 1,
@@ -107,7 +109,6 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                     if (index == reparaciones.length) {
                       return Column(
                         children: [
-                 
                           Center(
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
@@ -125,9 +126,9 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                         ],
                       );
                     }
-                
+
                     final reparacion = reparaciones[index];
-                
+
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ExpansionTile(

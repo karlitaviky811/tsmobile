@@ -21,12 +21,22 @@ class _RepairLogCardState extends State<RepairLogCard> {
   List<String> imagePaths = [];
   late Map<String, dynamic> reparacion;
   TextEditingController _dateController = TextEditingController();
+  late TextEditingController _tituloController;
 
+  late TextEditingController _observacionesController;
+  late TextEditingController _comentariosGeneralesController;
 
   @override
   void initState() {
     super.initState();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
+    _tituloController = TextEditingController(text: reparacion['titulo']);
+    _observacionesController =
+        TextEditingController(text: reparacion['observaciones']);
+    _comentariosGeneralesController =
+        TextEditingController(text: reparacion['comentariosGenerales']);
+    _comentariosGeneralesController =
+        TextEditingController(text: reparacion['comentariosGenerales']);
     _dateController.text = reparacion['selectedDate'] != null
         ? reparacion['selectedDate'].toLocal().toString().split(' ')[0]
         : '';
@@ -38,7 +48,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
       setState(() {
         if (imagePaths.length < 5) {
           imagePaths.add(pickedFile.path);
-          reparacion[imageType] = pickedFile.path;  // Actualizar el mapa mutable
+          reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
         } else {
           _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
         }
@@ -111,184 +121,232 @@ class _RepairLogCardState extends State<RepairLogCard> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
+  child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Título de la reparación',
+            Chip(
+              label: Text(reparacion['estado']),
+              backgroundColor: _getChipColor(reparacion['estado']),
+              avatar: Icon(
+                _getChipIcon(reparacion['estado']),
+                color: Colors.white,
               ),
-              onChanged: (value) {
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0),
+                side: const BorderSide(color: Colors.transparent),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _tituloController,
+          decoration: InputDecoration(
+            labelText: 'Título de la reparación',
+            labelStyle: TextStyle(color: Colors.black54, fontSize: 16),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey, width: 1),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xff051937), width: 1),
+            ),
+          ),
+          onChanged: (value) {
+            setState(() {
+              reparacion['titulo'] = value;
+            });
+          },
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _dateController,
+          decoration: InputDecoration(
+            labelText: 'Fecha de reparación',
+            labelStyle: TextStyle(color: Colors.black54, fontSize: 16),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.calendar_today, color: Color(0xff051937)),
+              onPressed: () => _selectDate(context),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey, width: 1),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Color(0xff051937), width: 1),
+            ),
+          ),
+          readOnly: true,
+        ),
+        const SizedBox(height: 10),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Servicios',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.normal, color: Colors.black54),
+            ),
+            MultiSelectDialogField(
+              items: [
+                MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
+                MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
+                // Agrega más servicios aquí
+              ],
+              title: const Text('Servicios realizados'),
+              selectedColor: const Color(0xff051937),
+              buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
+              buttonText: const Text(
+                'Seleccione uno o más servicios',
+                style: TextStyle(color: Color(0xff051937), fontSize: 16),
+              ),
+              initialValue: reparacion['selectedServicios'].cast<String>(),
+              onConfirm: (values) {
                 setState(() {
-                  reparacion['titulo'] = value;
+                  reparacion['selectedServicios'] = values.cast<String>();
                 });
               },
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Estado:'),
-                Chip(
-                  label: Text(reparacion['estado']),
-                  backgroundColor: _getChipColor(reparacion['estado']),
-                  avatar: Icon(
-                    _getChipIcon(reparacion['estado']),
-                    color: Colors.white,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    side: const BorderSide(color: Colors.transparent),
-                  ),
-                ),
-              ],
-            ),
-            TextField(
-              controller: _dateController,
-              decoration: InputDecoration(
-                labelText: 'Fecha de reparación',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(context),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey, width: 1),
                 ),
               ),
-              readOnly: true,
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Servicios'),
-                MultiSelectDialogField(
-                  items: [
-                    MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
-                    MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
-                    // Agrega más servicios aquí
-                  ],
-                  title: const Text('Servicios realizados'),
-                  selectedColor: Colors.blue,
-                  buttonIcon: const Icon(Icons.list),
-                  buttonText: const Text('Seleccione uno o más servicios'),
-                  initialValue: reparacion['selectedServicios'].cast<String>(),
-                  onConfirm: (values) {
-                    setState(() {
-                      reparacion['selectedServicios'] = values.cast<String>();
-                    });
-                  },
-                ),
-              ],
-            ),
-            CheckboxListTile(
-              title: const Text('¿Necesita repuesto?'),
-              value: reparacion['necesitaRepuesto'],
-              onChanged: (bool? value) {
-                setState(() {
-                  reparacion['necesitaRepuesto'] = value ?? false;
-                  if (value == true) {
-                    reparacion['estado'] = 'Solicitud de Repuesto';
-                  } else {
-                    reparacion['estado'] = 'Reparación';
-                  }
-                });
-              },
-            ),
-            if (reparacion['necesitaRepuesto'])
-              ExpansionTile(
-                title: const Text('Solicitud de repuesto'),
-                children: [
-                  MultiSelectDialogField(
-                    items: [
-                      MultiSelectItem<String>('Repuesto 1', 'Repuesto 1'),
-                      MultiSelectItem<String>('Repuesto 2', 'Repuesto 2'),
-                      // Agrega más repuestos aquí
-                    ],
-                    title: const Text('Repuestos necesarios'),
-                    selectedColor: Colors.blue,
-                    buttonIcon: const Icon(Icons.list),
-                    buttonText: const Text('Seleccione uno o más repuestos'),
-                    initialValue: reparacion['selectedRepuestos'].cast<String>(),
-                    onConfirm: (values) {
-                      setState(() {
-                        reparacion['selectedRepuestos'] = values.cast<String>();
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Observaciones'),
-                    onChanged: (value) {
-                      setState(() {
-                        reparacion['observaciones'] = value;
-                      });
-                    },
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (imagePaths.length < 5) {
-                        await _pickImage(context, 'imagenPresupuestoRepuesto${imagePaths.length}');
-                      } else {
-                        _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
-                      }
-                    },
-                    child: const Text('Adjuntar imágenes de presupuesto'),
-                  ),
-                  if (imagePaths.isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text('Imágenes cargadas:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        Wrap(
-                          children: imagePaths.map((path) {
-                            return Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Image.file(
-                                File(path),
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        CheckboxListTile(
+          title: const Text('¿Necesita repuesto?'),
+          value: reparacion['necesitaRepuesto'],
+          onChanged: (bool? value) {
+            setState(() {
+              reparacion['necesitaRepuesto'] = value ?? false;
+              reparacion['estado'] = value == true ? 'Solicitud de Repuesto' : 'Reparación';
+            });
+          },
+        ),
+        if (reparacion['necesitaRepuesto'])
+          ExpansionTile(
+            title: const Text('Solicitud de repuesto'),
+            children: [
+              MultiSelectDialogField(
+                items: [
+                  MultiSelectItem<String>('Repuesto 1', 'Repuesto 1'),
+                  MultiSelectItem<String>('Repuesto 2', 'Repuesto 2'),
+                  // Agrega más repuestos aquí
                 ],
-              ),
-              if (widget.reparacion['estado'] == 'Sin stock')
-                BuySparePart(
-                  reparacion: const {
-                    'nombreRepuesto': '',
-                    'montoRepuesto': '',
-                    'presupuestoRepuesto': '',
-                  },
+                title: const Text('Repuestos necesarios'),
+                selectedColor: const Color(0xff051937),
+                buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
+                buttonText: const Text(
+                  'Seleccione uno o más repuestos',
+                  style: TextStyle(color: Color(0xff051937), fontSize: 16),
                 ),
-              //_MoreDetailsTicket(widget: widget),
+                initialValue: reparacion['selectedRepuestos'].cast<String>(),
+                onConfirm: (values) {
+                  setState(() {
+                    reparacion['selectedRepuestos'] = values.cast<String>();
+                  });
+                },
+                decoration: const BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey, width: 1),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
               TextField(
-            decoration:
-                const InputDecoration(labelText: 'Comentarios generales'),
-            onChanged: (value) {
-              widget.reparacion['comentariosGenerales'] = value;
+                decoration: const InputDecoration(
+                  labelText: 'Observaciones',
+                  labelStyle: TextStyle(color: Colors.black54, fontSize: 16),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey, width: 1),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff051937), width: 1),
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    reparacion['observaciones'] = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  if (imagePaths.length < 5) {
+                    await _pickImage(context, 'imagenPresupuestoRepuesto${imagePaths.length}');
+                  } else {
+                    _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff051937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Adjuntar imágenes de presupuesto'),
+              ),
+              if (imagePaths.isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: Text(
+                        'Imágenes cargadas:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    Wrap(
+                      children: imagePaths.map((path) {
+                        return Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Image.file(
+                            File(path),
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        if (reparacion['estado'] == 'Sin stock')
+          BuySparePart(
+            reparacion: const {
+              'nombreRepuesto': '',
+              'montoRepuesto': '',
+              'presupuestoRepuesto': '',
             },
           ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
+        const SizedBox(height: 16),
+        Center(
+          child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff051937),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
             ),
-            onPressed: (){},
+            onPressed: () {},
             icon: const Icon(Icons.save, color: Colors.white),
             label: const Text('Guardar', style: TextStyle(color: Colors.white)),
-          )
-          ],
+          ),
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
+    ;
   }
 }
-
