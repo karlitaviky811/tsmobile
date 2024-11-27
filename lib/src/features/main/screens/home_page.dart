@@ -24,20 +24,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: CustomAppBar(
-        title: const Text(
-          'Home',
-          style: TextStyle(color: Colors.white),
-        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               // Acción de búsqueda
               print('Buscar');
             },
           ),
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {
               // Acción de notificaciones
               print('Notificaciones');
@@ -120,14 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Configuración'),
-                   onTap: () {
+                onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) =>  SettingsView()),
+                    MaterialPageRoute(builder: (context) => SettingsView()),
                   );
                 },
-              
               ),
               const SizedBox(
                 height: 30,
@@ -357,30 +351,41 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Material(
       elevation: elevation,
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomLeft,
-            end: Alignment.bottomRight,
-            stops: [
-              0.1,
-              1.0,
-            ],
-            colors: [
-              Color(0xff051937),
-              Color(0XFF131314),
-            ],
-          ),
+      child: AppBar(
+        automaticallyImplyLeading: true,
+        centerTitle: false,
+        leading: leading,
+        elevation: 0.0,
+        toolbarHeight: 64,
+        title: const Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text('Inicio', style: TextStyle(color: Colors.white),)
+            
+          ],
         ),
-        child: AppBar(
-          automaticallyImplyLeading: true,
-          centerTitle: false,
-          leading: leading,
-          elevation: 0.0,
-          toolbarHeight: 64,
-          title: title,
-          backgroundColor: Colors.transparent,
-          actions: actions,
+        backgroundColor: Colors.transparent,
+        actions: actions,
+        flexibleSpace: Container(
+          height: 200,
+          alignment: Alignment.bottomLeft,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.bottomRight,
+              stops: [
+                0.1,
+                1.0,
+              ],
+              colors: [
+               Color(0xff051937),
+              Color(0XFF131314),
+
+                //Color(0xff051937),
+                //Color(0XFF131314),
+              ],
+            ),
+          ),
         ),
       ),
     );

@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Color(0xffF3F5FD)
       ),
-      home: const TabsPage(),
+      home: const TabsPage() ,
       routes: RouterApp.getRoutes(),
       initialRoute: RouterApp.initialRoute,
 

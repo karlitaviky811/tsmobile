@@ -150,6 +150,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
       
                   children: [
                     MultiSelectDialogField(
+                      backgroundColor: Colors.white,
                       items: [
                         MultiSelectItem<String>('Repuesto 1', 'Repuesto 1'),
                         MultiSelectItem<String>('Repuesto 2', 'Repuesto 2'),

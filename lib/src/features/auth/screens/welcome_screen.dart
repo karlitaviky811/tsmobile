@@ -13,13 +13,11 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: AuthBackgorund(
           child: SingleChildScrollView(
         child: Column(
           children: [
-            const Text('Hoooolaaa'),
             const SizedBox(
               height: 280,
             ),
@@ -115,13 +113,13 @@ class _LoginForm extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                   disabledColor: Colors.grey,
                   elevation: 0,
-                  color: const Color(0xff051937),
+                  color: const Color(0xffffdc00),
                   child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 80, vertical: 15),
                       child: const Text('Ingresar',
                           style: const TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 16,
                               fontWeight: FontWeight.bold))),
                 )

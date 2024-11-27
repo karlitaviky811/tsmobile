@@ -147,7 +147,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
         const SizedBox(height: 10),
         TextField(
           controller: _tituloController,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: 'Título de la reparación',
             labelStyle: TextStyle(color: Colors.black54, fontSize: 16),
             enabledBorder: UnderlineInputBorder(
@@ -168,15 +168,15 @@ class _RepairLogCardState extends State<RepairLogCard> {
           controller: _dateController,
           decoration: InputDecoration(
             labelText: 'Fecha de reparación',
-            labelStyle: TextStyle(color: Colors.black54, fontSize: 16),
+            labelStyle: const TextStyle(color: Colors.black54, fontSize: 16),
             suffixIcon: IconButton(
               icon: const Icon(Icons.calendar_today, color: Color(0xff051937)),
               onPressed: () => _selectDate(context),
             ),
-            enabledBorder: UnderlineInputBorder(
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.grey, width: 1),
             ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: Color(0xff051937), width: 1),
             ),
           ),
@@ -197,6 +197,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                 // Agrega más servicios aquí
               ],
               title: const Text('Servicios realizados'),
+                         backgroundColor: Colors.white,
               selectedColor: const Color(0xff051937),
               buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
               buttonText: const Text(
@@ -239,6 +240,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   // Agrega más repuestos aquí
                 ],
                 title: const Text('Repuestos necesarios'),
+                  backgroundColor: Colors.white,
                 selectedColor: const Color(0xff051937),
                 buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
                 buttonText: const Text(
@@ -290,7 +292,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Adjuntar imágenes de presupuesto'),
+                child: const Text('Adjuntar imágenes de presupuesto',  style:TextStyle(color: Colors.white)),
               ),
               if (imagePaths.isNotEmpty)
                 Column(
