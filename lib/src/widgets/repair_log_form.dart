@@ -97,7 +97,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  'Bitácora',
+                  'Bitácora de visitas',
                   textAlign: TextAlign.left,
                   style: AppStyle.txtPoppinsMedium18Black,
                 ),

@@ -1,5 +1,6 @@
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
+import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
@@ -141,11 +142,16 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           color: Colors.white,
           child: Padding(
-            padding: const EdgeInsets.only(left: 23, top: 12),
+            padding: const EdgeInsets.only(left: 10, top: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Hola Andrea!', style: AppStyle.txtPoppinsSemiBold20Black),
+                const SizedBox(height: 31),
+                Text('Ubicación Actual',
+                    style: AppStyle.txtPoppinsSemiBold18Black),
+                const SizedBox(height: 10),
+                LocationCard(),
                 const SizedBox(height: 31),
                 Text(
                   'Servicios',
@@ -305,7 +311,7 @@ class ReservationItem extends StatelessWidget {
     return ListTile(
       leading: const Image(
           image: AssetImage(
-              'assets/images/car-repair.png')), // Ícono de herramientas
+              'assets/images/repair-tools.png')), // Ícono de herramientas
       title: Text(title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -360,8 +366,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: const Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text('Inicio', style: TextStyle(color: Colors.white),)
-            
+            Text(
+              'Inicio',
+              style: TextStyle(color: Colors.white),
+            )
           ],
         ),
         backgroundColor: Colors.transparent,
@@ -378,8 +386,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 1.0,
               ],
               colors: [
-               Color(0xff051937),
-              Color(0XFF131314),
+                Color(0xff051937),
+                Color(0XFF131314),
 
                 //Color(0xff051937),
                 //Color(0XFF131314),

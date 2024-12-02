@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:glass/glass.dart';
 class TicketDetailCard extends StatelessWidget {
   final String headerTitle;
   final String code;
@@ -10,6 +10,7 @@ class TicketDetailCard extends StatelessWidget {
   final String title;
   final String description;
 
+  //obligatorio por el reuired , no posicional
   TicketDetailCard({
     required this.headerTitle,
     required this.code,
@@ -25,9 +26,8 @@ class TicketDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Colors.white,
-      margin: EdgeInsets.all(16.0),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Stack(
           children: [
             Positioned(
@@ -40,19 +40,19 @@ class TicketDetailCard extends StatelessWidget {
               children: [
                 Text(
                   headerTitle,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 _buildDetailRow('Código:', code),
                 _buildDetailRow('Cliente:', clientName),
                 _buildDetailRow('Tipo:', type),
                 _buildDetailRow('Fecha de Creación:', creationDate),
                 _buildDetailRow('Título:', title),
-                Text(
+                const Text(
                   'Descripción:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Text(description, style: TextStyle(fontSize: 14)),
+                Text(description, style: const TextStyle(fontSize: 14)),
               ],
             ),
           ],
@@ -68,9 +68,9 @@ class TicketDetailCard extends StatelessWidget {
         children: [
           Text(
             '$label ',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
         ],
       ),
     );
@@ -127,7 +127,7 @@ class TicketDetailCard extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25.0),
-        side: BorderSide(color: Colors.transparent),
+        side: const BorderSide(color: Colors.transparent),
       ),
     );
   }

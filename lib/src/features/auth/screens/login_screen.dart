@@ -15,8 +15,7 @@ class LoginScreen extends StatelessWidget {
           decoration: const BoxDecoration(
             image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage("assets/images/daki-min-image.png")
-              ),
+                image: AssetImage("assets/images/daki-min-image.png")),
           ),
           child: SizedBox(
               width: double.infinity,
@@ -32,7 +31,7 @@ class LoginScreen extends StatelessWidget {
                       decoration: const BoxDecoration(
                         image: DecorationImage(
                             image: AssetImage("assets/images/daki-min-image"),
-                             fit: BoxFit.cover),
+                            fit: BoxFit.cover),
                       ),
                       child: null,
                     ),

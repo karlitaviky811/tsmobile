@@ -19,6 +19,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     'Cliente no disponible',
     'Información insuficiente',
     'Problema fuera de alcance',
+    'Lugar de destino lejano',
     'Solicitud cancelada',
     'Equipo no se puede reparar',
     'No especificado'
@@ -32,7 +33,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           'Detalle del Ticket',
           style: AppStyle.txtPoppinsRegular18Black,
         ),
-         leading: IconButton(
+        leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
             onPressed: () {
               Navigator.pop(context);
@@ -42,7 +43,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
         color: Colors.white,
         child: Stack(children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -55,7 +56,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                         title: 'Reparación del Aire Acondicionado',
                         description:
                             'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                              creationDateTime: DateTime.now(),
+                        creationDateTime: DateTime.now(),
                         location: 'Caracas, Venezuela',
                         product: 'Aire Acondicionado',
                         brand: 'Hyundai')),

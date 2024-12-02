@@ -66,8 +66,20 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                 runSpacing: 4.0,
                 children: ["Nuevos", "En proceso", "Historico"].map((tag) {
                   return FilterChip(
-                    label: Text(tag),
+                    label: Text(
+                      tag,
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        height: 1.4,
+                        fontWeight: FontWeight.normal,
+                        color:  selectedTags.contains(tag)
+                            ? Colors.white
+                            : Color(0xff051937),
+                      ),
+                    ),
                     selected: selectedTags.contains(tag),
+                    checkmarkColor: Colors.white,
+                    selectedColor: Color(0xff051937),
                     onSelected: (bool selected) {
                       setState(() {
                         if (selected) {
@@ -95,7 +107,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: const Color(0xffEEEFF1)),
                           ),
-                          child:  ReservationItemElement(),
+                          child: ReservationItemElement(),
                         ),
                         if (index < items.length - 1)
                           const SizedBox(

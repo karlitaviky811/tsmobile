@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:tsmobile/src/widgets/maps_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 
@@ -19,30 +22,35 @@ class ClienteDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return SingleChildScrollView(
+      child: Card(
         color: Colors.white,
-      margin: EdgeInsets.all(16.0),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Detalles del Cliente',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            _buildEditableDetailRow(context, 'Dirección:', address),
-            _buildPhoneDetailRow(context, 'Teléfono:', phoneNumber),
-            _buildDetailRow('Correo:', email),
-            _buildDetailRow('Geolocalización:', geolocation),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Detalles del Cliente',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              _buildEditableDetailRow(context, 'Dirección:', address),
+              _buildPhoneDetailRow(context, 'Teléfono:', phoneNumber),
+              _buildDetailRow('Correo:', email),
+              _buildDetailRow('Geolocalización:', geolocation),
+              const Center(
+                child: MyMapPage(),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildEditableDetailRow(BuildContext context, String label, String value) {
+  Widget _buildEditableDetailRow(
+      BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -54,17 +62,18 @@ class ClienteDetailCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Text(
                   value,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: Icon(Icons.edit, color: Colors.blue),
+            icon: const Icon(Icons.edit, color: Colors.blue),
             onPressed: () => _editarDireccion(context),
           ),
         ],
@@ -72,19 +81,22 @@ class ClienteDetailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPhoneDetailRow(BuildContext context, String label, String value) {
+  Widget _buildPhoneDetailRow(
+      BuildContext context, String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
+          Text('$label ',
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
           IconButton(
-            icon: Icon(Icons.phone, color: Colors.green),
+            icon: const Icon(Icons.phone, color: Colors.green),
             onPressed: () => _llamarTelefono(value),
           ),
           IconButton(
-            icon: Icon(Icons.message, color: Colors.green),
+            icon: const Icon(Icons.message, color: Colors.green),
             onPressed: () => _enviarMensajeWhatsApp(value),
           ),
         ],
@@ -105,25 +117,26 @@ class ClienteDetailCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        TextEditingController addressController = TextEditingController(text: address);
+        TextEditingController addressController =
+            TextEditingController(text: address);
 
         return AlertDialog(
-          title: Text('Editar Dirección'),
+          title: const Text('Editar Dirección'),
           content: TextField(
             controller: addressController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Ingrese nueva dirección',
             ),
           ),
           actions: [
             TextButton(
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Guardar'),
+              child: const Text('Guardar'),
               onPressed: () {
                 onAddressChanged(addressController.text);
                 Navigator.of(context).pop();
@@ -140,10 +153,43 @@ class ClienteDetailCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
+          Text('$label ',
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
         ],
       ),
+    );
+  }
+}
+
+class MapsDteail extends StatelessWidget {
+  const MapsDteail({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    double latitude = 41.0;
+    double longitude = 29.0;
+    double zoomLevel = 8.0;
+    double zoom = 0;
+    /* if (zoomLevel.isFinite) {
+      int zoom = zoomLevel.toInt(); // Utiliza el valor de zoom convertido
+    } else {
+      print('Error: Nivel de zoom no válido');
+    }*/
+    return FlutterMap(
+      options: MapOptions(
+        initialCenter: LatLng(latitude, longitude),
+        initialZoom: zoomLevel,
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          subdomains: ['a', 'b', 'c'],
+        ),
+      ],
     );
   }
 }

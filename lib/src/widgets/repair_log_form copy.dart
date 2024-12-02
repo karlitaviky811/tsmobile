@@ -22,7 +22,7 @@ class RepairLogFormData extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Bitácora de reparación',
+              'Bitácora de visitas',
               textAlign: TextAlign.left,
               style: AppStyle.txtPoppinsMedium18Black,
             ),
@@ -75,7 +75,7 @@ Widget _buildReparacionForm(
                 reparacionesNotifier.notifyListeners();
               },
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -89,7 +89,7 @@ Widget _buildReparacionForm(
                   ),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25.0),
-                      side: BorderSide(color: Colors.transparent)),
+                      side: const BorderSide(color: Colors.transparent)),
                 ),
               ],
             ),
@@ -278,7 +278,7 @@ Widget _buildReparacionForm(
 void _guardarCompraRepuesto(BuildContext context, Map<String, dynamic> reparacion) {
   // Implementar la lógica para guardar la compra del repuesto
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Compra de repuesto guardada')),
+    const SnackBar(content: Text('Compra de repuesto guardada')),
   );
 }
 

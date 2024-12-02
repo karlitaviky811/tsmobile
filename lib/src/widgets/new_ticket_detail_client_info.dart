@@ -71,7 +71,7 @@ class NewTicketDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(16.0),
+      color: Colors.white,
       child: Padding(
         padding: EdgeInsets.all(16.0),
         child: Stack(

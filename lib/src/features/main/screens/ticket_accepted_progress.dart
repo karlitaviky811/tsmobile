@@ -1,20 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
+import 'package:glass/glass.dart';
 import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
-
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
-import 'package:tsmobile/src/widgets/cliente_direccion_card.dart';
-
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
-
 import '../../../widgets/diagnostic_log_ticket.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
@@ -95,8 +86,6 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         'estadoCompraRepuesto': 'Enviada',
       }
     ];
-
-
 
     final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
     return DefaultTabController(
@@ -213,33 +202,37 @@ class _TicketDetailProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView(
-              children: [
-                TicketDetailCard(
-                  headerTitle: 'Ticket de Servicio',
-                  code: 'TICKET12345',
-                  clientName: 'Juan Pérez',
-                  status: 'En Proceso',
-                  type: 'Reparación',
-                  creationDate: '2024-11-18',
-                  title: 'Reparación del Aire Acondicionado',
-                  description:
-                      'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                ClienteHandler(),
+    return Card(
+      color: Colors.white,
+      child: Container(
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                children: [
+                  TicketDetailCard(
+                    headerTitle: 'Ticket de Servicio',
+                    code: 'TICKET12345',
+                    clientName: 'Juan Pérez',
+                    status: 'En Proceso',
+                    type: 'Reparación',
+                    creationDate: '2024-11-18',
+                    title: 'Reparación del Aire Acondicionado',
+                    description:
+                        'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  //Divider(),
+                  ClienteHandler(),
 
-                // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
-              ],
+                  // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

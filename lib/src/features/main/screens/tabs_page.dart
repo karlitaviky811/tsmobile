@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+
 import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
 import 'package:tsmobile/src/features/main/screens/home_page.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
+import 'package:tsmobile/src/features/main/screens/settings_page.dart';
+import 'package:tsmobile/src/features/main/screens/settings_page2.dart';
+import 'package:tsmobile/src/widgets/maps_test.dart';
 
+import '../constant/image.constant.dart';
 
 class TabsPage extends StatelessWidget {
   const TabsPage({Key? key}) : super(key: key);
 
   static const String route = 'home-tabs-route';
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -30,19 +37,41 @@ class _Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final navegationModel = Provider.of<_NavigationModel>(context);
     return BottomNavigationBar(
-      selectedItemColor: Colors.amber[800],
+      backgroundColor: Colors.transparent,
+      selectedItemColor: Color(0xff051937),
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.shifting,
       currentIndex: navegationModel.paginaActual,
       onTap: (i) => navegationModel.paginaActual = i,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+      items: [
         BottomNavigationBarItem(
-            icon: Icon(Icons.sell_rounded), label: 'Servicios'),
+          icon: SvgPicture.asset(
+            ImageConstant.imgHome,
+            color: navegationModel.paginaActual == 0 ? Color(0xff051937) : Colors.grey,
+          ),
+          label: 'Home',
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month), label: 'Calendario'),
+          icon: SvgPicture.asset(
+            ImageConstant.imgSearch,
+            color: navegationModel.paginaActual == 1 ? Color(0xff051937)  : Colors.grey,
+          ),
+          label: 'Servicios',
+        ),
         BottomNavigationBarItem(
-            icon: Icon(Icons.tips_and_updates), label: 'Repuestos'),
+          icon: SvgPicture.asset(
+            ImageConstant.imgCalendar,
+            color: navegationModel.paginaActual == 2 ? Color(0xff051937) : Colors.grey,
+          ),
+          label: 'Calendario',
+        ),
+        BottomNavigationBarItem(
+          icon: SvgPicture.asset(
+            ImageConstant.imgCalendar,
+            color: navegationModel.paginaActual == 3 ? Color(0xff051937) : Colors.grey,
+          ),
+          label: 'Repuestos',
+        ),
       ],
     );
   }
@@ -59,12 +88,12 @@ class _Pages extends StatelessWidget {
     return PageView(
       controller: navegationController.pageController,
       physics: const NeverScrollableScrollPhysics(),
-      //physics: BouncingScrollPhysics(),
       children: const <Widget>[
         HomeScreen(),
         TicketsListFiltered(),
         CalendarScreen(),
-        CalendarScreen(),
+        //SettingsPage2(),
+        MyMapPage(),
       ],
     );
   }

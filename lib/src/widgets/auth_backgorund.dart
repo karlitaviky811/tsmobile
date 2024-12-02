@@ -63,10 +63,21 @@ class _PurpleBox extends StatelessWidget {
 
   BoxDecoration _purpleBackground() {
     return const BoxDecoration(
-        gradient: LinearGradient(colors: [
-      const Color(0xff051937),
-      const Color(0xff051937),
-    ]));
+        gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.bottomRight,
+              stops: [
+                0.1,
+                1.0,
+              ],
+              colors: [
+                Color(0xff051937),
+                Color(0XFF131314),
+
+                //Color(0xff051937),
+                //Color(0XFF131314),
+              ],
+            ),);
   }
 }
 

@@ -18,7 +18,7 @@ class ReservationItemElement extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const _CardScheduledReservationtImage(
-             image: 'assets/images/car-repair.png',
+             image: 'assets/images/wrench.png',
           ),
           const SizedBox(width: 8),
           Column(
@@ -108,7 +108,7 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       height: 60,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Color(0xffEEEFF1)),
+          border: Border.all(color: Colors.transparent),
           image: DecorationImage(image: AssetImage(image), fit: BoxFit.contain)),
     );
   }
