@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glass/glass.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 class TicketDetailCard extends StatelessWidget {
   final String headerTitle;
   final String code;
@@ -40,7 +41,7 @@ class TicketDetailCard extends StatelessWidget {
               children: [
                 Text(
                   headerTitle,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: AppStyle.txtPoppinsSemiBold18Black,
                 ),
                 const SizedBox(height: 16),
                 _buildDetailRow('Código:', code),
@@ -66,11 +67,8 @@ class TicketDetailCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text(
-            '$label ',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
+        Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
+          Expanded(child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
         ],
       ),
     );

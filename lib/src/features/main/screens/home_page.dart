@@ -27,14 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: CustomAppBar(
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Acción de búsqueda
-              print('Buscar');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications, color: Colors.white),
             onPressed: () {
               // Acción de notificaciones
               print('Notificaciones');
@@ -42,102 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
         leading: IconButton(
-          icon: const Icon(Icons.drag_indicator),
+          icon: Image.asset('assets/images/android-chrome-192x192new.png'),
           color: Colors.white, // Cambiar color aquí
           onPressed: () {
-            _scaffoldKey.currentState?.openDrawer();
+            //_scaffoldKey.currentState?.openDrawer();
           },
         ),
       ),
-      drawer: Drawer(
-        backgroundColor: const Color(0xffF3F5FD),
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              const SizedBox(
-                height: 30,
-              ),
-              ListTile(
-                leading: const Icon(Icons.account_circle_rounded),
-                title: const Text('Perfil'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfileUser()),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.star),
-                title: const Text('Calificaciones'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => TecnicoRatingCard(
-                              technicianName: 'Carlos Pérez',
-                              overallRating: 4.5,
-                              ticketRatings: const [
-                                const {
-                                  'ticketId': 'TICKET12345',
-                                  'rating': 5,
-                                  'date':
-                                      '2024-11-20', // Verifica que la clave sea 'date'
-                                  'clientName':
-                                      'Ana González', // Verifica que la clave sea 'clientName'
-                                  'comment': 'Servicio excelente y rápido',
-                                },
-                                {
-                                  'ticketId': 'TICKET12346',
-                                  'rating': 4,
-                                  'date':
-                                      '2024-11-18', // Verifica que la clave sea 'date'
-                                  'clientName':
-                                      'Luis Martínez', // Verifica que la clave sea 'clientName'
-                                  'comment':
-                                      'Buen servicio, pero podría mejorar la puntualidad',
-                                },
-                                {
-                                  'ticketId': 'TICKET12347',
-                                  'rating': 3,
-                                  'date':
-                                      '2024-11-15', // Verifica que la clave sea 'date'
-                                  'clientName':
-                                      'María Rodríguez', // Verifica que la clave sea 'clientName'
-                                  'comment':
-                                      'Servicio aceptable, pero hubo un retraso significativo',
-                                },
-                              ],
-                            )),
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: const Text('Configuración'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SettingsView()),
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 30,
-              ),
-              ListTile(
-                leading: const Icon(Icons.exit_to_app),
-                title: const Text('Salir'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+      
       body: SingleChildScrollView(
         child: Container(
           color: Colors.white,
@@ -146,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hola Andrea!', style: AppStyle.txtPoppinsSemiBold20Black),
+                Text('Hola, Carlos Pérez!', style: AppStyle.txtPoppinsSemiBold20Black),
+                Text('Proyectos Y Servicios JR C.A.', style: AppStyle.txtPoppinsSemiBold14Black),
                 const SizedBox(height: 31),
                 Text('Ubicación Actual',
                     style: AppStyle.txtPoppinsSemiBold18Black),
@@ -311,7 +217,7 @@ class ReservationItem extends StatelessWidget {
     return ListTile(
       leading: const Image(
           image: AssetImage(
-              'assets/images/repair-tools.png')), // Ícono de herramientas
+              'assets/images/wrench.png',)), // Ícono de herramientas
       title: Text(title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

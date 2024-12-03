@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
+
+import 'location_map_distance.dart';
 
 class TicketDetailPageView extends StatefulWidget {
   static const String route = 'detail-view-ticket-route';
@@ -39,69 +42,79 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
               Navigator.pop(context);
             }),
       ),
-      body: Container(
-        color: Colors.white,
-        child: Stack(children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Center(
-                    child: NewTicketDetailCard(
-                        code: 'TICKET12345',
-                        clientName: 'Juan Pérez',
-                        status: 'En proceso',
-                        type: 'Reparación',
-                        title: 'Reparación del Aire Acondicionado',
-                        description:
-                            'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                        creationDateTime: DateTime.now(),
-                        location: 'Caracas, Venezuela',
-                        product: 'Aire Acondicionado',
-                        brand: 'Hyundai')),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.check_box,
-                          size: 18, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          _status = 'accepted';
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff051937),
-                        // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.white,
+          child: Stack(children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Center(
+                      child: NewTicketDetailCard(
+                          code: 'TICKET12345',
+                          clientName: 'Juan Pérez',
+                          status: 'En proceso',
+                          type: 'Reparación',
+                          title: 'Reparación del Aire Acondicionado',
+                          description:
+                              'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                          creationDateTime: DateTime.now(),
+                          location: 'Caracas, Venezuela',
+                          product: 'Aire Acondicionado',
+                          brand: 'Hyundai')),
+                  const SizedBox(height: 10),
+                  LocationMapDistance(
+                    initialCoordinates: LatLng(
+                        37.7749, -122.4194), // Coordenadas de San Francisco
+                    destinationCoordinates:
+                        LatLng(34.0522, -118.2437), // Coordenadas de Los Ángeles
+                  ),
+                  // Usar la ubicación del sistema
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.check_box,
+                            size: 18, color: Colors.white),
+                        onPressed: () {
+                          setState(() {
+                            _status = 'accepted';
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xff051937),
+                          // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
+                        ),
+                        label: Text('Aceptar',
+                            style: AppStyle.txtPoppinsMedium14White),
                       ),
-                      label: Text('Aceptar',
-                          style: AppStyle.txtPoppinsMedium14White),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.report_problem,
-                          size: 18, color: Colors.white),
-                      onPressed: () {
-                        setState(() {
-                          _status = 'rejected';
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xff051937)),
-                      label: Text('Rechazar',
-                          style: AppStyle.txtPoppinsMedium14White),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                if (_status == 'accepted') Expanded(child: buildAcceptedForm()),
-                if (_status == 'rejected') Expanded(child: buildRejectedForm()),
-              ],
+                      const SizedBox(width: 10),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.report_problem,
+                            size: 18, color: Colors.white),
+                        onPressed: () {
+                          setState(() {
+                            _status = 'rejected';
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xff051937)),
+                        label: Text('Rechazar',
+                            style: AppStyle.txtPoppinsMedium14White),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  if (_status == 'accepted') Expanded(child: buildAcceptedForm()),
+                  if (_status == 'rejected') Expanded(child: buildRejectedForm()),
+                ],
+              ),
             ),
-          ),
-        ]),
+          ]),
+        ),
       ),
     );
   }

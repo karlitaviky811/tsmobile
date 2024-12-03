@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
 
 class NewTicketDetailCard extends StatelessWidget {
   final String code;
@@ -119,8 +120,8 @@ class NewTicketDetailCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$label ', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: TextStyle(fontSize: 16))),
+          Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
+          Expanded(child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
         ],
       ),
     );

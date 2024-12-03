@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:tsmobile/src/widgets/maps_test.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
@@ -30,18 +32,18 @@ class ClienteDetailCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Detalles del Cliente',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: AppStyle.txtPoppinsSemiBold18Black,
               ),
               const SizedBox(height: 16),
               _buildEditableDetailRow(context, 'Dirección:', address),
               _buildPhoneDetailRow(context, 'Teléfono:', phoneNumber),
               _buildDetailRow('Correo:', email),
               _buildDetailRow('Geolocalización:', geolocation),
-              const Center(
-                child: MyMapPage(),
-              ),
+              LocationCard(
+                initialCoordinates: LatLng(10.4806, -66.9036),
+              )
             ],
           ),
         ),
@@ -62,12 +64,11 @@ class ClienteDetailCard extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                  style: AppStyle.txtPoppinsSemiBold16Black,
                 ),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 16),
+                  style: AppStyle.txtPoppinsRegular14Black,
                 ),
               ],
             ),
@@ -87,10 +88,9 @@ class ClienteDetailCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          Text('$label ',
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
+          Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
+          Expanded(
+              child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
           IconButton(
             icon: const Icon(Icons.phone, color: Colors.green),
             onPressed: () => _llamarTelefono(value),
@@ -154,9 +154,9 @@ class ClienteDetailCard extends StatelessWidget {
       child: Row(
         children: [
           Text('$label ',
-              style:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value, style: const TextStyle(fontSize: 16))),
+              style: AppStyle.txtPoppinsSemiBold16Black),
+          Expanded(
+              child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
         ],
       ),
     );

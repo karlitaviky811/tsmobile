@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
+import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
 import 'package:tsmobile/src/features/main/screens/home_page.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/settings_page.dart';
@@ -47,6 +48,8 @@ class _Navigation extends StatelessWidget {
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             ImageConstant.imgHome,
+             height: 22,
+     width: 22,
             color: navegationModel.paginaActual == 0 ? Color(0xff051937) : Colors.grey,
           ),
           label: 'Home',
@@ -72,6 +75,7 @@ class _Navigation extends StatelessWidget {
           ),
           label: 'Repuestos',
         ),
+        
       ],
     );
   }
@@ -88,12 +92,12 @@ class _Pages extends StatelessWidget {
     return PageView(
       controller: navegationController.pageController,
       physics: const NeverScrollableScrollPhysics(),
-      children: const <Widget>[
-        HomeScreen(),
-        TicketsListFiltered(),
-        CalendarScreen(),
+      children: <Widget>[
+        const HomeScreen(),
+        const TicketsListFiltered(),
+        const CalendarScreen(),
         //SettingsPage2(),
-        MyMapPage(),
+        SettingsView(),
       ],
     );
   }

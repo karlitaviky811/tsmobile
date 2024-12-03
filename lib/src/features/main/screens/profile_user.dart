@@ -60,6 +60,11 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                 const SizedBox(
                   height: 30,
                 ),
+                Text('Martes, 3 de Diciembre',
+                    style: AppStyle.txtPoppinsRegular14Black),
+                const SizedBox(
+                  height: 30,
+                ),
                 Form(
                   key: _formKey,
                   child: Column(
