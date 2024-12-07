@@ -175,7 +175,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                         label: const Text(
                           'Guardar',
                           style: TextStyle(color: Colors.white),
-                        ),
+                        ), icon: Icon(Icons.abc),
                       ),
                     ],
                   ),

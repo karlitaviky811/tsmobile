@@ -1,34 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/services/list_service.dart';
 import 'package:tsmobile/src/widgets/reservation_item.dart';
 import '../../../widgets/index.dart';
-// import 'package:tsmobile/src/features/main/screens/reservation_screen.dart';
+
 
 class TicketsListFiltered extends StatefulWidget {
   static const String route = 'technician-route';
 
   const TicketsListFiltered({super.key});
   @override
-  // ignore: library_private_types_in_public_api
   _FilteredListScreenState createState() => _FilteredListScreenState();
 }
 
 class _FilteredListScreenState extends State<TicketsListFiltered> {
-  List<Item> items = [
-    Item("Item 1", ["Nuevos", "tag2"]),
-    Item("Item 2", ["Nuevos"]),
-    Item("Item 3", ["En proceso", "tag3"]),
-    Item("Item 4", ["tag1", "tag3"]),
-  ];
-
+  List<Item> items = [];
   List<String> selectedTags = [];
   List<Item> filteredItems = [];
+  bool _isLoading = true;
+
+  final ItemService _itemService = ItemService();
 
   @override
   void initState() {
     super.initState();
-    filteredItems = items;
+    _loadItems();
+  }
+
+  void _loadItems() async {
+    try {
+      final items = await _itemService.getItems();
+      setState(() {
+        this.items = items;
+        filteredItems = items;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Failed to load items: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void updateFilteredItems() {
@@ -55,74 +68,76 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
               );
             }),
       ),
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 4.0,
-                children: ["Nuevos", "En proceso", "Historico"].map((tag) {
-                  return FilterChip(
-                    label: Text(
-                      tag,
-                      style: TextStyle(
-                        fontSize: 16.0,
-                        height: 1.4,
-                        fontWeight: FontWeight.normal,
-                        color:  selectedTags.contains(tag)
-                            ? Colors.white
-                            : Color(0xff051937),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: ["Nuevos", "En proceso", "Historico"].map((tag) {
+                        return FilterChip(
+                          label: Text(
+                            tag,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              height: 1.4,
+                              fontWeight: FontWeight.normal,
+                              color: selectedTags.contains(tag)
+                                  ? Colors.white
+                                  : Color(0xff051937),
+                            ),
+                          ),
+                          selected: selectedTags.contains(tag),
+                          checkmarkColor: Colors.white,
+                          selectedColor: Color(0xff051937),
+                          onSelected: (bool selected) {
+                            setState(() {
+                              if (selected) {
+                                selectedTags.add(tag);
+                              } else {
+                                selectedTags.remove(tag);
+                              }
+                              updateFilteredItems();
+                            });
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredItems.length,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    left: 18.25, top: 14, bottom: 14, right: 15.75),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: const Color(0xffEEEFF1)),
+                                ),
+                                child: ReservationItemElement(),
+                              ),
+                              if (index < items.length - 1)
+                                const SizedBox(
+                                  height: 10,
+                                )
+                              // Cambia el color del separador thickness: 1.0, // Cambia el grosor del separador
+                            ],
+                          );
+                        },
                       ),
                     ),
-                    selected: selectedTags.contains(tag),
-                    checkmarkColor: Colors.white,
-                    selectedColor: Color(0xff051937),
-                    onSelected: (bool selected) {
-                      setState(() {
-                        if (selected) {
-                          selectedTags.add(tag);
-                        } else {
-                          selectedTags.remove(tag);
-                        }
-                        updateFilteredItems();
-                      });
-                    },
-                  );
-                }).toList(),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: filteredItems.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.only(
-                              left: 18.25, top: 14, bottom: 14, right: 15.75),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xffEEEFF1)),
-                          ),
-                          child: ReservationItemElement(),
-                        ),
-                        if (index < items.length - 1)
-                          const SizedBox(
-                            height: 10,
-                          )
-                        // Cambia el color del separador thickness: 1.0, // Cambia el grosor del separador
-                      ],
-                    );
-                  },
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
@@ -131,11 +146,4 @@ List<Item> filterItems(List<Item> items, List<String> selectedTags) {
   return items.where((item) {
     return selectedTags.any((tag) => item.tags.contains(tag));
   }).toList();
-}
-
-class Item {
-  final String name;
-  final List<String> tags;
-
-  Item(this.name, this.tags);
 }

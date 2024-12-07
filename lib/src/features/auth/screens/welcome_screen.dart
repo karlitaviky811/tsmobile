@@ -2,8 +2,9 @@ import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/providers/login_form_provider.dart';
+import 'package:tsmobile/src/services/auth_service.dart';
 import 'package:tsmobile/src/ui/input_decoration.dart';
-
+import 'package:geolocator/geolocator.dart';
 import '../../../widgets/index.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -54,6 +55,18 @@ class _LoginForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loginForm = Provider.of<LoginFormProvider>(context);
+    final authService = AuthService();
+    void _signIn() async {
+      try {
+        final response = await authService.signIn(
+          loginForm.email,
+          loginForm.password,
+        );
+        print('Login successful: $response');
+      } catch (e) {
+        print('Login failed: $e');
+      }
+    }
 
     return Container(
         height: 300,
@@ -106,7 +119,9 @@ class _LoginForm extends StatelessWidget {
                 MaterialButton(
                   onPressed: () {
                     if (loginForm.isValidForm()) {
-                      Navigator.pushReplacementNamed(context, TabsPage.route);
+                       //_signIn();
+                          _showLocationModal(context);
+                      //Navigator.pushReplacementNamed(context, TabsPage.route);
                     }
                   },
                   shape: RoundedRectangleBorder(
@@ -126,4 +141,35 @@ class _LoginForm extends StatelessWidget {
               ],
             )));
   }
+void _showLocationModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Actualizar Ubicación'),
+          content: Text('¿Deseas actualizar tu ubicación actual?'),
+          actions: [
+            TextButton(
+              child: Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Actualizar'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Position position = await Geolocator.getCurrentPosition(
+                  desiredAccuracy: LocationAccuracy.high,
+                );
+                print('Ubicación actual: ${position.latitude}, ${position.longitude}');
+                // Aquí puedes enviar la ubicación al servidor o hacer lo que necesites con ella
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  //void _signIn() async { try { final response = await widget.authService.signIn( loginForm.email , _passwordController.text, ); print('Login successful: $response'); } catch (e) { print('Login failed: $e'); }
 }
