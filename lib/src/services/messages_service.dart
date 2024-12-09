@@ -1,52 +1,70 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsmobile/src/providers/messages_model.dart';
 
-class Message {
-  final String text;
-  final DateTime time;
 
-  Message({required this.text, required this.time});
+class MessageService {
+  final String apiUrl = 'http://3.137.100.242:3000/api/v1/comments';
 
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return Message(
-      text: json['text'],
-      time: DateTime.parse(json['time']),
+  Future<List<Message>> fetchMessages(String commentableType, int commentableId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token'); // Obtén el token del almacenamiento local
+
+    if (token == null) {
+      print('No se encontró el token de usuario');
+      throw Exception('No se encontró el token de usuario');
+    }
+
+    print('Token encontrado: $token');
+
+    final response = await http.get(
+      Uri.parse('$apiUrl?commentable_type=$commentableType&commentable_id=$commentableId'),
+      headers: {
+        'Authorization': 'Bearer $token', // Agrega el token en las cabeceras
+        'Content-Type': 'application/json',
+      },
     );
-  }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'text': text,
-      'time': time.toIso8601String(),
-    };
-  }
-}
-
-class ChatService {
-  final String apiUrl = 'http://example.com/api/messages';
-
-  Future<List<Message>> fetchMessages() async {
-    final response = await http.get(Uri.parse(apiUrl));
+    print('Respuesta del servidor: ${response.body}');
 
     if (response.statusCode == 200) {
-      List<dynamic> jsonResponse = jsonDecode(response.body);
-      return jsonResponse.map((json) => Message.fromJson(json)).toList();
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse.containsKey('data')) {
+        List<dynamic> data = jsonResponse['data'];
+        print('Datos obtenidos: $data');  // Añadir log para verificar datos
+        return data.map((json) => Message.fromJson(json)).toList();
+      } else {
+        throw Exception('La clave "data" no existe en el JSON de respuesta.');
+      }
     } else {
-      throw Exception('Failed to load messages');
+      print('Error al obtener los mensajes: ${response.statusCode}');
+      throw Exception('Error al obtener los mensajes: ${response.statusCode}');
     }
   }
 
   Future<void> sendMessage(Message message) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token'); // Obtén el token del almacenamiento local
+
+    if (token == null) {
+      throw Exception('No se encontró el token de usuario');
+    }
+
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: {
+        'Authorization': 'Bearer $token', // Agrega el token en las cabeceras
         'Content-Type': 'application/json',
       },
       body: jsonEncode(message.toJson()),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to send message');
+      print('Error al enviar el mensaje: ${response.statusCode}');
+      print('Respuesta del servidor: ${response.body}');
+      throw Exception('Error al enviar el mensaje');
     }
   }
 }

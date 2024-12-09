@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/providers/comments_provider.dart';
+import 'package:tsmobile/src/providers/message_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -25,7 +28,9 @@ Future<void> main() async {
       print("all events:------------------------------------ $event");
       print("body is: ${event.notification.additionalData}");
     });*/
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
+      ],child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
