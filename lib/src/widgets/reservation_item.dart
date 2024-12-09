@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
-
 import '../core/theme/app.styles.dart';
+import 'package:tsmobile/src/services/Item.model.dart';
 
 class ReservationItemElement extends StatelessWidget {
-  const ReservationItemElement({super.key});
+  final Item item;
+
+  const ReservationItemElement({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        print('item----- $item');
         Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TicketDetailPageView()));
+            MaterialPageRoute(builder: (context) => TicketDetailPageView(item: item)));
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -21,48 +24,66 @@ class ReservationItemElement extends StatelessWidget {
              image: 'assets/images/wrench.png',
           ),
           const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Aire no enfría',
-                style: AppStyle.txtPoppinsSemiBold16Black,
-              ),
-              const SizedBox(height: 6),
-              const _CardScheduledReservationToday(),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Text('Cliente: ',
-                      style: AppStyle.txtPoppinsRegular12Black),
-                  Text('Andrea Gómez', style: AppStyle.txtPoppinsRegular12Black)
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.schedule_outlined,
-                    size: 12,
-                  ),
-                  Text('2 horas', style: AppStyle.txtPoppinsRegular12Black),
-                  const Text(' | '),
-                  Text('50', style: AppStyle.txtPoppinsRegular12Black),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.location_on_outlined,
-                    size: 12,
-                  ),
-                  Text('Vía Av. Caracas y Av. P.º Caroni', style: AppStyle.txtPoppinsRegular12Black),
-                  const Text(' | '),
-                  Text('50', style: AppStyle.txtPoppinsRegular12Black),
-                ],
-              )
-            ],
+          Expanded( // Envuelve la columna en un widget Expanded para evitar desbordamientos
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title, // Mostrar el título del item
+                  style: AppStyle.txtPoppinsSemiBold16Black,
+                  overflow: TextOverflow.ellipsis, // Agregar esta línea
+                  maxLines: 1, // Limitar el número de líneas
+                ),
+                const SizedBox(height: 6),
+                _CardScheduledReservationToday(date: item.diagnosisDate ?? DateTime.now()), // Pasar la fecha de diagnóstico
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Text('Cliente: ',
+                        style: AppStyle.txtPoppinsRegular12Black),
+                    Expanded(
+                      child: Text(
+                        item.customerName, 
+                        style: AppStyle.txtPoppinsRegular12Black,
+                        overflow: TextOverflow.ellipsis, // Agregar esta línea
+                        maxLines: 1, // Limitar el número de líneas
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.schedule_outlined,
+                      size: 12,
+                    ),
+                    Text('${item.totalCost} USD', style: AppStyle.txtPoppinsRegular12Black), // Mostrar el costo total
+                    const Text(' | '),
+                    Text('50', style: AppStyle.txtPoppinsRegular12Black),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on_outlined,
+                      size: 12,
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Vía Av. Caracas y Av. P.º Caroni', 
+                        style: AppStyle.txtPoppinsRegular12Black,
+                        overflow: TextOverflow.ellipsis, // Agregar esta línea
+                        maxLines: 1, // Limitar el número de líneas
+                      ),
+                    ),
+                    const Text(' | '),
+                    Text('50', style: AppStyle.txtPoppinsRegular12Black),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -71,8 +92,11 @@ class ReservationItemElement extends StatelessWidget {
 }
 
 class _CardScheduledReservationToday extends StatelessWidget {
+  final DateTime date;
+
   const _CardScheduledReservationToday({
     super.key,
+    required this.date,
   });
 
   @override
@@ -85,11 +109,19 @@ class _CardScheduledReservationToday extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '9 de julio 2024',
+          '${date.day} de ${_getMonthName(date.month)} ${date.year}', // Formatear la fecha
           style: AppStyle.txtPoppinsRegular12Black,
         ),
       ],
     );
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ];
+    return months[month - 1];
   }
 }
 

@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/services/Item.model.dart';
 import 'package:tsmobile/src/services/list_service.dart';
 import 'package:tsmobile/src/widgets/reservation_item.dart';
 import '../../../widgets/index.dart';
-
 
 class TicketsListFiltered extends StatefulWidget {
   static const String route = 'technician-route';
 
   const TicketsListFiltered({super.key});
+
   @override
   _FilteredListScreenState createState() => _FilteredListScreenState();
 }
@@ -79,7 +80,8 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                     Wrap(
                       spacing: 8.0,
                       runSpacing: 4.0,
-                      children: ["Nuevos", "En proceso", "Historico"].map((tag) {
+                      children:
+                          ["Nuevos", "En proceso", "Historico"].map((tag) {
                         return FilterChip(
                           label: Text(
                             tag,
@@ -116,19 +118,23 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                             children: [
                               Container(
                                 padding: const EdgeInsets.only(
-                                    left: 18.25, top: 14, bottom: 14, right: 15.75),
+                                    left: 18.25,
+                                    top: 14,
+                                    bottom: 14,
+                                    right: 15.75),
                                 width: double.infinity,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0xffEEEFF1)),
+                                  border: Border.all(
+                                      color: const Color(0xffEEEFF1)),
                                 ),
-                                child: ReservationItemElement(),
+                                child: ReservationItemElement(
+                                    item: filteredItems[index]),
                               ),
                               if (index < items.length - 1)
                                 const SizedBox(
                                   height: 10,
                                 )
-                              // Cambia el color del separador thickness: 1.0, // Cambia el grosor del separador
                             ],
                           );
                         },
@@ -144,6 +150,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
 
 List<Item> filterItems(List<Item> items, List<String> selectedTags) {
   return items.where((item) {
-    return selectedTags.any((tag) => item.tags.contains(tag));
+    return selectedTags.any((tag) => item.title
+        .contains(tag)); // Ajusta la lógica de filtrado según tus datos
   }).toList();
 }

@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String apiUrl = "https://example.com/api";  // URL del endpoint ficticio
-
+  final String apiUrl =
+      "http://3.137.100.242:3000/api/v1"; // URL del endpoint ficticio
+  final String token = 'your_token_here';
   Future<Map<String, dynamic>> signIn(String email, String password) async {
     final response = await http.post(
       Uri.parse('$apiUrl/login'),
@@ -15,7 +17,10 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final String token = responseData['data']['token'];
+      saveToken(token);
+      return jsonDecode(responseData['data']['token']);
     } else {
       throw Exception('Failed to login');
     }
@@ -32,9 +37,17 @@ class AuthService {
     );
 
     if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final String token = responseData['data']['token'];
+      saveToken(token);
       return jsonDecode(response.body);
     } else {
       throw Exception('Failed to register');
     }
+  }
+
+  Future<void> saveToken(String token) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', token);
   }
 }

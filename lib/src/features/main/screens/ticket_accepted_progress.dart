@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:glass/glass.dart';
-import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
+import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';

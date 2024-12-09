@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/card_detail_ticket.dart';
 import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
-import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 
 import 'location_map_distance.dart';
 
 class TicketDetailPageView extends StatefulWidget {
   static const String route = 'detail-view-ticket-route';
+
+  final dynamic item;
+  const TicketDetailPageView({super.key, this.item});
 
   @override
   _TicketDetailPageState createState() => _TicketDetailPageState();
@@ -29,9 +30,11 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   ];
   @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+  
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xffF3F5FD),
+        backgroundColor: const Color(0xffF3F5FD),
         title: Text(
           'Detalle del Ticket',
           style: AppStyle.txtPoppinsRegular18Black,
@@ -53,23 +56,23 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                 children: <Widget>[
                   Center(
                       child: NewTicketDetailCard(
-                          code: 'TICKET12345',
-                          clientName: 'Juan Pérez',
-                          status: 'En proceso',
+                          code: item.id.toString(),
+                          clientName: item.customerName,
+                          status: item.status.toString(),
                           type: 'Reparación',
-                          title: 'Reparación del Aire Acondicionado',
+                          title: item.title,
                           description:
                               'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                          creationDateTime: DateTime.now(),
+                          creationDateTime: item.createdAt,
                           location: 'Caracas, Venezuela',
                           product: 'Aire Acondicionado',
                           brand: 'Hyundai')),
                   const SizedBox(height: 10),
                   LocationMapDistance(
-                    initialCoordinates: LatLng(
+                    initialCoordinates: const LatLng(
                         37.7749, -122.4194), // Coordenadas de San Francisco
-                    destinationCoordinates:
-                        LatLng(34.0522, -118.2437), // Coordenadas de Los Ángeles
+                    destinationCoordinates: const LatLng(
+                        34.0522, -118.2437), // Coordenadas de Los Ángeles
                   ),
                   // Usar la ubicación del sistema
 
@@ -85,7 +88,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xff051937),
+                          backgroundColor: const Color(0xff051937),
                           // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
                         ),
                         label: Text('Aceptar',
@@ -101,15 +104,17 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xff051937)),
+                            backgroundColor: const Color(0xff051937)),
                         label: Text('Rechazar',
                             style: AppStyle.txtPoppinsMedium14White),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  if (_status == 'accepted') Expanded(child: buildAcceptedForm()),
-                  if (_status == 'rejected') Expanded(child: buildRejectedForm()),
+                  if (_status == 'accepted')
+                    Expanded(child: buildAcceptedForm()),
+                  if (_status == 'rejected')
+                    Expanded(child: buildRejectedForm()),
                 ],
               ),
             ),
@@ -138,12 +143,12 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                 style: AppStyle.txtPoppinsRegular14Black),
             const SizedBox(height: 20),
             ElevatedButton.icon(
-              icon: Icon(Icons.save, size: 18, color: Colors.white),
+              icon: const Icon(Icons.save, size: 18, color: Colors.white),
               onPressed: () {
                 // Lógica para guardar los detalles del ticket aceptado
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff051937),
+                backgroundColor: const Color(0xff051937),
                 // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
               ),
               label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
@@ -182,12 +187,12 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
             height: 20,
           ),
           ElevatedButton.icon(
-            icon: Icon(Icons.save, size: 18, color: Colors.white),
+            icon: const Icon(Icons.save, size: 18, color: Colors.white),
             onPressed: () {
               // Lógica para guardar los detalles del ticket aceptado
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xff051937),
+              backgroundColor: const Color(0xff051937),
               // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
             ),
             label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
@@ -208,20 +213,20 @@ Widget getStatusChip(String status) {
       color = Colors.orange;
       text = 'Pendiente';
       break;
-    case 'new':
-      color = Color(0xffE0FFFF);
+    case '3':
+      color = const Color(0xffE0FFFF);
       text = 'Nuevo';
       break;
     case 'in_progress':
-      color = Color(0xffb0c2f2);
+      color = const Color(0xffb0c2f2);
       text = 'En Proceso';
       break;
     case 'completed':
-      color = Color(0xffa07a);
+      color = const Color(0xffa07a);
       text = 'Completado';
       break;
     case 'canceled':
-      color = Color(0xffa07a);
+      color = const Color(0xffa07a);
       text = 'Cancelado';
       break;
     default:

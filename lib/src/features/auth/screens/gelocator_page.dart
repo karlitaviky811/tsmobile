@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'home_screen.dart';  // Tu pantalla de inicio (home)
-import 'auth_service.dart';  // Tu servicio de autenticación
+import 'package:tsmobile/src/services/auth_service.dart';
+// Tu servicio de autenticación
 
 class LoginScreen extends StatefulWidget {
   @override

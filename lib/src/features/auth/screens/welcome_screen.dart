@@ -119,9 +119,9 @@ class _LoginForm extends StatelessWidget {
                 MaterialButton(
                   onPressed: () {
                     if (loginForm.isValidForm()) {
-                       //_signIn();
-                          _showLocationModal(context);
-                      //Navigator.pushReplacementNamed(context, TabsPage.route);
+                      _signIn();
+                      //_showLocationModal(context);
+                      Navigator.pushReplacementNamed(context, TabsPage.route);
                     }
                   },
                   shape: RoundedRectangleBorder(
@@ -141,7 +141,8 @@ class _LoginForm extends StatelessWidget {
               ],
             )));
   }
-void _showLocationModal(BuildContext context) {
+
+  void _showLocationModal(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -162,7 +163,8 @@ void _showLocationModal(BuildContext context) {
                 Position position = await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.high,
                 );
-                print('Ubicación actual: ${position.latitude}, ${position.longitude}');
+                print(
+                    'Ubicación actual: ${position.latitude}, ${position.longitude}');
                 // Aquí puedes enviar la ubicación al servidor o hacer lo que necesites con ella
               },
             ),
@@ -171,5 +173,4 @@ void _showLocationModal(BuildContext context) {
       },
     );
   }
-  //void _signIn() async { try { final response = await widget.authService.signIn( loginForm.email , _passwordController.text, ); print('Login successful: $response'); } catch (e) { print('Login failed: $e'); }
 }
