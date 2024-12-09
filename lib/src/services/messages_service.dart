@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/providers/messages_model.dart';
 
-
 class MessageService {
   final String apiUrl = 'http://3.137.100.242:3000/api/v1/comments';
 
