@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
-import 'package:tsmobile/src/providers/messages_model.dart';
+import 'package:tsmobile/src/models/messages_model.dart';
 
 class ChatScreen extends StatelessWidget {
   static const String route = 'chat-client-ticket-route';
@@ -14,7 +14,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xffF3F5FD),
+        backgroundColor: const Color(0xffF3F5FD),
         title: Text('Chat', style: AppStyle.txtPoppinsRegular18Black),
       ),
       body: FutureBuilder<void>(
@@ -22,7 +22,7 @@ class ChatScreen extends StatelessWidget {
         builder: (context, snapshot) {
           print('Estado de FutureBuilder: ${snapshot.connectionState}'); // Log para estado del FutureBuilder
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error al cargar los mensajes: ${snapshot.error}'));
           } else {
@@ -41,8 +41,8 @@ class ChatScreen extends StatelessWidget {
                           return Align(
                             alignment: isOwnMessage ? Alignment.centerRight : Alignment.centerLeft,
                             child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                              margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                               decoration: BoxDecoration(
                                 color: isOwnMessage ? Colors.blue : Colors.grey[300],
                                 borderRadius: BorderRadius.circular(15),
@@ -54,7 +54,7 @@ class ChatScreen extends StatelessWidget {
                                     message.comment,
                                     style: TextStyle(color: isOwnMessage ? Colors.white : Colors.black),
                                   ),
-                                  SizedBox(height: 5),
+                                  const SizedBox(height: 5),
                                   Text(
                                     timeString,
                                     style: TextStyle(color: isOwnMessage ? Colors.white70 : Colors.black54, fontSize: 10),
@@ -73,14 +73,14 @@ class ChatScreen extends StatelessWidget {
                           Expanded(
                             child: TextField(
                               controller: _controller,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 hintText: 'Escribe un mensaje...',
                                 border: OutlineInputBorder(),
                               ),
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.send),
+                            icon: const Icon(Icons.send),
                             onPressed: () => _sendMessage(context, _controller.text, messageProvider),
                           ),
                         ],

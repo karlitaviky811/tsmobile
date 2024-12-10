@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import 'package:tsmobile/src/features/main/screens/home_page.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 
 class SplashScreen extends StatefulWidget {

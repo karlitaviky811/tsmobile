@@ -1,49 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
+import 'package:tsmobile/src/models/tickets_model.dart';
 import '../core/theme/app.styles.dart';
-import 'package:tsmobile/src/services/Item.model.dart';
+// Asegúrate de importar el modelo correcto
 
 class ReservationItemElement extends StatelessWidget {
-  final Item item;
+  final ServiceTicket ticket; // Cambiar Item a ServiceTicket
 
-  const ReservationItemElement({super.key, required this.item});
+  const ReservationItemElement({super.key, required this.ticket}); // Cambiar item a ticket
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('item----- $item');
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => TicketDetailPageView(item: item)));
+        print('ticket----- $ticket'); // Cambiar item a ticket
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TicketDetailPageView(item: ticket), // Cambiar item a ticket
+          ),
+        );
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           const _CardScheduledReservationtImage(
-             image: 'assets/images/wrench.png',
+            image: 'assets/images/wrench.png',
           ),
           const SizedBox(width: 8),
-          Expanded( // Envuelve la columna en un widget Expanded para evitar desbordamientos
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.title, // Mostrar el título del item
+                  ticket.title, // Mostrar el título del ticket
                   style: AppStyle.txtPoppinsSemiBold16Black,
                   overflow: TextOverflow.ellipsis, // Agregar esta línea
                   maxLines: 1, // Limitar el número de líneas
                 ),
                 const SizedBox(height: 6),
-                _CardScheduledReservationToday(date: item.diagnosisDate ?? DateTime.now()), // Pasar la fecha de diagnóstico
+                _CardScheduledReservationToday(date: ticket.diagnosisDate ?? DateTime.now()), // Pasar la fecha de diagnóstico
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Text('Cliente: ',
-                        style: AppStyle.txtPoppinsRegular12Black),
+                    Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
                     Expanded(
                       child: Text(
-                        item.customerName, 
+                        ticket.customerName, 
                         style: AppStyle.txtPoppinsRegular12Black,
                         overflow: TextOverflow.ellipsis, // Agregar esta línea
                         maxLines: 1, // Limitar el número de líneas
@@ -58,7 +62,7 @@ class ReservationItemElement extends StatelessWidget {
                       Icons.schedule_outlined,
                       size: 12,
                     ),
-                    Text('${item.totalCost} USD', style: AppStyle.txtPoppinsRegular12Black), // Mostrar el costo total
+                    Text('${ticket.totalCost} USD', style: AppStyle.txtPoppinsRegular12Black), // Mostrar el costo total
                     const Text(' | '),
                     Text('50', style: AppStyle.txtPoppinsRegular12Black),
                   ],

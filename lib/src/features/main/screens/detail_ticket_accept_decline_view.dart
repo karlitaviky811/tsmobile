@@ -1,8 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/providers/geolocation_provider.dart';
+import 'package:tsmobile/src/services/map_coordinates.dart';
+import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
+import 'package:http/http.dart' as http;
 import 'location_map_distance.dart';
 
 class TicketDetailPageView extends StatefulWidget {
@@ -19,6 +26,10 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   String _status = 'pending';
   String _selectedReason = 'No especificado';
 
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
+  DateTime? _selectedDate;
+
   final List<String> _rejectionReasons = [
     'Cliente no disponible',
     'Información insuficiente',
@@ -28,10 +39,98 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     'Equipo no se puede reparar',
     'No especificado'
   ];
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = DateFormat.yMd().format(picked);
+      });
+    }
+  }
+
+  void _saveDetails() async {
+    // Lógica para enviar datos al endpoint
+    if (_selectedDate == null) {
+      print("Por favor, selecciona una fecha.");
+      return;
+    }
+
+    final Map<String, dynamic> data = {
+      'start_date': _selectedDate!.toIso8601String(),
+      'additional_notes': _notesController.text,
+      'status': 4,
+    };
+
+    print('programado $data');
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final idTicket = widget.item.serviceCallId.toString();
+      String? token = prefs.getString('auth_token');
+      final response = await http.put(
+        Uri.parse('http://3.137.100.242:3000/api/v1/tickets/${idTicket}'),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print("Detalles guardados con éxito");
+        // Acciones adicionales después de guardar
+      } else {
+        print("Error al guardar los detalles: ${response.body}");
+      }
+    } catch (e) {
+      print("Error al conectar con el servidor: $e");
+    }
+  }
+
+  void _saveDetailsRejected() async {
+    // Lógica para enviar datos al endpoint
+
+    final Map<String, dynamic> data = {
+      'start_date': new DateTime.now().toIso8601String(),
+      'additional_notes': _notesController.text,
+      'status': 1,
+    };
+
+    print('programado $data');
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final idTicket = widget.item.serviceCallId.toString();
+      String? token = prefs.getString('auth_token');
+      final response = await http.put(
+        Uri.parse('http://3.137.100.242:3000/api/v1/tickets/${idTicket}'),
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print("Detalles guardados con éxito");
+        // Acciones adicionales después de guardar
+      } else {
+        print("Error al guardar los detalles: ${response.body}");
+      }
+    } catch (e) {
+      print("Error al conectar con el servidor: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final item = widget.item;
-  
+    //GeolocationInfo gelocation = Provider.of<GeolocationInfo>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xffF3F5FD),
@@ -56,26 +155,26 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                 children: <Widget>[
                   Center(
                       child: NewTicketDetailCard(
-                          code: item.id.toString(),
+                          code: item.serviceCallId.toString(),
                           clientName: item.customerName,
                           status: item.status.toString(),
                           type: 'Reparación',
                           title: item.title,
-                          description:
-                              'El aire acondicionado no enfría adecuadamente y hace ruido.',
+                          description: item.serviceCallDetail['U_DK_QUEJA'],
                           creationDateTime: item.createdAt,
-                          location: 'Caracas, Venezuela',
-                          product: 'Aire Acondicionado',
+                          location: 'Cambiar formato de coordenadas',
+                          product: item.serviceCallDetail['itemName'],
                           brand: 'Hyundai')),
                   const SizedBox(height: 10),
                   LocationMapDistance(
-                    initialCoordinates: const LatLng(
-                        37.7749, -122.4194), // Coordenadas de San Francisco
-                    destinationCoordinates: const LatLng(
-                        34.0522, -118.2437), // Coordenadas de Los Ángeles
+                    initialCoordinates: const LatLng(10.254027777778,
+                        -68.010855555556), // Coordenadas de San Francisco
+                    destinationCoordinates: LatLng(
+                        double.parse(item.serviceCallDetail['latitude']),
+                        double.parse(item.serviceCallDetail[
+                            'longitude'])), // Coordenadas de Los Ángeles
                   ),
-                  // Usar la ubicación del sistema
-
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -111,10 +210,8 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  if (_status == 'accepted')
-                    Expanded(child: buildAcceptedForm()),
-                  if (_status == 'rejected')
-                    Expanded(child: buildRejectedForm()),
+                  if (_status == 'accepted') buildAcceptedForm(),
+                  if (_status == 'rejected') buildRejectedForm(),
                 ],
               ),
             ),
@@ -132,24 +229,26 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           children: <Widget>[
             Text('Programar visita ticket aceptado:',
                 style: AppStyle.txtPoppinsRegular18Black),
-            TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Fecha de inicio',
-                ),
-                style: AppStyle.txtPoppinsRegular14Black),
-            TextFormField(
-                decoration:
-                    const InputDecoration(labelText: 'Notas adicionales'),
-                style: AppStyle.txtPoppinsRegular14Black),
+            TextField(
+              controller: _dateController,
+              readOnly: true,
+              decoration: const InputDecoration(
+                labelText: 'Fecha de inicio',
+              ),
+              onTap: () => _selectDate(context),
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
+            TextField(
+              controller: _notesController,
+              decoration: const InputDecoration(labelText: 'Notas adicionales'),
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               icon: const Icon(Icons.save, size: 18, color: Colors.white),
-              onPressed: () {
-                // Lógica para guardar los detalles del ticket aceptado
-              },
+              onPressed: _saveDetails,
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff051937),
-                // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
               ),
               label: Text('Guardar', style: AppStyle.txtPoppinsMedium14White),
             ),
@@ -188,9 +287,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.save, size: 18, color: Colors.white),
-            onPressed: () {
-              // Lógica para guardar los detalles del ticket aceptado
-            },
+            onPressed: _saveDetailsRejected,
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff051937),
               // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón

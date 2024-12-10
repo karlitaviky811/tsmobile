@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 
 import 'package:tsmobile/src/core/theme/app.styles.dart';
@@ -7,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/models/auth_model.dart';
 import 'package:tsmobile/src/services/user_service.dart';
 import '../../../widgets/index.dart';
-import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   static const String route = 'main-tabs-route';

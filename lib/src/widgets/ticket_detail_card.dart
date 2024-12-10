@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:glass/glass.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 class TicketDetailCard extends StatelessWidget {
   final String headerTitle;

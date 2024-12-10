@@ -19,8 +19,9 @@ class AuthService {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       final String token = responseData['data']['token'];
-      saveToken(token);
-      return jsonDecode(responseData['data']['token']);
+      await saveToken(
+          token); // Asegúrate de que esta función guarde el token correctamente
+      return responseData; // Devolvemos el mapa completo
     } else {
       throw Exception('Failed to login');
     }
@@ -47,7 +48,7 @@ class AuthService {
   }
 
   Future<void> saveToken(String token) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('auth_token', token);
   }
 }

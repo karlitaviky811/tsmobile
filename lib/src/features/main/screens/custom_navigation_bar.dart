@@ -30,7 +30,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   @override
   initState() {
     super.initState();
-    _currentIndex = widget.currentIndex!;
+    _currentIndex = widget.currentIndex;
   }
 
   @override
@@ -63,7 +63,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               icon: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 5),
+                    padding: const EdgeInsets.only(top: 10, bottom: 5),
                     child: CustomImageView(
                       svgPath: widget.bottomMenuList[index].icon,
                       height: getSize(24),
@@ -85,7 +85,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               activeIcon: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
                     child: CustomImageView(
                         svgPath: widget.bottomMenuList[index].icon,
                         height: getSize(24),

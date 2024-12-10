@@ -7,8 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class LocationMapDistance extends StatefulWidget {
   final LatLng? initialCoordinates;
-  final LatLng?
-      destinationCoordinates; // Nueva propiedad para la ubicación destino
+  final LatLng? destinationCoordinates;
 
   LocationMapDistance({this.initialCoordinates, this.destinationCoordinates});
 
@@ -111,7 +110,7 @@ class _LocationMapDistanceState extends State<LocationMapDistance> {
         ),
         child: Container(
           width: double.infinity,
-          height: 350, // Ajustamos la altura para incluir el botón
+          height: 350,
           child: Column(
             children: [
               Expanded(
@@ -163,6 +162,19 @@ class _LocationMapDistanceState extends State<LocationMapDistance> {
                                 ),
                             ],
                           ),
+                          if (widget.destinationCoordinates != null)
+                            PolylineLayer(
+                              polylines: [
+                                Polyline(
+                                  points: [
+                                    _selectedLocation,
+                                    widget.destinationCoordinates!,
+                                  ],
+                                  color: Colors.blue,
+                                  strokeWidth: 4.0,
+                                ),
+                              ],
+                            ),
                         ],
                       )
                     else
@@ -212,16 +224,13 @@ class _LocationMapDistanceState extends State<LocationMapDistance> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
                   onPressed: _saveLocation,
-                  icon: Icon(Icons.save,
-                      color: Colors.blue), // Color resaltante para el ícono
+                  icon: Icon(Icons.save, color: Colors.blue),
                   label: Text('Guardar Ubicación',
-                      style: TextStyle(
-                          color:
-                              Colors.blue)), // Color resaltante para el texto
+                      style: TextStyle(color: Colors.blue)),
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.transparent, // Fondo transparente
-                    foregroundColor: Colors.blue, // Color del texto
-                    side: BorderSide(color: Colors.blue), // Borde azul
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.blue,
+                    side: BorderSide(color: Colors.blue),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

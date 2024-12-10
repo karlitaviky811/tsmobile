@@ -117,12 +117,16 @@ class _LoginForm extends StatelessWidget {
                   height: 60,
                 ),
                 MaterialButton(
+                  
                   onPressed: () {
                     if (loginForm.isValidForm()) {
                       _signIn();
                       //_showLocationModal(context);
                       Navigator.pushReplacementNamed(context, TabsPage.route);
                     }
+
+            
+                    
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
@@ -147,17 +151,17 @@ class _LoginForm extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Actualizar Ubicación'),
-          content: Text('¿Deseas actualizar tu ubicación actual?'),
+          title: const Text('Actualizar Ubicación'),
+          content: const Text('¿Deseas actualizar tu ubicación actual?'),
           actions: [
             TextButton(
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Actualizar'),
+              child: const Text('Actualizar'),
               onPressed: () async {
                 Navigator.of(context).pop();
                 Position position = await Geolocator.getCurrentPosition(
@@ -174,3 +178,7 @@ class _LoginForm extends StatelessWidget {
     );
   }
 }
+
+
+//  //String email = 'tecnico8@gmail.com';
+  //String password = '83244473487';

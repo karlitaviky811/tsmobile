@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/providers/messages_model.dart';
+import 'package:tsmobile/src/models/messages_model.dart';
 import 'package:tsmobile/src/services/messages_service.dart';
 
 class MessageProvider with ChangeNotifier {

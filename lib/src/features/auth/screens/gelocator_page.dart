@@ -4,6 +4,8 @@ import 'package:tsmobile/src/services/auth_service.dart';
 // Tu servicio de autenticación
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -37,17 +39,17 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Actualizar Ubicación'),
-          content: Text('¿Deseas actualizar tu ubicación actual?'),
+          title: const Text('Actualizar Ubicación'),
+          content: const Text('¿Deseas actualizar tu ubicación actual?'),
           actions: [
             TextButton(
-              child: Text('Cancelar'),
+              child: const Text('Cancelar'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Actualizar'),
+              child: const Text('Actualizar'),
               onPressed: () async {
                 Navigator.of(context).pop();
                 Position position = await Geolocator.getCurrentPosition(
@@ -67,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -75,16 +77,16 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(labelText: 'Email'),
             ),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             ElevatedButton(
               onPressed: _signIn,
-              child: Text('Sign In'),
+              child: const Text('Sign In'),
             ),
           ],
         ),
@@ -94,13 +96,15 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Welcome to the Home Screen!'),
       ),
     );

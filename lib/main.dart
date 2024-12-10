@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/providers/comments_provider.dart';
+import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -18,19 +18,19 @@ Future<void> main() async {
 
 // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
 
-
   OneSignal.User.addAlias('external_id', 'userId-test-1');
   OneSignal.login('userId-test-1');
-  if((OneSignal.User.pushSubscription.id== null)){
-      OneSignal.Notifications.requestPermission(true);
+  if ((OneSignal.User.pushSubscription.id == null)) {
+    OneSignal.Notifications.requestPermission(true);
   }
   /*OneSignal.Notifications.addClickListener((event) {
       print("all events:------------------------------------ $event");
       print("body is: ${event.notification.additionalData}");
     });*/
   runApp(MultiProvider(providers: [
-        ChangeNotifierProvider(create: (_) => MessageProvider()),
-      ],child: const MyApp()));
+    ChangeNotifierProvider(create: (_) => MessageProvider()),
+     ChangeNotifierProvider(create: (_) => GeolocationInfo())
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -43,18 +43,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        dividerColor: Colors.transparent,
-        hintColor: Colors.indigo,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-        scaffoldBackgroundColor: Color(0xffF3F5FD)
-      ),
-      home: const TabsPage() ,
+          dividerColor: Colors.transparent,
+          hintColor: Colors.indigo,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+          useMaterial3: true,
+          scaffoldBackgroundColor: Color(0xffF3F5FD)),
+      home: const TabsPage(),
       routes: RouterApp.getRoutes(),
       initialRoute: RouterApp.initialRoute,
-
     );
   }
 }
-
-

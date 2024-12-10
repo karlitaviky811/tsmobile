@@ -6,9 +6,6 @@ import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
 import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
 import 'package:tsmobile/src/features/main/screens/home_page.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
-import 'package:tsmobile/src/features/main/screens/settings_page.dart';
-import 'package:tsmobile/src/features/main/screens/settings_page2.dart';
-import 'package:tsmobile/src/widgets/maps_test.dart';
 
 import '../constant/image.constant.dart';
 
@@ -39,7 +36,7 @@ class _Navigation extends StatelessWidget {
     final navegationModel = Provider.of<_NavigationModel>(context);
     return BottomNavigationBar(
       backgroundColor: Colors.transparent,
-      selectedItemColor: Color(0xff051937),
+      selectedItemColor: const Color(0xff051937),
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.shifting,
       currentIndex: navegationModel.paginaActual,
@@ -50,28 +47,28 @@ class _Navigation extends StatelessWidget {
             ImageConstant.imgHome,
              height: 22,
      width: 22,
-            color: navegationModel.paginaActual == 0 ? Color(0xff051937) : Colors.grey,
+            color: navegationModel.paginaActual == 0 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             ImageConstant.imgSearch,
-            color: navegationModel.paginaActual == 1 ? Color(0xff051937)  : Colors.grey,
+            color: navegationModel.paginaActual == 1 ? const Color(0xff051937)  : Colors.grey,
           ),
           label: 'Servicios',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             ImageConstant.imgCalendar,
-            color: navegationModel.paginaActual == 2 ? Color(0xff051937) : Colors.grey,
+            color: navegationModel.paginaActual == 2 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Calendario',
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
             ImageConstant.imgCalendar,
-            color: navegationModel.paginaActual == 3 ? Color(0xff051937) : Colors.grey,
+            color: navegationModel.paginaActual == 3 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Repuestos',
         ),

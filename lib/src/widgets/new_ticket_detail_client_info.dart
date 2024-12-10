@@ -12,7 +12,7 @@ class NewTicketDetailCard extends StatelessWidget {
   final String location;
   final String product;
   final String brand;
-  final DateTime creationDateTime;
+  final String creationDateTime; // Cambiar a String
 
   NewTicketDetailCard({
     required this.code,
@@ -24,8 +24,10 @@ class NewTicketDetailCard extends StatelessWidget {
     required this.location,
     required this.product,
     required this.brand,
-    required this.creationDateTime,
-  });
+    required DateTime creationDateTime, // Recibir como DateTime
+  }) : creationDateTime = DateFormat.yMMMMd()
+            .add_Hm()
+            .format(creationDateTime); // Formatear a String
 
   Color _getChipColor(String status) {
     switch (status) {
@@ -61,14 +63,6 @@ class NewTicketDetailCard extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime date) {
-    return DateFormat.yMMMMd().format(date);
-  }
-
-  String _formatTime(DateTime date) {
-    return DateFormat.Hm().format(date);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -85,7 +79,8 @@ class NewTicketDetailCard extends StatelessWidget {
                 backgroundColor: _getChipColor(status),
                 avatar: Icon(_getStatusIcon(status), color: Colors.white),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0), // Hacemos el chip más redondeado
+                  borderRadius: BorderRadius.circular(
+                      20.0), // Hacemos el chip más redondeado
                   side: BorderSide(color: Colors.transparent),
                 ),
               ),
@@ -97,12 +92,8 @@ class NewTicketDetailCard extends StatelessWidget {
                 _buildDetailRow('Cliente:', clientName),
                 _buildDetailRow('Tipo:', type),
                 _buildDetailRow('Título:', title),
-                _buildDetailRow('Fecha de Creación:', _formatDate(creationDateTime)),
-                _buildDetailRow('Hora de Creación:', _formatTime(creationDateTime)),
-                SizedBox(height: 8),
-                Text('Descripción:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(description, style: TextStyle(fontSize: 16)),
-                SizedBox(height: 8),
+                _buildDetailRow('Fecha de Creación:', creationDateTime),
+                _buildDetailRow('Descripciónn:', description),
                 _buildDetailRow('Ubicación:', location),
                 _buildDetailRow('Producto:', product),
                 _buildDetailRow('Marca:', brand),
@@ -118,10 +109,12 @@ class NewTicketDetailCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment
+            .center, // Cambiar a center para una mejor alineación vertical
         children: [
           Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
-          Expanded(child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
+          Expanded(
+              child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
         ],
       ),
     );
