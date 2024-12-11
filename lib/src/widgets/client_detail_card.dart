@@ -37,10 +37,10 @@ class ClienteDetailCard extends StatelessWidget {
                 style: AppStyle.txtPoppinsSemiBold18Black,
               ),
               const SizedBox(height: 16),
-              _buildEditableDetailRow(context, 'Dirección:', address),
+                  _buildEditableDetailRow(context, 'Dirección:', address),
               _buildPhoneDetailRow(context, 'Teléfono:', phoneNumber),
-              _buildDetailRow('Correo:', email),
-              _buildDetailRow('Geolocalización:', geolocation),
+              _buildDetailRowLarge('Correo:', email),
+              _buildDetailRowLarge('Ubicación:', geolocation),
               LocationCard(
                 initialCoordinates: LatLng(10.4806, -66.9036),
               )
@@ -104,6 +104,57 @@ class ClienteDetailCard extends StatelessWidget {
     );
   }
 
+  Widget _buildDetailRowLarge(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+              overflow:
+                  TextOverflow.ellipsis, // Añadir si deseas manejar texto largo
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   void _llamarTelefono(String phoneNumber) async {
     bool? res = await FlutterPhoneDirectCaller.callNumber(phoneNumber);
   }
@@ -148,19 +199,7 @@ class ClienteDetailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        children: [
-          Text('$label ',
-              style: AppStyle.txtPoppinsSemiBold16Black),
-          Expanded(
-              child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
-        ],
-      ),
-    );
-  }
+  
 }
 
 class MapsDteail extends StatelessWidget {

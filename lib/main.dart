@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
+
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -30,7 +31,7 @@ Future<void> main() async {
     });*/
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => MessageProvider()),
-     ChangeNotifierProvider(create: (_) => GeolocationInfo()),
+     ChangeNotifierProvider(create: (_) => GeolocationProvider()),
      ChangeNotifierProvider(create: (_)=> TicketProvider())
   ], child: const MyApp()));
 }

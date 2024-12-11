@@ -67,7 +67,6 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
 
     print('programado $data');
     // Lógica para enviar datos al endpoint
- 
 
     print('programado $data');
     try {
@@ -165,10 +164,10 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                             status: item.status?.toString() ?? 'N/A',
                             type: 'Reparación',
                             title: item.title ?? 'N/A',
-                            description: 'N/A', // Ajusta según sea necesario
+                            description: item.serviceCallDetail['descrption'], // Ajusta según sea necesario
                             creationDateTime: item.createdAt,
                             location: 'Cambiar formato de coordenadas',
-                            product: 'N/A', // Ajusta según sea necesario
+                            product:  item.serviceCallDetail['itemName'], // Ajusta según sea necesario
                             brand: 'Hyundai',
                           ),
                         ),

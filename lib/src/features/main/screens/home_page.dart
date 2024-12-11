@@ -201,7 +201,7 @@ class _ListScheduleReservationItems extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      TicketAcceptedProgressDetailPage(ticket: tickets[0])),
+                      TicketAcceptedProgressDetailPage(ticketId: tickets[0].id)),
             )
           },
           child: ReservationItem(

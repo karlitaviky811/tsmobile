@@ -26,9 +26,7 @@ class MainRouter {
       TicketDetailPageView.route: (BuildContext context) =>
           TicketDetailPageView(),
       TicketAcceptedProgressDetailPage.route: (BuildContext context) =>
-          TicketAcceptedProgressDetailPage(
-            ticket: tickets[0],
-          ),
+          TicketAcceptedProgressDetailPage(),
       ChatScreen.route: (BuildContext context) => ChatScreen(),
     });
 

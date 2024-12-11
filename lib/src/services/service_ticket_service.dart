@@ -48,6 +48,7 @@ class TicketService {
         Map<String, dynamic> jsonResponse = jsonDecode(response.body);
         Map<String, dynamic> data = jsonResponse['data'];
         print('data $data');
+        
         return ServiceTicket.fromJson(data);
       } else {
         throw Exception('Failed to load service ticket');

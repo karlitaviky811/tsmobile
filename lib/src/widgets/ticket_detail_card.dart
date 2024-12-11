@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+
 class TicketDetailCard extends StatelessWidget {
   final String headerTitle;
   final String code;
@@ -46,13 +47,9 @@ class TicketDetailCard extends StatelessWidget {
                 _buildDetailRow('Código:', code),
                 _buildDetailRow('Cliente:', clientName),
                 _buildDetailRow('Tipo:', type),
-                _buildDetailRow('Fecha de Creación:', creationDate),
-                _buildDetailRow('Título:', title),
-                const Text(
-                  'Descripción:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                Text(description, style: const TextStyle(fontSize: 14)),
+                _buildDetailRow('Fecha:', creationDate),
+                _buildDetailRowLarge('Título:', title),
+                _buildDetailRowLarge('Detalle:', description),
               ],
             ),
           ],
@@ -61,34 +58,72 @@ class TicketDetailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRowLarge(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-        Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
-          Expanded(child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+              overflow:
+                  TextOverflow.ellipsis, // Añadir si deseas manejar texto largo
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+ Widget _buildStatusChip(String status) {
     Color statusColor;
     switch (status) {
-      case 'Creada':
+      case 'Abierto':
         statusColor = const Color.fromARGB(255, 49, 145, 224);
         break;
-      case 'Nuevo':
+      case 'Cerrado':
         statusColor = const Color.fromARGB(108, 224, 49, 131);
         break;
-      case 'Aprobada':
+      case 'En Progreso':
         statusColor = const Color.fromARGB(188, 138, 140, 233);
         break;
-      case 'En Proceso':
+      case 'Rechazado':
         statusColor = const Color.fromARGB(150, 230, 107, 36);
         break;
-      case 'Resuelto':
+      case 'Bloqueado':
         statusColor = const Color.fromARGB(143, 80, 37, 87);
         break;
       case 'Cerrado':
@@ -104,7 +139,7 @@ class TicketDetailCard extends StatelessWidget {
           return Icons.create;
         case 'Aprobada':
           return Icons.check_circle;
-        case 'En proceso':
+        case 'En Progreso':
           return Icons.work;
         case 'Resuelto':
           return Icons.done;
@@ -115,8 +150,25 @@ class TicketDetailCard extends StatelessWidget {
       }
     }
 
+    String _getChipLabel(String estado) {
+      switch (estado) {
+        case '1':
+          return 'Abierto';
+        case '2':
+          return 'Cerrado';
+        case '3':
+          return 'Rechazado';
+        case '4':
+         return 'En Progreso';
+        case '5':
+            return 'Bloqueado';
+        default:
+          return  'Nuevo';
+      }
+    }
+
     return Chip(
-      label: Text(status),
+      label: Text(_getChipLabel(status)),
       backgroundColor: statusColor,
       avatar: Icon(
         _getChipIcon(status),

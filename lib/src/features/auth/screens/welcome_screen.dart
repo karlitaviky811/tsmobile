@@ -56,14 +56,16 @@ class _LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final loginForm = Provider.of<LoginFormProvider>(context);
     final authService = AuthService();
-    void _signIn() async {
+    Future<bool> _signIn() async {
       try {
         final response = await authService.signIn(
           loginForm.email,
           loginForm.password,
         );
         print('Login successful: $response');
+        return true;
       } catch (e) {
+        return false;
         print('Login failed: $e');
       }
     }
@@ -120,7 +122,8 @@ class _LoginForm extends StatelessWidget {
                   
                   onPressed: () {
                     if (loginForm.isValidForm()) {
-                      _signIn();
+                    final  res = _signIn();
+                      
                       //_showLocationModal(context);
                       Navigator.pushReplacementNamed(context, TabsPage.route);
                     }

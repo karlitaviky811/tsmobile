@@ -1,11 +1,19 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
-
 import 'package:tsmobile/src/widgets/reservation_item.dart';
+
+class Status {
+  final int id;
+  final String title;
+
+  Status(this.id, this.title);
+}
 
 class TicketsListFiltered extends StatefulWidget {
   static const String route = 'technician-route';
@@ -18,15 +26,27 @@ class TicketsListFiltered extends StatefulWidget {
 
 class _FilteredListScreenState extends State<TicketsListFiltered> {
   List<ServiceTicket> filteredItems = [];
-  List<String> selectedTags = [];
+  List<Status> selectedTags = [];
+  String searchQuery = "";
+
+  List<Status> tags = [
+    Status(0, "Todos"),
+    Status(1, "Nuevos"),
+    Status(2, "En Progreso"),
+    Status(3, "Cerrado"),
+  ];
 
   @override
   void initState() {
     super.initState();
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    
+    // Seleccionar "Todos" por defecto
+    selectedTags.add(tags.firstWhere((tag) => tag.title == "Todos"));
+    
     ticketProvider.loadTickets().then((_) {
       setState(() {
-        filteredItems = ticketProvider.tickets;
+        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
       });
     });
   }
@@ -34,7 +54,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   void updateFilteredItems() {
     setState(() {
       final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-      filteredItems = filterItems(ticketProvider.tickets, selectedTags);
+      filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
     });
   }
 
@@ -67,13 +87,25 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: "Buscar por título",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value;
+                          updateFilteredItems();
+                        });
+                      },
+                    ),
                     Wrap(
                       spacing: 8.0,
                       runSpacing: 4.0,
-                      children: ["Nuevos", "En proceso", "Historico"].map((tag) {
+                      children: tags.map((tag) {
                         return FilterChip(
                           label: Text(
-                            tag,
+                            tag.title,
                             style: TextStyle(
                               fontSize: 16.0,
                               height: 1.4,
@@ -88,10 +120,18 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                           selectedColor: const Color(0xff051937),
                           onSelected: (bool selected) {
                             setState(() {
-                              if (selected) {
+                              if (tag.title == "Todos") {
+                                selectedTags.clear();
                                 selectedTags.add(tag);
                               } else {
-                                selectedTags.remove(tag);
+                                if (selectedTags.any((tag) => tag.title == "Todos")) {
+                                  selectedTags.removeWhere((tag) => tag.title == "Todos");
+                                }
+                                if (selected) {
+                                  selectedTags.add(tag);
+                                } else {
+                                  selectedTags.remove(tag);
+                                }
                               }
                               updateFilteredItems();
                             });
@@ -137,8 +177,11 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   }
 }
 
-List<ServiceTicket> filterItems(List<ServiceTicket> items, List<String> selectedTags) {
+List<ServiceTicket> filterItems(List<ServiceTicket> items, List<Status> selectedTags, String searchQuery) {
+  if (selectedTags.any((tag) => tag.title == "Todos")) {
+    return items.where((item) => item.title.contains(searchQuery)).toList(); // Si "Todos" está seleccionado, filtrar por título
+  }
   return items.where((item) {
-    return selectedTags.any((tag) => item.title.contains(tag)); // Ajusta la lógica de filtrado según tus datos
+    return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery); // Filtrar por id de estatus y título
   }).toList();
 }

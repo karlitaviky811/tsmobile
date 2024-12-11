@@ -74,16 +74,7 @@ class NewTicketDetailCard extends StatelessWidget {
             Positioned(
               right: 0,
               top: 0,
-              child: Chip(
-                label: Text(status, style: TextStyle(color: Colors.white)),
-                backgroundColor: _getChipColor(status),
-                avatar: Icon(_getStatusIcon(status), color: Colors.white),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      20.0), // Hacemos el chip más redondeado
-                  side: BorderSide(color: Colors.transparent),
-                ),
-              ),
+              child: _buildStatusChip(status),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,8 +83,9 @@ class NewTicketDetailCard extends StatelessWidget {
                 _buildDetailRow('Cliente:', clientName),
                 _buildDetailRow('Tipo:', type),
                 _buildDetailRow('Título:', title),
-                _buildDetailRow('Fecha de Creación:', creationDateTime),
-                _buildDetailRow('Descripciónn:', description),
+                _buildDetailRow('Fecha:', creationDateTime),
+                _buildDetailRowLarge('Título:', title),
+                _buildDetailRowLarge('Detalle:', description),
                 _buildDetailRow('Ubicación:', location),
                 _buildDetailRow('Producto:', product),
                 _buildDetailRow('Marca:', brand),
@@ -105,17 +97,125 @@ class NewTicketDetailCard extends StatelessWidget {
     );
   }
 
+  Widget _buildDetailRowLarge(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDetailRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment
-            .center, // Cambiar a center para una mejor alineación vertical
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text('$label ', style: AppStyle.txtPoppinsSemiBold16Black),
+          Container(
+            width: 100, // Ajusta el ancho según sea necesario
+            child: Text(
+              label,
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
           Expanded(
-              child: Text(value, style: AppStyle.txtPoppinsRegular14Black)),
+            child: Text(
+              value,
+              style: AppStyle.txtPoppinsRegular14Black,
+              overflow:
+                  TextOverflow.ellipsis, // Añadir si deseas manejar texto largo
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildStatusChip(String status) {
+    Color statusColor;
+    switch (status) {
+      case 'Abierto':
+        statusColor = const Color.fromARGB(255, 49, 145, 224);
+        break;
+      case 'Cerrado':
+        statusColor = const Color.fromARGB(108, 224, 49, 131);
+        break;
+      case 'En Progreso':
+        statusColor = const Color.fromARGB(188, 138, 140, 233);
+        break;
+      case 'Rechazado':
+        statusColor = const Color.fromARGB(150, 230, 107, 36);
+        break;
+      case 'Bloqueado':
+        statusColor = const Color.fromARGB(143, 80, 37, 87);
+        break;
+      case 'Cerrado':
+        statusColor = const Color.fromARGB(148, 21, 201, 147);
+        break;
+      default:
+        statusColor = Colors.grey.shade100;
+    }
+
+    IconData _getChipIcon(String estado) {
+      switch (estado) {
+        case 'Abierto':
+          return Icons.create;
+        case 'Aprobada':
+          return Icons.check_circle;
+        case 'En Progreso':
+          return Icons.work;
+        case 'Resuelto':
+          return Icons.done;
+        case 'Cerrado':
+          return Icons.close;
+        default:
+          return Icons.info;
+      }
+    }
+
+    String _getChipLabel(String estado) {
+      switch (estado) {
+        case '1':
+          return 'Abierto';
+        case '2':
+          return 'Cerrado';
+        case '3':
+          return 'Rechazado';
+        case '4':
+          return 'En Progreso';
+        case '5':
+          return 'Bloqueado';
+        default:
+          return 'Nuevo';
+      }
+    }
+
+    return Chip(
+      label: Text(_getChipLabel(status)),
+      backgroundColor: statusColor,
+      avatar: Icon(
+        _getChipIcon(status),
+        color: Colors.white,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(25.0),
+        side: const BorderSide(color: Colors.transparent),
       ),
     );
   }

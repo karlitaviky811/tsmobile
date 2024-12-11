@@ -1,16 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 import '../../../widgets/diagnostic_log_ticket.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
-  final Ticket ticket;
+  final String ticketId;
   static const String route = 'ticket-accepted-decline-ticket-route';
-  const TicketAcceptedProgressDetailPage({super.key, required this.ticket});
+  const TicketAcceptedProgressDetailPage({super.key, this.ticketId = '0'});
 
   @override
   _TicketDetailPageState createState() => _TicketDetailPageState();
@@ -22,9 +25,18 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   //final _inputController1 = TextEditingController();
   //final _inputController2 = TextEditingController();
   //final _replacementCodeController = TextEditingController();
+  late Future<void> _loadTicketFuture;
+  @override
+  void initState() {
+    super.initState();
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    _loadTicketFuture = ticketProvider.loadTicketById(widget.ticketId);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final ticketProvider = Provider.of<TicketProvider>(context);
+
     List<Map<String, dynamic>> reparaciones = [
       // Ejemplo de datos iniciales provenientes del backend
       {
@@ -94,7 +106,10 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => ChatScreen()),
+              MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                        ticketId: widget.ticketId,
+                      )),
             );
           },
           child: const Icon(
@@ -115,7 +130,6 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
               onPressed: () {
                 Navigator.pop(context);
               }),
-          backgroundColor: Colors.white,
           title: const Text('Detalles del Ticket',
               style: TextStyle(
                   fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
@@ -133,22 +147,39 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
             ],
           ),
         ),
-        body: TabBarView(
-          children: [
-            const _TicketDetailProgress(),
-            DiagnosticForm(
-              onSave: (DateTime? date, String observations, String comments,
-                  List<File> images) {
-                // Lógica para manejar los datos guardados del formulario
-                print('Fecha: $date');
-                print('Observaciones: $observations');
-                print('Comentarios: $comments');
-                print('Imágenes: $images');
-              },
-            ),
-            RepairLogFormData(initialReparaciones: reparaciones),
-          ],
-        ),
+        body: FutureBuilder(
+            future:
+                _loadTicketFuture, // Utiliza el Future inicializado en initState
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                final item = ticketProvider.ticketInfo;
+
+                if (item == null) {
+                  return const Center(child: Text('No se encontró el ticket'));
+                }
+
+                return TabBarView(
+                  children: [
+                    _TicketDetailProgress(ticketInfo: item),
+                    DiagnosticForm(
+                      onSave: (DateTime? date, String observations,
+                          String comments, List<File> images) {
+                        // Lógica para manejar los datos guardados del formulario
+                        print('Fecha: $date');
+                        print('Observaciones: $observations');
+                        print('Comentarios: $comments');
+                        print('Imágenes: $images');
+                      },
+                    ),
+                    RepairLogFormData(initialReparaciones: reparaciones),
+                  ],
+                );
+              }
+            }),
       ),
     );
   }
@@ -195,47 +226,55 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 }
 
 class _TicketDetailProgress extends StatelessWidget {
-  const _TicketDetailProgress({
-    super.key,
-  });
+  final dynamic ticketInfo;
+
+  const _TicketDetailProgress({super.key, required this.ticketInfo});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      child: Container(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                children: [
-                  TicketDetailCard(
-                    headerTitle: 'Ticket de Servicio',
-                    code: 'TICKET12345',
-                    clientName: 'Juan Pérez',
-                    status: 'En Proceso',
-                    type: 'Reparación',
-                    creationDate: '2024-11-18',
-                    title: 'Reparación del Aire Acondicionado',
-                    description:
-                        'El aire acondicionado no enfría adecuadamente y hace ruido.',
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  //Divider(),
-                  ClienteHandler(),
+    print('ticketInfo $ticketInfo');
 
-                  // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
-                ],
-              ),
+    String formattedDate =
+        DateFormat('yyyy-MM-dd – kk:mm').format(ticketInfo.createdAt);
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView(
+              children: [
+                TicketDetailCard(
+                  headerTitle: 'Ticket de Servicio',
+                  code: ticketInfo.serviceCallId?.toString() ?? 'N/A',
+                  clientName: ticketInfo.customerName ?? 'N/A',
+                  status: ticketInfo.status.toString(),
+                  type: 'Reparación',
+                  creationDate: formattedDate,
+                  title: ticketInfo.title,
+                  description: ticketInfo.serviceCallDetail['descrption'],
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                //Divider(),
+                ClienteHandler(),
+    
+                // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
+
+/*
+
+     description: item.serviceCallDetail['descrption'], // Ajusta según sea necesario
+                            creationDateTime: item.createdAt,
+                            location: 'Cambiar formato de coordenadas',
+                            product:  item.serviceCallDetail['itemName'], 
+ */
 
 class ClienteHandler extends StatefulWidget {
   @override
@@ -264,3 +303,16 @@ class _ClienteHandlerState extends State<ClienteHandler> {
     );
   }
 }
+
+
+/*
+
+              code: item.serviceCallId?.toString() ?? 'N/A',
+                            clientName: item.customerName ?? 'N/A',
+                            status: item.status?.toString() ?? 'N/A',
+                            type: 'Reparación',
+                            title: item.title ?? 'N/A',
+                            description: 'N/A', // Ajusta según sea necesario
+                            creationDateTime: item.createdAt,
+
+ */

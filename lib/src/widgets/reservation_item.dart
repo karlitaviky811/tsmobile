@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
+import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import '../core/theme/app.styles.dart';
 // Asegúrate de importar el modelo correcto
@@ -13,13 +14,25 @@ class ReservationItemElement extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('ticket----- $ticket'); // Cambiar item a ticket
-        Navigator.push(
+        print('ticket----- ${ticket}');
+        
+        if(ticket.status == 1){
+            Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TicketDetailPageView(ticketId: ticket.id.toString()), // Cambiar item a ticket
           ),
         );
+        }else{
+          
+            Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TicketAcceptedProgressDetailPage(ticketId:  ticket.id.toString()), // Cambiar item a ticket
+          ),
+        );
+        }
+      
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

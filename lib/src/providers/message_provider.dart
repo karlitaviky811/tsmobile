@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsmobile/src/models/message_send.dart';
 import 'package:tsmobile/src/models/messages_model.dart';
 import 'package:tsmobile/src/services/messages_service.dart';
 
@@ -21,16 +23,25 @@ class MessageProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addMessage(Message message) async {
-    print('Añadiendo mensaje: ${message.comment}'); // Log para iniciar la adición de mensaje
+ Future<void> addMessage(Message messageSend) async {
+    print('Añadiendo mensaje: ${messageSend.comment}'); // Accede al valor usando el objeto
     try {
-      await _messageService.sendMessage(message);
-      _messages.add(message);
-      print('Mensaje añadido: ${message.comment}'); // Verificación del mensaje añadido
+      // Simulación de una llamada a un servicio remoto
+       await _messageService.sendMessage(MessageSend(commentableId: messageSend.commentableId, commentableType: messageSend.commentableType, comment: messageSend.comment));
+   
+      _messages.add(messageSend);
       notifyListeners();
+
+      // Guardar mensaje en SharedPreferences (si es necesario)
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> messagesString = _messages.map((msg) => msg.comment).toList();
+      prefs.setStringList('messages', messagesString);
     } catch (e) {
-      print('Error al agregar el mensaje: $e');
-      throw Exception('Error al agregar el mensaje: $e');
+      print('Error añadiendo el mensaje: $e');
+      notifyListeners();
     }
   }
+
 }
+
+
