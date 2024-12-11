@@ -14,7 +14,7 @@ class ServiceTicket {
   final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Object serviceCallDetail;
+  final Map<String,dynamic> serviceCallDetail;
 
   
   ServiceTicket({
@@ -50,7 +50,7 @@ class ServiceTicket {
       status: json['status'],
       totalCost: json['total_cost'],
       meta: json['meta'],
-      serviceCallDetail: json['service_call'],
+      serviceCallDetail: json['service_call'] as Map<String, dynamic>,
       deletedAt: json['deleted_at'] != null ? DateTime.tryParse(json['deleted_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),

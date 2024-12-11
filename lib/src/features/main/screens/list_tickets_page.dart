@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
-import 'package:tsmobile/src/services/service_ticket_service.dart';
+import 'package:tsmobile/src/providers/tikets_provider.dart';
 
 import 'package:tsmobile/src/widgets/reservation_item.dart';
 
@@ -17,49 +17,34 @@ class TicketsListFiltered extends StatefulWidget {
 }
 
 class _FilteredListScreenState extends State<TicketsListFiltered> {
-  List<ServiceTicket> items = [];
-  List<String> selectedTags = [];
   List<ServiceTicket> filteredItems = [];
-  bool _isLoading = true;
-
-  final TicketService _ticketService = TicketService();
-
- 
+  List<String> selectedTags = [];
 
   @override
   void initState() {
     super.initState();
-    _loadItems();
-  }
-
-  void _loadItems() async {
-    try {
-      final items = await _ticketService.fetchServiceTickets();
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    ticketProvider.loadTickets().then((_) {
       setState(() {
-        this.items = items;
-        filteredItems = items;
-        _isLoading = false;
+        filteredItems = ticketProvider.tickets;
       });
-    } catch (e) {
-      print('Failed to load items: $e');
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    });
   }
 
   void updateFilteredItems() {
     setState(() {
-      filteredItems = filterItems(items, selectedTags);
+      final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+      filteredItems = filterItems(ticketProvider.tickets, selectedTags);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-      final dataTickets = Provider.of<TicketService>(context);
+    final ticketProvider = Provider.of<TicketProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xffF3F5FD),
+        backgroundColor: const Color(0xffF3F5FD),
         title: Text(
           'Servicios',
           style: AppStyle.txtPoppinsRegular18Black,
@@ -74,8 +59,8 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
           },
         ),
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+      body: ticketProvider.isLoading
+          ? const Center(child: CircularProgressIndicator())
           : Container(
               color: Colors.white,
               child: Padding(
@@ -95,12 +80,12 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                               fontWeight: FontWeight.normal,
                               color: selectedTags.contains(tag)
                                   ? Colors.white
-                                  : Color(0xff051937),
+                                  : const Color(0xff051937),
                             ),
                           ),
                           selected: selectedTags.contains(tag),
                           checkmarkColor: Colors.white,
-                          selectedColor: Color(0xff051937),
+                          selectedColor: const Color(0xff051937),
                           onSelected: (bool selected) {
                             setState(() {
                               if (selected) {
@@ -135,7 +120,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                                 child: ReservationItemElement(
                                     ticket: filteredItems[index]),
                               ),
-                              if (index < items.length - 1)
+                              if (index < filteredItems.length - 1)
                                 const SizedBox(
                                   height: 10,
                                 ),

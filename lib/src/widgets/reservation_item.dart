@@ -17,7 +17,7 @@ class ReservationItemElement extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => TicketDetailPageView(item: ticket), // Cambiar item a ticket
+            builder: (context) => TicketDetailPageView(ticketId: ticket.id.toString()), // Cambiar item a ticket
           ),
         );
       },
