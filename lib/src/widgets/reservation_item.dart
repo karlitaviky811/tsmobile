@@ -8,31 +8,32 @@ import '../core/theme/app.styles.dart';
 class ReservationItemElement extends StatelessWidget {
   final ServiceTicket ticket; // Cambiar Item a ServiceTicket
 
-  const ReservationItemElement({super.key, required this.ticket}); // Cambiar item a ticket
+  const ReservationItemElement(
+      {super.key, required this.ticket}); // Cambiar item a ticket
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         print('ticket----- ${ticket}');
-        
-        if(ticket.status == 1){
-            Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TicketDetailPageView(ticketId: ticket.id.toString()), // Cambiar item a ticket
-          ),
-        );
-        }else{
-          
-            Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TicketAcceptedProgressDetailPage(ticketId:  ticket.id.toString()), // Cambiar item a ticket
-          ),
-        );
+
+        if (ticket.status == 1) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TicketDetailPageView(
+                  ticketId: ticket.id.toString()), // Cambiar item a ticket
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TicketAcceptedProgressDetailPage(
+                  ticketId: ticket.id.toString()), // Cambiar item a ticket
+            ),
+          );
         }
-      
       },
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,14 +54,16 @@ class ReservationItemElement extends StatelessWidget {
                   maxLines: 1, // Limitar el número de líneas
                 ),
                 const SizedBox(height: 6),
-                _CardScheduledReservationToday(date: ticket.diagnosisDate ?? DateTime.now()), // Pasar la fecha de diagnóstico
+                _CardScheduledReservationToday(
+                    date: ticket.diagnosisDate ??
+                        DateTime.now()), // Pasar la fecha de diagnóstico
                 const SizedBox(height: 8),
                 Row(
                   children: [
                     Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
                     Expanded(
                       child: Text(
-                        ticket.customerName, 
+                        ticket.customerName,
                         style: AppStyle.txtPoppinsRegular12Black,
                         overflow: TextOverflow.ellipsis, // Agregar esta línea
                         maxLines: 1, // Limitar el número de líneas
@@ -75,7 +78,9 @@ class ReservationItemElement extends StatelessWidget {
                       Icons.schedule_outlined,
                       size: 12,
                     ),
-                    Text('${ticket.totalCost} USD', style: AppStyle.txtPoppinsRegular12Black), // Mostrar el costo total
+                    Text('${ticket.totalCost} USD',
+                        style: AppStyle
+                            .txtPoppinsRegular12Black), // Mostrar el costo total
                     const Text(' | '),
                     Text('50', style: AppStyle.txtPoppinsRegular12Black),
                   ],
@@ -89,7 +94,7 @@ class ReservationItemElement extends StatelessWidget {
                     ),
                     Expanded(
                       child: Text(
-                        'Vía Av. Caracas y Av. P.º Caroni', 
+                        'Vía Av. Caracas y Av. P.º Caroni',
                         style: AppStyle.txtPoppinsRegular12Black,
                         overflow: TextOverflow.ellipsis, // Agregar esta línea
                         maxLines: 1, // Limitar el número de líneas
@@ -135,8 +140,18 @@ class _CardScheduledReservationToday extends StatelessWidget {
 
   String _getMonthName(int month) {
     const months = [
-      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
-      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+      'enero',
+      'febrero',
+      'marzo',
+      'abril',
+      'mayo',
+      'junio',
+      'julio',
+      'agosto',
+      'septiembre',
+      'octubre',
+      'noviembre',
+      'diciembre'
     ];
     return months[month - 1];
   }
@@ -158,7 +173,8 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.transparent),
-          image: DecorationImage(image: AssetImage(image), fit: BoxFit.contain)),
+          image:
+              DecorationImage(image: AssetImage(image), fit: BoxFit.contain)),
     );
   }
 }

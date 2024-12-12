@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/profile_user.dart';
+import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/features/main/screens/tecnico_rating_card.dart';
 
 class SettingsView extends StatelessWidget {
+  Future<void> _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token'); // Borra el token del almacenamiento local
+
+    // Navega a la pantalla de inicio de sesión o cualquier otra pantalla
+    Navigator.of(context).pushReplacementNamed('welcome-route');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +24,10 @@ class SettingsView extends StatelessWidget {
         leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
             onPressed: () {
-              Navigator.pop(context);
+               Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const TabsPage()),
+            );
             }),
       ),
       body: ListView(
@@ -107,8 +120,8 @@ class SettingsView extends StatelessWidget {
                               TextButton(
                                 child: const Text('Confirmar'),
                                 onPressed: () {
-                                  // Lógica para confirmar baja
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context)
+                                      .pushReplacementNamed('welcome-route');
                                 },
                               ),
                             ],

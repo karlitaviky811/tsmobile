@@ -10,6 +10,7 @@ class User {
   final String address;
   final String latitude;
   final String longitude;
+  final String? agency;
   final String phone;
 
   User({
@@ -24,6 +25,7 @@ class User {
     required this.geographicalcoordinates,
     required this.latitude,
     required this.longitude,
+    this.agency,
     required this.phone,
   });
 
@@ -40,6 +42,7 @@ class User {
       geographicalcoordinates: json['GeographicalCoordinates']['data'].toString(),
       latitude: json['latitude'] ?? '',
       longitude: json['longitude'] ?? '',
+      agency: json['agency'] ?? '',
       phone: json['Phone'] ?? '',
     );
   }

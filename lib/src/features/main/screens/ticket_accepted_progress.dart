@@ -6,6 +6,7 @@ import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
+import 'package:tsmobile/src/widgets/close_ticket_form.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 import '../../../widgets/diagnostic_log_ticket.dart';
@@ -100,7 +101,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
     final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -144,6 +145,9 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
               Tab(
                 text: 'Reparación',
               ),
+              Tab(
+                text: 'Cierre',
+              ),
             ],
           ),
         ),
@@ -166,16 +170,26 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                   children: [
                     _TicketDetailProgress(ticketInfo: item),
                     DiagnosticForm(
+                      idTicket: widget.ticketId,
                       onSave: (DateTime? date, String observations,
-                          String comments, List<File> images) {
+                          List<File> images) {
                         // Lógica para manejar los datos guardados del formulario
                         print('Fecha: $date');
                         print('Observaciones: $observations');
-                        print('Comentarios: $comments');
                         print('Imágenes: $images');
                       },
                     ),
                     RepairLogFormData(initialReparaciones: reparaciones),
+                    CloseTicketForm(
+                      idTicket: widget.ticketId,
+                      onSave: (DateTime? date, String observations,
+                          List<File> images) {
+                        // Lógica para manejar los datos guardados del formulario
+                        print('Fecha: $date');
+                        print('Observaciones: $observations');
+                        print('Imágenes: $images');
+                      },
+                    )
                   ],
                 );
               }
@@ -257,7 +271,7 @@ class _TicketDetailProgress extends StatelessWidget {
                 ),
                 //Divider(),
                 ClienteHandler(),
-    
+
                 // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
               ],
             ),

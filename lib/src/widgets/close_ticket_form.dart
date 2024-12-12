@@ -8,18 +8,18 @@ import 'dart:io';
 
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 
-class DiagnosticForm extends StatefulWidget {
+class CloseTicketForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;
 
   var idTicket;
 
-  DiagnosticForm({required this.onSave, required this.idTicket});
+  CloseTicketForm({required this.onSave, required this.idTicket});
 
   @override
-  _DiagnosticFormState createState() => _DiagnosticFormState();
+  _CloseTicketFormState createState() => _CloseTicketFormState();
 }
 
-class _DiagnosticFormState extends State<DiagnosticForm> {
+class _CloseTicketFormState extends State<CloseTicketForm> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
   final List<File> _images = [];
@@ -93,13 +93,13 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
             }
 
             // Setea los valores de los campos de texto con los datos del ticket si no han sido inicializados
-            if (!isDateInitialized && item.diagnosisDate != null) {
-              _dateController.text =     _dateController.text = getFormattedDate(item.diagnosisDate as DateTime);
+            if (!isDateInitialized && item.solutionDate != null) {
+              _dateController.text =     _dateController.text = getFormattedDate(item.solutionDate as DateTime);
               _observationsController.text = item.diagnosisDetail ?? '';;
               isDateInitialized = true;
             }
-            if (!isObservationsInitialized && item.diagnosisDetail != null) {
-              _observationsController.text = item.diagnosisDetail ?? '';
+            if (!isObservationsInitialized && item.solutionDetail != null) {
+              _observationsController.text = item.solutionDetail ?? '';
               isObservationsInitialized = true;
             }
 
@@ -120,7 +120,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Diagnóstico',
+                            'Cierre del ticket',
                             textAlign: TextAlign.left,
                             style: AppStyle.txtPoppinsMedium18Black,
                           ),
@@ -167,8 +167,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                               onPressed: () async {
                                 print(_dateController.text);
                                 final DateTime? selectedDate = await DateTime.tryParse(_dateController.text);
-                                serviceUpdateTicket.saveFormData(
-                                  _dateController.text + ' 00:00',
+                                serviceUpdateTicket.savecloseTicketFormData(
+                                  _dateController.text + ' at 00:00',
                                   _observationsController.text,
                                   _images,
                                   widget.idTicket

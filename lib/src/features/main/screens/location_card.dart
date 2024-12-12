@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -20,27 +21,26 @@ class _LocationCardState extends State<LocationCard> {
   Location location = Location();
   LocationData? _locationData;
   double _zoomLevel = 16.0;
-  LatLng _selectedLocation = LatLng(0.0, 0.0);
+  LatLng _selectedLocation = const LatLng(0.0, 0.0);
 
   @override
   void initState() {
     super.initState();
-    _loadLocationFromStorage();
+
+    if (widget.initialCoordinates != null) {
+      _selectedLocation = widget.initialCoordinates!;
+    } else {
+      _fetchLocation();
+    }
   }
 
-  Future<void> _loadLocationFromStorage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    double? lat = prefs.getDouble('latitude');
-    double? lng = prefs.getDouble('longitude');
-
-    if (lat != null && lng != null) {
-      setState(() {
-        _selectedLocation = LatLng(lat, lng);
-      });
-    } else if (widget.initialCoordinates != null) {
-      setState(() {
-        _selectedLocation = widget.initialCoordinates!;
-      });
+  Future<void> validLocation() async {
+   /* SharedPreferences prefs = await SharedPreferences.getInstance();
+    final coordinatesEncode = jsonEncode(widget.initialCoordinates);
+    await prefs.setString('coordinates_user', coordinatesEncode);
+*/
+    if (widget.initialCoordinates != null) {
+      _selectedLocation = widget.initialCoordinates!;
     } else {
       _fetchLocation();
     }
@@ -70,16 +70,10 @@ class _LocationCardState extends State<LocationCard> {
 
     if (_locationData != null && mounted) {
       setState(() {
-        _selectedLocation = LatLng(_locationData!.latitude!, _locationData!.longitude!);
+        _selectedLocation =
+            LatLng(_locationData!.latitude!, _locationData!.longitude!);
       });
-      await _saveLocationToStorage(_selectedLocation);
     }
-  }
-
-  Future<void> _saveLocationToStorage(LatLng location) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setDouble('latitude', location.latitude);
-    await prefs.setDouble('longitude', location.longitude);
   }
 
   void _updateLocationMarker() {
@@ -88,17 +82,16 @@ class _LocationCardState extends State<LocationCard> {
 
   void _saveLocation() {
     // Guardar la ubicación seleccionada.
-    _saveLocationToStorage(_selectedLocation);
+    // Aquí puedes realizar cualquier acción necesaria para guardar la ubicación.
     log('Ubicación guardada: $_selectedLocation');
     Fluttertoast.showToast(
-      msg: "Ubicación actualizada con éxito",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.blue,
-      textColor: Colors.white,
-      fontSize: 16.0
-    );
+        msg: "Ubicación actualizada con éxito",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.blue,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 
   @override
@@ -123,39 +116,46 @@ class _LocationCardState extends State<LocationCard> {
               Expanded(
                 child: Stack(
                   children: [
-                    FlutterMap(
-                      mapController: mapController,
-                      options: MapOptions(
-                        initialCenter: _selectedLocation,
-                        initialZoom: _zoomLevel,
-                        onTap: (tapPosition, point) {
-                          setState(() {
-                            _selectedLocation = point;
-                          });
-                          _updateLocationMarker();
-                        },
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.app',
+                    if (_locationData != null ||
+                        widget.initialCoordinates != null)
+                      FlutterMap(
+                        mapController: mapController,
+                        options: MapOptions(
+                          initialCenter: _selectedLocation,
+                          initialZoom: _zoomLevel,
+                          onTap: (tapPosition, point) {
+                            setState(() {
+                              _selectedLocation = point;
+                            });
+                            _updateLocationMarker();
+                          },
                         ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              width: 80.0,
-                              height: 80.0,
-                              point: _selectedLocation,
-                              child: const Icon(
-                                Icons.location_on,
-                                color: Color(0xff051937),
-                                size: 40.0,
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.app',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                width: 80.0,
+                                height: 80.0,
+                                point: _selectedLocation,
+                                child: const Icon(
+                                  Icons.location_on,
+                                  color: Color(0xff051937),
+                                  size: 40.0,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
+                        ],
+                      )
+                    else
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     Positioned(
                       right: 10,
                       top: 50,
@@ -191,12 +191,16 @@ class _LocationCardState extends State<LocationCard> {
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
                   onPressed: _saveLocation,
-                  icon: const Icon(Icons.save, color: Colors.blue), // Color resaltante para el ícono
-                  label: const Text('Guardar Ubicación', style: TextStyle(color: Colors.blue)), // Color resaltante para el texto
+                  icon: Icon(Icons.save,
+                      color: Colors.blue), // Color resaltante para el ícono
+                  label: Text('Guardar Ubicación',
+                      style: TextStyle(
+                          color:
+                              Colors.blue)), // Color resaltante para el texto
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.transparent, // Fondo transparente
                     foregroundColor: Colors.blue, // Color del texto
-                    side: const BorderSide(color: Colors.blue), // Borde azul
+                    side: BorderSide(color: Colors.blue), // Borde azul
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

@@ -1,5 +1,3 @@
-
-
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +5,7 @@ import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/models/auth_model.dart';
+import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:tsmobile/src/services/user_service.dart';
 import '../../../widgets/index.dart';
 
@@ -29,75 +28,81 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void main() async {
-    User? fetchedUser = await fetchUserData();
-
-    setState(() {
-      user = fetchedUser;
+    final userService = new UserProvider();
+    Future<void> fetchedUser = userService.obatinUserData();
+    fetchedUser.then((_) {
+      setState(() {
+        user = userService.user;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-    return user == null ? Center(child: CircularProgressIndicator(),) :
-        Scaffold(
-          key: _scaffoldKey,
-          appBar: CustomAppBar(
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications, color: Colors.white),
+    return user == null
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : Scaffold(
+            key: _scaffoldKey,
+            appBar: CustomAppBar(
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.notifications, color: Colors.white),
+                  onPressed: () {
+                    // Acción de notificaciones
+                    print('Notificaciones');
+                  },
+                ),
+              ],
+              leading: IconButton(
+                icon:
+                    Image.asset('assets/images/android-chrome-192x192new.png'),
+                color: Colors.white, // Cambiar color aquí
                 onPressed: () {
-                  // Acción de notificaciones
-                  print('Notificaciones');
+                  //_scaffoldKey.currentState?.openDrawer();
                 },
               ),
-            ],
-            leading: IconButton(
-              icon: Image.asset('assets/images/android-chrome-192x192new.png'),
-              color: Colors.white, // Cambiar color aquí
-              onPressed: () {
-                //_scaffoldKey.currentState?.openDrawer();
-              },
             ),
-          ),
-          body: SingleChildScrollView(
-            child: Container(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, top: 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user!.name,
-                        style: AppStyle.txtPoppinsSemiBold20Black),
-                    Text(user!.nameComercial,
-                        style: AppStyle.txtPoppinsSemiBold14Black),
-                    const SizedBox(height: 31),
-                    Text('Ubicación Actual',
-                        style: AppStyle.txtPoppinsSemiBold18Black),
-                    const SizedBox(height: 10),
-                    LocationCard(),
-                    const SizedBox(height: 31),
-                    Text(
-                      'Servicios',
-                      style: AppStyle.txtPoppinsMedium18Black,
-                    ),
-                    const SizedBox(height: 16),
-                    const _ListCourt(),
-                    const SizedBox(height: 40),
-                    Text(
-                      'Servicios programados',
-                      style: AppStyle.txtPoppinsMedium18Black,
-                    ),
-                    const SizedBox(height: 20),
-                    const _ListScheduleReservationItems(),
-                    const SizedBox(height: 40),
-                  ],
+            body: SingleChildScrollView(
+              child: Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10, top: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(user!.name,
+                          style: AppStyle.txtPoppinsSemiBold20Black),
+                      Text(user!.nameComercial,
+                          style: AppStyle.txtPoppinsSemiBold14Black),
+                      const SizedBox(height: 31),
+                      Text('Ubicación Actual',
+                          style: AppStyle.txtPoppinsSemiBold18Black),
+                      const SizedBox(height: 10),
+                      LocationCard(),
+                      const SizedBox(height: 31),
+                      Text(
+                        'Servicios',
+                        style: AppStyle.txtPoppinsMedium18Black,
+                      ),
+                      const SizedBox(height: 16),
+                      const _ListCourt(),
+                      const SizedBox(height: 40),
+                      Text(
+                        'Servicios programados',
+                        style: AppStyle.txtPoppinsMedium18Black,
+                      ),
+                      const SizedBox(height: 20),
+                      const _ListScheduleReservationItems(),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
   }
 }
 
@@ -200,8 +205,8 @@ class _ListScheduleReservationItems extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      TicketAcceptedProgressDetailPage(ticketId: tickets[0].id)),
+                  builder: (context) => TicketAcceptedProgressDetailPage(
+                      ticketId: tickets[0].id)),
             )
           },
           child: ReservationItem(

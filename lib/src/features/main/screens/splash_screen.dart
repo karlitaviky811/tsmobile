@@ -14,13 +14,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkAuthStatus() async {
-    String initialRoute = await RouterApp.initialRoute;
+    String initialRoute = await RouterApp.getInitialRoute();
     Navigator.of(context).pushReplacementNamed(initialRoute);
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
       ),

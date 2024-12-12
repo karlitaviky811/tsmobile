@@ -67,10 +67,10 @@ class _Navigation extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: SvgPicture.asset(
-            ImageConstant.imgCalendar,
+            ImageConstant.imgUser,
             color: navegationModel.paginaActual == 3 ? const Color(0xff051937) : Colors.grey,
           ),
-          label: 'Repuestos',
+          label: 'Configuración',
         ),
         
       ],

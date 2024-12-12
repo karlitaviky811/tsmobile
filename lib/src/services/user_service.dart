@@ -3,7 +3,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/auth_model.dart';
 
-Future<User?> fetchUserData() async {
+
+class UserService {
+
+  Future<User?> fetchUserData() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('auth_token');
 
@@ -34,4 +37,8 @@ Future<User?> fetchUserData() async {
     print('Error fetching user data: $e');
     return null;
   }
+}
+
+
+
 }

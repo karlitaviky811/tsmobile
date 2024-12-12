@@ -1,37 +1,78 @@
+
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/location_card.dart';
+import 'package:tsmobile/src/providers/user_provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class ProfileUser extends StatefulWidget {
   static const String route = 'profile-ticket-route';
 
   const ProfileUser({super.key});
+
   @override
   _EditProfileWidgetState createState() => _EditProfileWidgetState();
 }
 
 class _EditProfileWidgetState extends State<ProfileUser> {
   final _formKey = GlobalKey<FormState>();
-  String _name = 'Andrea Torres';
-  String _email = 'andreat@gmail.com';
-  String _phone = '+5804244984474';
-  final _nameController = TextEditingController(text: 'Andrea Torres');
-  final _emailController = TextEditingController(text: 'andreat@gmail.com');
-  final _addressController = TextEditingController(text: 'Agencia Valencia');
-  final _companyController =
-      TextEditingController(text: 'Martínez y asociados');
-  final _ubicationController = TextEditingController(text: 'Agencia Valencia');
-  final _phoneController = TextEditingController(text: '+5804244984474');
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _addressController;
+  late TextEditingController _companyController;
+  late TextEditingController _ubicationController;
+  late TextEditingController _phoneController;
+  final MapController mapController = MapController();
+  LatLng _selectedLocation = LatLng(10.1807, -68.0034);  // Coordenadas de ejemplo
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    userProvider.obatinUserData().then((_) {
+      if (userProvider.user != null) {
+        _nameController = TextEditingController(text: userProvider.user!.name);
+        _emailController = TextEditingController(text: userProvider.user!.email);
+        _addressController = TextEditingController(text: userProvider.user!.address);
+        _companyController = TextEditingController(text: userProvider.user!.nameComercial);
+        _ubicationController = TextEditingController(text: userProvider.user!.address);
+        _phoneController = TextEditingController(text: userProvider.user!.phone);
+        
+        // Establecer la ubicación seleccionada a partir de las coordenadas del usuario
+        setState(() {
+          _selectedLocation = LatLng(double.parse(userProvider.user!.latitude), double.parse( userProvider.user!.longitude));
+        });
+      }
+    });
+  }
+
   void _updateProfile() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      // Aquí puedes agregar la lógica para actualizar el perfil
-      print(
-          'Perfil actualizado: Nombre: $_name, Email: $_email, Teléfono: $_phone');
+      Fluttertoast.showToast(
+        msg: "Datos guardados con éxito",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.blue,
+        textColor: Colors.white,
+        fontSize: 16.0
+      );
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+
+      //userProvider.
+      print('Perfil actualizado: Nombre: ${_nameController.text}, Email: ${_emailController.text}, Teléfono: ${_phoneController.text}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -42,149 +83,134 @@ class _EditProfileWidgetState extends State<ProfileUser> {
               Navigator.pop(context);
             }),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Card(
-          elevation: 20,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Hola, Andrea', style: AppStyle.txtPoppinsRegular18Black),
-                const SizedBox(
-                  height: 30,
-                ),
-                Text('Martes, 3 de Diciembre',
-                    style: AppStyle.txtPoppinsRegular14Black),
-                const SizedBox(
-                  height: 30,
-                ),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          'Información de la cuenta',
-                          style: AppStyle.txtPoppinsRegular18Black,
+      body: userProvider.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SingleChildScrollView(
+                child: Card(
+                  elevation: 20,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  color: Colors.white,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Hola, ${userProvider.user?.name ?? ''}', style: AppStyle.txtPoppinsRegular18Black),
+                        const SizedBox(height: 30),
+                        Form(
+                          key: _formKey,
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text('Información de la cuenta', style: AppStyle.txtPoppinsRegular18Black),
+                              ),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: _nameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Nombre',
+                                  prefixIcon: Icon(Icons.person),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu nombre';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Email',
+                                  prefixIcon: Icon(Icons.email),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu email';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _addressController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Dirección',
+                                  prefixIcon: Icon(Icons.room),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu dirección';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _companyController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Empresa',
+                                  prefixIcon: Icon(Icons.apartment_sharp),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu empresa';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _ubicationController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Sucursal',
+                                  prefixIcon: Icon(Icons.email),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu sucursal';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _phoneController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Teléfono',
+                                  prefixIcon: Icon(Icons.phone),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor, ingresa tu teléfono';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 20),
+                              // Añadir el mapa aquí
+                              LocationCard(),
+                              const SizedBox(height: 20),
+                              ElevatedButton.icon(
+                                onPressed: _updateProfile,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  minimumSize: const Size(150, 50), // Tamaño del botón
+                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                ),
+                                label: const Text('Guardar', style: TextStyle(color: Colors.white)),
+                                icon: const Icon(Icons.save, color: Colors.white),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        controller: _nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nombre',
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                        onSaved: (value) => _name = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu nombre';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: Icon(Icons.email),
-                        ),
-                        onSaved: (value) => _email = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu email';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _addressController,
-                        decoration: const InputDecoration(
-                          labelText: 'Dirección',
-                          prefixIcon: Icon(Icons.room),
-                        ),
-                        onSaved: (value) => _email = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu dirección';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _companyController,
-                        decoration: const InputDecoration(
-                          labelText: 'Empresa',
-                          prefixIcon: Icon(Icons.apartment_sharp),
-                        ),
-                        onSaved: (value) => _email = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu empresa';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _ubicationController,
-                        decoration: const InputDecoration(
-                          labelText: 'Sucursal',
-                          prefixIcon: Icon(Icons.email),
-                        ),
-                        onSaved: (value) => _email = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu sucursal';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _phoneController,
-                        decoration: const InputDecoration(
-                          labelText: 'Teléfono',
-                          prefixIcon: Icon(Icons.phone),
-                        ),
-                        onSaved: (value) => _phone = value!,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Por favor, ingresa tu teléfono';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 80),
-                      ElevatedButton.icon(
-                        onPressed: _updateProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff051937),
-                          minimumSize: const Size(150, 50), // Tamaño del botón
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          // Cambia este color al que desees onPrimary: Colors.white, // Color del texto del botón
-                        ),
-                        label: const Text(
-                          'Guardar',
-                          style: TextStyle(color: Colors.white),
-                        ), icon: Icon(Icons.abc),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
     );
   }
 }

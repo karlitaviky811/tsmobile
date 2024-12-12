@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/splash_screen.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
-
 import 'package:tsmobile/src/providers/tikets_provider.dart';
+import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+// Importa la pantalla de splash
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -18,42 +19,44 @@ Future<void> main() async {
 
   OneSignal.initialize(oneSignalAppId as String);
 
-// The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
-
+  // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
+  // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
   OneSignal.User.addAlias('external_id', 'userId-test-1');
   OneSignal.login('userId-test-1');
   if ((OneSignal.User.pushSubscription.id == null)) {
     OneSignal.Notifications.requestPermission(true);
   }
-  /*OneSignal.Notifications.addClickListener((event) {
-      print("all events:------------------------------------ $event");
-      print("body is: ${event.notification.additionalData}");
-    });*/
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (_) => MessageProvider()),
-     ChangeNotifierProvider(create: (_) => GeolocationProvider()),
-     ChangeNotifierProvider(create: (_)=> TicketProvider())
-  ], child: const MyApp()));
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
+        ChangeNotifierProvider(create: (_) => GeolocationProvider()),
+        ChangeNotifierProvider(create: (_) => TicketProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider())
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-          dividerColor: Colors.transparent,
-          hintColor: Colors.indigo,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-          useMaterial3: true,
-          scaffoldBackgroundColor: Color(0xffF3F5FD)),
-      home: const TabsPage(),
+        dividerColor: Colors.transparent,
+        hintColor: Colors.indigo,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        useMaterial3: true,
+        scaffoldBackgroundColor: const Color(0xffF3F5FD),
+      ),
+      home: SplashScreen(), // Usa SplashScreen como pantalla inicial
       routes: RouterApp.getRoutes(),
-      initialRoute: RouterApp.initialRoute,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
+import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -12,70 +13,24 @@ class CalendarScreen extends StatefulWidget {
 
 class _CalendarScreenState extends State<CalendarScreen> {
   bool showEvents = true;
-
-
-  final List<NeatCleanCalendarEvent> _eventList = [
-    NeatCleanCalendarEvent(
-      'MultiDay Event A',
-      description: 'test desc',
-      startTime: DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day, 10, 0),
-      endTime: DateTime(DateTime.now().year, DateTime.now().month,
-          DateTime.now().day + 2, 12, 0),
-      color: Colors.orange,
-      isMultiDay: true,
-    ),
-    NeatCleanCalendarEvent('Event X',
-        description: 'test desc',
-        startTime: DateTime(DateTime.now().year, DateTime.now().month,
-            DateTime.now().day, 10, 30),
-        endTime: DateTime(DateTime.now().year, DateTime.now().month,
-            DateTime.now().day, 11, 30),
-        color: Colors.lightGreen,
-        isAllDay: false,
-        isDone: true,
-        icon: 'assets/event1.jpg',
-        wide: false),
-    NeatCleanCalendarEvent('Allday Event B',
-        description: 'test desc',
-        startTime: DateTime(DateTime.now().year, DateTime.now().month,
-            DateTime.now().day - 2, 14, 30),
-        endTime: DateTime(DateTime.now().year, DateTime.now().month,
-            DateTime.now().day + 2, 17, 0),
-        color: Colors.blue,
-        isAllDay: true,
-        icon: 'assets/event1.jpg',
-        wide: false),
-    NeatCleanCalendarEvent(
-      'Normal Event D',
-      description: 'test desc',
-      startTime: DateTime(DateTime.now().year, DateTime.now().month,
-          DateTime.now().day, 14, 30),
-      endTime: DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day, 17, 0),
-      color: Colors.indigo,
-      wide: true,
-      icon: 'assets/events.jpg',
-    ),
-    NeatCleanCalendarEvent(
-      'Normal Event E',
-      description: 'test desc',
-      startTime: DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day, 7, 45),
-      endTime: DateTime(
-          DateTime.now().year, DateTime.now().month, DateTime.now().day, 9, 0),
-      color: Colors.indigo,
-      wide: true,
-      icon: 'assets/profile.jpg',
-    ),
-  ];
+  List<NeatCleanCalendarEvent> _eventList = [];
 
   @override
   void initState() {
     super.initState();
-    // Force selection of today on first load, so that the list of today's events gets shown.
-    _handleNewDate(DateTime(
-        DateTime.now().year, DateTime.now().month, DateTime.now().day));
+    // Cargar eventos del servicio al iniciar
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    try {
+      List<NeatCleanCalendarEvent> events = await fetchTechnicalVisits();
+      setState(() {
+        _eventList = events;
+      });
+    } catch (e) {
+      print('Error al cargar eventos: $e');
+    }
   }
 
   Widget eventCell(BuildContext context, NeatCleanCalendarEvent event,
@@ -88,13 +43,17 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         title: Text('Calendario'),
-        leading: IconButton( icon: Icon(Icons.arrow_back), onPressed: () { Navigator.pop(context); }),
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
       ),
       body: SafeArea(
         child: Calendar(
-          locale: 'Es_ES',
+          locale: 'es_ES',
           startOnMonday: true,
           weekDays: const ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'],
           eventsList: _eventList,
@@ -146,9 +105,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
           onEventLongPressed: (value) {
             print('Event long pressed ${value.summary}');
           },
-          // onMonthChanged: (value) {
-          //   print('Month changed $value');
-          // },
           onDateSelected: (value) {
             print('Date selected $value');
           },
@@ -172,9 +128,5 @@ class _CalendarScreenState extends State<CalendarScreen> {
         backgroundColor: Colors.white,
       ),
     );
-  }
-
-  void _handleNewDate(date) {
-    print('Date selected: $date');
   }
 }

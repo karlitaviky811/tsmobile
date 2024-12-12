@@ -32,7 +32,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   List<Status> tags = [
     Status(0, "Todos"),
     Status(1, "Nuevos"),
-    Status(2, "En Progreso"),
+    Status(4, "En Progreso"),
     Status(3, "Cerrado"),
   ];
 
@@ -88,7 +88,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                 child: Column(
                   children: [
                     TextField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: "Buscar por título",
                         prefixIcon: Icon(Icons.search),
                       ),
