@@ -96,7 +96,7 @@ class _MyMapPageState extends State<MyMapPage> {
                           _locationData!.latitude!,
                           _locationData!.longitude!,
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.location_on,
                           color: Colors.red,
                           size: 40.0,
@@ -118,7 +118,7 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyMapPage(),
     );
   }

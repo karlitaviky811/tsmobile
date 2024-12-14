@@ -1,9 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'package:http_parser/http_parser.dart';
 
 const String apiUrl =
     'http://3.137.100.242:3000/api/v1/tickets?include=serviceCall';
@@ -85,6 +90,41 @@ class TicketService {
     }
   }
 
+  Future<void> sendFile(File file, String modelType, String modelId, String collectionName) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('auth_token');
+  
+  final uri = Uri.parse('http://3.137.100.242:3000/api/v1/media');
+  
+  var request = http.MultipartRequest('POST', uri)
+    ..headers['Authorization'] = 'Bearer $token'
+    ..fields['model_type'] = modelType
+    ..fields['model_id'] = modelId
+    ..fields['collection_name'] = collectionName
+    ..files.add(await http.MultipartFile.fromPath(
+      'file', 
+      file.path,
+      contentType: MediaType('image', 'webp'),
+    ));
+
+  try {
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      print('Archivo enviado exitosamente.');
+    } else {
+      final responseBody = await response.stream.bytesToString();
+      print('Error al enviar el archivo: ${response.statusCode}');
+      print('Respuesta del servidor: $responseBody');
+    }
+  } on http.ClientException catch (e) {
+    print('ClientException: $e');
+  } catch (e) {
+    print('Error al enviar la solicitud: $e');
+  }
+}
+
+
   Future<void> saveFormData(
       String date, String observations, List<File> images, idTicket) async {
     String apiUrl =
@@ -92,16 +132,15 @@ class TicketService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    String dateString = "2023-12-31 23:59";
-    DateFormat dateFormat = DateFormat("dd/MM/yyyy 'at' HH:mm");
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ss");
     DateTime dateTime = dateFormat.parse(date.replaceAll('/', '-'));
 
-    print("String: $dateString");
-    //print("DateTime: $dateTime");
+    print("DateTime: $dateTime");
 
     // Crea el cuerpo de la solicitud
     Map<String, dynamic> formData = {
-      'diagnosis_date': dateTime,
+      'diagnosis_date':
+          dateFormat.format(dateTime), // Convierte el DateTime a String
       'diagnosis_detail': observations,
       // Aquí podrías agregar la lógica para manejar las imágenes si es necesario
     };
@@ -122,12 +161,39 @@ class TicketService {
 
       if (response.statusCode == 200) {
         print('Datos guardados exitosamente.');
+
+        Fluttertoast.showToast(
+            msg: "Datos guardados exitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        // Enviar imágenes
+        for (File image in images) {
+          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+        }
       } else {
-        print('Error al guardar los datos: ${response.statusCode}');
+        Fluttertoast.showToast(
+            msg: "Error al guardar los datos",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
         print('Respuesta del servidor: ${response.body}');
       }
     } catch (e) {
-      print('Error al enviar la solicitud: $e');
+      Fluttertoast.showToast(
+          msg: "Error al enviar la solicitud",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 
@@ -138,16 +204,15 @@ class TicketService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    String dateString = "2023-12-31 23:59";
-    DateFormat dateFormat = DateFormat("yyyy-MM-dd HH:mm");
-    // DateTime dateTime = dateFormat.parse(date);
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    DateTime dateTime = dateFormat.parse(date.replaceAll('/', '-'));
 
-    print("String: $dateString");
+    print("DateTime: $dateTime");
     //print("DateTime: $dateTime");
 
     // Crea el cuerpo de la solicitud
     Map<String, dynamic> formData = {
-      'solution_date': new DateTime.now().toIso8601String(),
+      'solution_date': dateFormat.format(dateTime),
       'solution_detail': observations,
       'status': 2,
       // Aquí podrías agregar la lógica para manejar las imágenes si es necesario
@@ -168,13 +233,34 @@ class TicketService {
       );
 
       if (response.statusCode == 200) {
-        print('Datos guardados exitosamente.');
+        Fluttertoast.showToast(
+            msg: "Datos guardados exitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
       } else {
-        print('Error al guardar los datos: ${response.statusCode}');
+        Fluttertoast.showToast(
+            msg: "Error al guardar los datos",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
         print('Respuesta del servidor: ${response.body}');
       }
     } catch (e) {
-      print('Error al enviar la solicitud: $e');
+      Fluttertoast.showToast(
+          msg: "Error al enviar la solicitud",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
   }
 }

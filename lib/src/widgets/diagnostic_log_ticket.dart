@@ -5,12 +5,10 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
-
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 
 class DiagnosticForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;
-
   var idTicket;
 
   DiagnosticForm({required this.onSave, required this.idTicket});
@@ -25,7 +23,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   final List<File> _images = [];
   final ImagePicker _picker = ImagePicker();
   late Future<void> _loadTicketFuture;
-
+  DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
 
@@ -38,7 +36,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     );
     if (picked != null) {
       setState(() {
-        _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
+        _selectedDate = picked; // Almacena la fecha seleccionada
+        _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
@@ -51,10 +50,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
       });
     }
   }
- String getFormattedDate(DateTime date) {
-    var outputFormat = DateFormat('dd/MM/yyyy');
-    return outputFormat.format(date);
-  }
+
   void _removeImage(int index) {
     if (index >= 0 && index < _images.length) {
       setState(() {
@@ -92,10 +88,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
               return const Center(child: Text('No se encontró el ticket'));
             }
 
-            // Setea los valores de los campos de texto con los datos del ticket si no han sido inicializados
             if (!isDateInitialized && item.diagnosisDate != null) {
-              _dateController.text =     _dateController.text = getFormattedDate(item.diagnosisDate as DateTime);
-              _observationsController.text = item.diagnosisDetail ?? '';;
+              _selectedDate = item.diagnosisDate; // Guarda el DateTime
+              _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.diagnosisDetail != null) {
@@ -140,11 +135,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                           TextField(
                             controller: _observationsController,
                             decoration: const InputDecoration(labelText: 'Observaciones'),
-                            onChanged: (value) {
-                              setState(() {
-                                _observationsController.text = value;
-                              });
-                            },
                           ),
                           const SizedBox(height: 16),
                           TextButton.icon(
@@ -165,14 +155,16 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                               ),
                               icon: const Icon(Icons.save, size: 18, color: Colors.white),
                               onPressed: () async {
-                                print(_dateController.text);
-                                final DateTime? selectedDate = await DateTime.tryParse(_dateController.text);
-                                serviceUpdateTicket.saveFormData(
-                                  _dateController.text + ' 00:00',
-                                  _observationsController.text,
-                                  _images,
-                                  widget.idTicket
-                                );
+                                if (_selectedDate != null) {
+                                  await serviceUpdateTicket.saveFormData(
+                                    _selectedDate!.toIso8601String(), // Convierte DateTime a String
+                                    _observationsController.text,
+                                    _images,
+                                    widget.idTicket,
+                                  );
+                                } else {
+                                  print('Por favor, selecciona una fecha.');
+                                }
                               },
                               label: const Text(
                                 'Guardar Información',

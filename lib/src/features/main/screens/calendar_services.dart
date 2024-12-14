@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -24,7 +26,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Future<void> _loadEvents() async {
     try {
-      List<NeatCleanCalendarEvent> events = await fetchTechnicalVisits();
+      final serviceVisit = VisitService();
+      List<NeatCleanCalendarEvent> events =
+          await serviceVisit.fetchTechnicalVisits();
       setState(() {
         _eventList = events;
       });
@@ -44,11 +48,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendario'),
+        title: Text('Calendario', style: AppStyle.txtPoppinsRegular18Black),
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back_ios_new),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TabsPage()),
+              );
             }),
       ),
       body: SafeArea(

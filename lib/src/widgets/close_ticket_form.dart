@@ -25,7 +25,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   final List<File> _images = [];
   final ImagePicker _picker = ImagePicker();
   late Future<void> _loadTicketFuture;
-
+  DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
 
@@ -38,6 +38,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
     );
     if (picked != null) {
       setState(() {
+        _selectedDate = picked; //
         _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
@@ -51,10 +52,12 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
       });
     }
   }
- String getFormattedDate(DateTime date) {
+
+  String getFormattedDate(DateTime date) {
     var outputFormat = DateFormat('dd/MM/yyyy');
     return outputFormat.format(date);
   }
+
   void _removeImage(int index) {
     if (index >= 0 && index < _images.length) {
       setState(() {
@@ -94,8 +97,9 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
 
             // Setea los valores de los campos de texto con los datos del ticket si no han sido inicializados
             if (!isDateInitialized && item.solutionDate != null) {
-              _dateController.text =     _dateController.text = getFormattedDate(item.solutionDate as DateTime);
-              _observationsController.text = item.diagnosisDetail ?? '';;
+               _selectedDate = item.solutionDate; 
+              _dateController.text = _dateController.text =
+                  getFormattedDate(item.solutionDate as DateTime);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.solutionDetail != null) {
@@ -139,7 +143,8 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
-                            decoration: const InputDecoration(labelText: 'Observaciones'),
+                            decoration: const InputDecoration(
+                                labelText: 'Observaciones'),
                             onChanged: (value) {
                               setState(() {
                                 _observationsController.text = value;
@@ -163,16 +168,20 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              icon: const Icon(Icons.save, size: 18, color: Colors.white),
+                              icon: const Icon(Icons.save,
+                                  size: 18, color: Colors.white),
                               onPressed: () async {
-                                print(_dateController.text);
-                                final DateTime? selectedDate = await DateTime.tryParse(_dateController.text);
-                                serviceUpdateTicket.savecloseTicketFormData(
-                                  _dateController.text + ' at 00:00',
-                                  _observationsController.text,
-                                  _images,
-                                  widget.idTicket
-                                );
+                                if (_selectedDate != null) {
+                                  serviceUpdateTicket.savecloseTicketFormData(
+                                    _selectedDate!
+                                        .toIso8601String(), // Convierte DateTime a String
+                                    _observationsController.text,
+                                    _images,
+                                    widget.idTicket,
+                                  );
+                                } else {
+                                  print('Por favor, selecciona una fecha.');
+                                }
                               },
                               label: const Text(
                                 'Guardar Información',

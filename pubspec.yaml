@@ -60,6 +60,9 @@ dependencies:
   geolocator: ^12.0.0
   http: ^1.2.2
   shared_preferences: ^2.3.3
+  dart_pusher_channels: ^1.2.3
+  pusher_channels_flutter: ^2.4.0
+  
   
   
 

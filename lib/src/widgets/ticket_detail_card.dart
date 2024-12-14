@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 
-class TicketDetailCard extends StatelessWidget {
+class TicketDetailCard extends StatefulWidget {
   final String headerTitle;
   final String code;
   final String clientName;
@@ -10,8 +11,9 @@ class TicketDetailCard extends StatelessWidget {
   final String creationDate;
   final String title;
   final String description;
+  final DateTime scheduledVisit; // Añadimos el campo de visita programada
 
-  //obligatorio por el reuired , no posicional
+  // Constructor con required
   TicketDetailCard({
     required this.headerTitle,
     required this.code,
@@ -21,7 +23,22 @@ class TicketDetailCard extends StatelessWidget {
     required this.creationDate,
     required this.title,
     required this.description,
+    required this.scheduledVisit,
   });
+
+  @override
+  _TicketDetailCardState createState() => _TicketDetailCardState();
+}
+
+class _TicketDetailCardState extends State<TicketDetailCard> {
+  late DateTime _scheduledVisit;
+  String? _rescheduleReason;
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduledVisit = widget.scheduledVisit;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,22 +51,23 @@ class TicketDetailCard extends StatelessWidget {
             Positioned(
               right: 0,
               top: 0,
-              child: _buildStatusChip(status),
+              child: _buildStatusChip(widget.status),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  headerTitle,
+                  widget.headerTitle,
                   style: AppStyle.txtPoppinsSemiBold18Black,
                 ),
                 const SizedBox(height: 16),
-                _buildDetailRow('Código:', code),
-                _buildDetailRow('Cliente:', clientName),
-                _buildDetailRow('Tipo:', type),
-                _buildDetailRow('Fecha:', creationDate),
-                _buildDetailRowLarge('Título:', title),
-                _buildDetailRowLarge('Detalle:', description),
+                _buildDetailRow('Código:', widget.code),
+                _buildDetailRow('Cliente:', widget.clientName),
+                _buildDetailRow('Tipo:', widget.type),
+                _buildDetailRow('Fecha:', widget.creationDate),
+                _buildDetailRowLarge('Título:', widget.title),
+                _buildDetailRowLarge('Detalle:', widget.description),
+                _buildScheduledVisitRow(),
               ],
             ),
           ],
@@ -99,8 +117,7 @@ class TicketDetailCard extends StatelessWidget {
             child: Text(
               value,
               style: AppStyle.txtPoppinsRegular14Black,
-              overflow:
-                  TextOverflow.ellipsis, // Añadir si deseas manejar texto largo
+              overflow: TextOverflow.ellipsis, // Añadir si deseas manejar texto largo
             ),
           ),
         ],
@@ -108,7 +125,7 @@ class TicketDetailCard extends StatelessWidget {
     );
   }
 
- Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(String status) {
     Color statusColor;
     switch (status) {
       case 'Abierto':
@@ -152,18 +169,18 @@ class TicketDetailCard extends StatelessWidget {
 
     String _getChipLabel(String estado) {
       switch (estado) {
-        case '1':
+        case 'Abierto':
           return 'Abierto';
-        case '2':
+        case 'Cerrado':
           return 'Cerrado';
-        case '3':
+        case 'Rechazado':
           return 'Rechazado';
-        case '4':
-         return 'En Progreso';
-        case '5':
-            return 'Bloqueado';
+        case 'En Progreso':
+          return 'En Progreso';
+        case 'Bloqueado':
+          return 'Bloqueado';
         default:
-          return  'Nuevo';
+          return 'Nuevo';
       }
     }
 
@@ -178,6 +195,104 @@ class TicketDetailCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(25.0),
         side: const BorderSide(color: Colors.transparent),
       ),
+    );
+  }
+
+  Widget _buildScheduledVisitRow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Container(
+            width: 100,
+            child: Text(
+              'Visita programada:',
+              style: AppStyle.txtPoppinsBold14Black,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              DateFormat('dd/MM/yyyy').format(_scheduledVisit),
+              style: AppStyle.txtPoppinsRegular14Black,
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () => _showDatePicker(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDatePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (BuildContext builder) {
+        return FractionallySizedBox(
+          heightFactor: 0.7, // Ajusta la altura según sea necesario
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Reprogramar Visita',
+                  style: AppStyle.txtPoppinsBold14Black,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: _scheduledVisit,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (picked != null && picked != _scheduledVisit) {
+                      setState(() {
+                        _scheduledVisit = picked;
+                      });
+                    }
+                  },
+                  child: Text('Seleccionar Fecha'),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    labelText: 'Motivo de Reprogramación',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['Motivo 1', 'Motivo 2', 'Motivo 3']
+                      .map((reason) => DropdownMenuItem<String>(
+                            value: reason,
+                            child: Text(reason),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _rescheduleReason = value;
+                    });
+                  },
+                  value: _rescheduleReason,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    // Aquí puedes agregar la lógica para guardar la nueva fecha y el motivo
+                  },
+                  child: Text('Guardar'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

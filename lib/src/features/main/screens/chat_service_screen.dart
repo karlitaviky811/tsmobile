@@ -1,38 +1,118 @@
-
-
-
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/models/messages_model.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
+import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 
-
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   static const String route = 'chat-client-ticket-route';
-
-  final TextEditingController _controller = TextEditingController();
   final String ticketId;
 
   ChatScreen({Key? key, required this.ticketId}) : super(key: key);
+
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
+  final TextEditingController _controller = TextEditingController();
+  late PusherChannelsClient client;
+  late StreamSubscription<ChannelReadEvent> messageSubscription;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    connectToPusher();
+    startPeriodicFetch();
+  }
+
+  @override
+  void dispose() {
+    messageSubscription.cancel();
+    client.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      connectToPusher();
+    } else if (state == AppLifecycleState.inactive ||
+               state == AppLifecycleState.paused) {
+      client.disconnect();
+    }
+  }
+
+  void connectToPusher() async {
+    PusherChannelsPackageLogger.enableLogs();
+
+    const options = PusherChannelsOptions.fromCluster(
+      host: '3.137.100.242',
+      scheme: 'wss',
+      cluster: 'qcxvi4ijlcw1bddsmfyq',
+      key: 'vabvfgptnghqkzsbh1xz',
+      port: 8080,
+    );
+
+    client = PusherChannelsClient.websocket(
+      options: options,
+      connectionErrorHandler: (exception, trace, refresh) async {
+        print("Error de conexión: $exception");
+        refresh();
+      },
+    );
+
+    final channel = client.publicChannel('App.Models.Ticket.${widget.ticketId}');
+
+    messageSubscription = channel.bind('NewComment').listen((event) {
+      final newMessage = Message.fromJson(event.data as Map<String, dynamic>);
+      Provider.of<MessageProvider>(context, listen: false).addMessage(newMessage);
+    });
+
+    client.onConnectionEstablished.listen((_) {
+      channel.subscribeIfNotUnsubscribed();
+    });
+
+    unawaited(client.connect());
+  }
+
+  void startPeriodicFetch() {
+    _timer = Timer.periodic(Duration(minutes: 1), (Timer timer) {
+      fetchMessages();
+    });
+  }
+
+  Future<void> fetchMessages() async {
+    try {
+      await Provider.of<MessageProvider>(context, listen: false)
+          .loadMessages("Ticket", int.parse(widget.ticketId));
+    } catch (e) {
+      print('Error al cargar los mensajes: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
+          icon: const Icon(Icons.arrow_back_ios_new),
+          onPressed: () {
+            Navigator.pop(context);
+          }),
         backgroundColor: const Color(0xffF3F5FD),
         title: Text('Chat', style: AppStyle.txtPoppinsRegular18Black),
       ),
       body: FutureBuilder<void>(
         future: Provider.of<MessageProvider>(context, listen: false)
-            .loadMessages("Ticket", int.parse(ticketId)),
+            .loadMessages("Ticket", int.parse(widget.ticketId)),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -139,7 +219,7 @@ class ChatScreen extends StatelessWidget {
       final messageSend = Message(
         id: 0, // Placeholder ID, will be set by the backend
         commentableType: "Ticket",
-        commentableId: int.parse(ticketId),
+        commentableId: int.parse(widget.ticketId),
         commentatorType: "",
         commentatorId: 17, // Example ID
         comment: text,
@@ -150,7 +230,7 @@ class ChatScreen extends StatelessWidget {
 
       try {
         await messageProvider.addMessage(messageSend);
-        await messageProvider.loadMessages('Ticket', int.parse(ticketId));
+        await messageProvider.loadMessages('Ticket', int.parse(widget.ticketId));
         _controller.clear();
       } catch (e) {
         print('Error enviando el mensaje: $e');

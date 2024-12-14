@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
+import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 
 class TicketProvider with ChangeNotifier {
   List<ServiceTicket> _tickets = [];
@@ -29,12 +30,12 @@ class TicketProvider with ChangeNotifier {
 
   Future<void> loadTicketById(String id) async {
     _isLoading = true;
-  
+
     try {
       // Obtener el ticket como un objeto ServiceTicket
       ServiceTicket ticket = await _ticketService.fetchServiceTicketById(id);
       _ticketInfo = ticket;
-        notifyListeners();
+      notifyListeners();
     } catch (e) {
       print('Error al cargar el ticket: $e');
     } finally {
@@ -42,13 +43,30 @@ class TicketProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-  Future<void> updateTicket(ServiceTicket ticket, Map<String, dynamic> data) async {
+
+  Future<void> updateTicket(
+      ServiceTicket ticket, Map<String, dynamic> data) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
+      
       if (token != null) {
-        await _ticketService.updateTickets(ticket.serviceCallId.toString(), data, token);
-        loadTicketById(ticket.serviceCallId.toString()); // Update the list of tickets after updating a ticket
+        await _ticketService.updateTickets(
+            ticket.serviceCallId.toString(), data, token);
+
+        final Map<String, dynamic> dataVisit = {
+          'visit_date': data['start_date'],
+          'title': data['additional_notes'],
+          'ticket_id': ticket.serviceCallId.toString()
+        };
+        try {
+          final visistService = VisitService();
+          await visistService.sendDataVisit(dataVisit);
+
+          loadTicketById(ticket.serviceCallId.toString()); // Update the list of tickets after updating a ticket
+        } catch (err) {
+          print('Error al actualizar el ticket: $err');
+        }
       }
     } catch (e) {
       print('Error al actualizar el ticket: $e');

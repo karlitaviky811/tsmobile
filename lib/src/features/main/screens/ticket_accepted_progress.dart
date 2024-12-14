@@ -265,6 +265,7 @@ class _TicketDetailProgress extends StatelessWidget {
                   creationDate: formattedDate,
                   title: ticketInfo.title,
                   description: ticketInfo.serviceCallDetail['descrption'],
+                  scheduledVisit: new DateTime.now(),
                 ),
                 const SizedBox(
                   height: 5,

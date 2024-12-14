@@ -2,6 +2,7 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:flutter/material.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
+import 'package:tsmobile/src/features/main/screens/notifications_screen.dart';
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/models/auth_model.dart';
@@ -53,6 +54,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     // Acción de notificaciones
                     print('Notificaciones');
+
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationListScreen(),
+                        ));
                   },
                 ),
               ],

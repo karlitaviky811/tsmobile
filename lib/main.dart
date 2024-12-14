@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/splash_screen.dart';
@@ -8,6 +10,7 @@ import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 // Importa la pantalla de splash
 
 Future<void> main() async {
@@ -26,7 +29,32 @@ Future<void> main() async {
   if ((OneSignal.User.pushSubscription.id == null)) {
     OneSignal.Notifications.requestPermission(true);
   }
+  PusherChannelsPackageLogger.enableLogs();
+  // Create an instance PusherChannelsOptions
+  // The test options can be accessed from test.pusher.com (using only for test purposes)
+  const testOptions = PusherChannelsOptions.fromCluster(
+    scheme: 'wss',
+    cluster: 'mt1',
+    key: 'a0173cd5499b34d93109',
+    port: 443,
+  );
+  // Create an instance of PusherChannelsClient
+  final client = PusherChannelsClient.websocket(
+    options: testOptions,
+    // Connection exceptions are handled here
+    connectionErrorHandler: (exception, trace, refresh) async {
+      // This method allows you to reconnect if any error is occurred.
+      refresh();
+    },
+  );
+    PublicChannel myPublicChannel = client.publicChannel(
+    'public-channel',
+  );
 
+  StreamSubscription<ChannelReadEvent> somePublicChannelEventSubs =
+      myPublicChannel.bind('public-MyEvent').listen((event) {
+    print('Event from the public channel fired!');
+  });
   runApp(
     MultiProvider(
       providers: [

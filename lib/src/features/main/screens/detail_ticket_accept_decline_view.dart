@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
+import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
 import 'location_map_distance.dart';
 
@@ -19,6 +22,27 @@ class TicketDetailPageView extends StatefulWidget {
   _TicketDetailPageState createState() => _TicketDetailPageState();
 }
 
+void _showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return const Dialog(
+        backgroundColor: Colors.transparent,
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+void _hideLoadingDialog(BuildContext context) {
+  Navigator.of(context).pop();
+}
+
 class _TicketDetailPageState extends State<TicketDetailPageView> {
   String _status = 'pending';
   String _selectedReason = 'No especificado';
@@ -27,8 +51,8 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
   DateTime? _selectedDate;
-  void _saveDetails() async {
-    // Lógica para enviar datos al endpoint
+
+  /* void _saveDetails() async {
     if (_selectedDate == null) {
       print("Por favor, selecciona una fecha.");
       return;
@@ -45,28 +69,139 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final idTicket = widget.ticketId.toString();
       String? token = prefs.getString('auth_token');
+      final visistService = VisistService();
       final ticketProvider =
           Provider.of<TicketProvider>(context, listen: false);
       final item = ticketProvider.ticketInfo;
       _loadTicketFuture = ticketProvider.updateTicket(item!, data);
 
-      print("Error al guardar los detalles:");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TicketAcceptedProgressDetailPage(
+              ticketId: item.id.toString()), // Cambiar item a ticket
+        ),
+      );
+      print("Se ha aceptado el ticket exitosamente");
     } catch (e) {
       print("Error al conectar con el servidor: $e");
     }
   }
-
-  void _saveDetailsRejected() async {
-    // Lógica para enviar datos al endpoint
+*/
+  void _saveDetails() async {
+    if (_selectedDate == null) {
+      print("Por favor, selecciona una fecha.");
+      return;
+    }
 
     final Map<String, dynamic> data = {
-      'start_date': new DateTime.now().toIso8601String(),
+      'start_date': _selectedDate!.toIso8601String(),
+      'additional_notes': _notesController.text,
+      'status': 4,
+    };
+
+    print('programado $data');
+
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final idTicket = widget.ticketId.toString();
+      String? token = prefs.getString('auth_token');
+      final visistService = VisitService();
+      final ticketProvider =
+          Provider.of<TicketProvider>(context, listen: false);
+      final item = ticketProvider.ticketInfo;
+      _loadTicketFuture = ticketProvider.updateTicket(item!, data);
+
+      Fluttertoast.showToast(
+          msg: "Detalles guardados exitosamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      print("Se ha aceptado el ticket exitosamente");
+      _hideLoadingDialog(context);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              TicketAcceptedProgressDetailPage(ticketId: item.id.toString()),
+        ),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Error al guardar los detalles",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      print("Error al conectar con el servidor: $e");
+    } finally {
+        Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              TicketAcceptedProgressDetailPage(ticketId: widget.ticketId.toString()),
+        ),
+      );
+      _hideLoadingDialog(context); 
+      
+      // Ocultar el diálogo de carga
+    }
+  }
+
+  void _saveDetailsRejected() async {
+    final Map<String, dynamic> data = {
+      'start_date': DateTime.now().toIso8601String(),
       'additional_notes': _notesController.text,
       'status': 1,
     };
 
     print('programado $data');
-    // Lógica para enviar datos al endpoint
+    _showLoadingDialog(context); // Mostrar el diálogo de carga
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final idTicket = widget.ticketId.toString();
+      String? token = prefs.getString('auth_token');
+      final ticketProvider =
+          Provider.of<TicketProvider>(context, listen: false);
+      final item = ticketProvider.ticketInfo;
+      _loadTicketFuture = ticketProvider.updateTicket(item!, data);
+
+      Fluttertoast.showToast(
+          msg: "Ticket rechazado exitosamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      print("Error al guardar los detalles:");
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Error al guardar los detalles",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      print("Error al conectar con el servidor: $e");
+    } finally {
+      _hideLoadingDialog(context); // Ocultar el diálogo de carga
+    }
+  }
+
+  /* void _saveDetailsRejected() async {
+    final Map<String, dynamic> data = {
+      'start_date': DateTime.now().toIso8601String(),
+      'additional_notes': _notesController.text,
+      'status': 1,
+    };
 
     print('programado $data');
     try {
@@ -82,7 +217,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     } catch (e) {
       print("Error al conectar con el servidor: $e");
     }
-  }
+  }*/
 
   final List<String> _rejectionReasons = [
     'Cliente no disponible',
@@ -114,6 +249,142 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
         _dateController.text = DateFormat.yMd().format(picked);
       });
     }
+  }
+
+  void _showAcceptedFormModal() {
+    bool _isSaveButtonEnabled = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            void _validateModalForm() {
+              setModalState(() {
+                _isSaveButtonEnabled = _dateController.text.isNotEmpty &&
+                    _notesController.text.isNotEmpty;
+              });
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Aceptar Ticket de Servicio',
+                      style: AppStyle.txtPoppinsBold14Black),
+                  const SizedBox(height: 10),
+                  const Text('Programar primera visita'),
+                  TextField(
+                    controller: _dateController,
+                    decoration: InputDecoration(
+                      labelText: 'Fecha de inicio',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today),
+                        onPressed: () => _selectDate(context),
+                      ),
+                    ),
+                    readOnly: true,
+                    onChanged: (text) => _validateModalForm(),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _notesController,
+                    decoration:
+                        const InputDecoration(labelText: 'Notas adicionales'),
+                    maxLines: null,
+                    onChanged: (text) => _validateModalForm(),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _isSaveButtonEnabled ? _saveDetails : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff051937),
+                    ),
+                    child: Text('Guardar',
+                        style: AppStyle.txtPoppinsMedium14White),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRejectedFormModal() {
+    bool _isSaveButtonEnabled = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            void _validateModalForm() {
+              setModalState(() {
+                _isSaveButtonEnabled = _selectedReason.isNotEmpty &&
+                    _notesController.text.isNotEmpty;
+              });
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Rechazar ticket',
+                      style: AppStyle.txtPoppinsBold14Black),
+                  const SizedBox(height: 10),
+                  const Text('Ingrese motivo'),
+                  const SizedBox(height: 10),
+                  DropdownButtonFormField<String>(
+                    value: _selectedReason,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedReason = newValue!;
+                        _validateModalForm();
+                      });
+                    },
+                    items: _rejectionReasons
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    decoration:
+                        const InputDecoration(labelText: 'Motivo de rechazo'),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _notesController,
+                    onChanged: (text) => _validateModalForm(),
+                    decoration:
+                        const InputDecoration(labelText: 'Notas adicionales'),
+                    maxLines: null,
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed:
+                        _isSaveButtonEnabled ? _saveDetailsRejected : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff051937),
+                    ),
+                    child: Text('Rechazar',
+                        style: AppStyle.txtPoppinsMedium14White),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -148,34 +419,35 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
               return const Center(child: Text('No se encontró el ticket'));
             }
 
-            return SingleChildScrollView(
-              child: Container(
-                color: Colors.white,
-                child: Stack(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Center(
-                          child: NewTicketDetailCard(
-                            code: item.serviceCallId?.toString() ?? 'N/A',
-                            clientName: item.customerName ?? 'N/A',
-                            status: item.status?.toString() ?? 'N/A',
-                            type: 'Reparación',
-                            title: item.title ?? 'N/A',
-                            description: item.serviceCallDetail['descrption'], // Ajusta según sea necesario
-                            creationDateTime: item.createdAt,
-                            location: 'Cambiar formato de coordenadas',
-                            product:  item.serviceCallDetail['itemName'], // Ajusta según sea necesario
-                            brand: 'Hyundai',
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Container(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Center(
+                            child: NewTicketDetailCard(
+                              code: item.serviceCallId?.toString() ?? 'N/A',
+                              clientName: item.customerName ?? 'N/A',
+                              status: item.status?.toString() ?? 'N/A',
+                              type: 'Reparación',
+                              title: item.title ?? 'N/A',
+                              description: item.serviceCallDetail['descrption'],
+                              creationDateTime: item.createdAt,
+                              location: 'Cambiar formato de coordenadas',
+                              product: item.serviceCallDetail['itemName'] ?? '',
+                              brand: 'Hyundai',
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
-                        LocationMapDistance(
-                          initialCoordinates: const LatLng(10.254027777778,
-                              -68.010855555556), // Coordenadas de San Francisco
-                          destinationCoordinates: LatLng(
+                          const SizedBox(height: 10),
+                          LocationMapDistance(
+                            initialCoordinates:
+                                const LatLng(10.254027777778, -68.010855555556),
+                            destinationCoordinates: LatLng(
                               double.tryParse(
                                       item.serviceCallDetail?['latitude'] ??
                                           '0') ??
@@ -183,53 +455,36 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                               double.tryParse(
                                       item.serviceCallDetail?['longitude'] ??
                                           '0') ??
-                                  0), // Coordenadas de Los Ángeles
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.check_box,
-                                  size: 18, color: Colors.white),
-                              onPressed: () {
-                                setState(() {
-                                  _status = 'accepted';
-                                });
-                                ticketProvider.acceptTicket(item);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff051937),
-                                // Cambia este color al que desees
-                              ),
-                              label: Text('Aceptar',
-                                  style: AppStyle.txtPoppinsMedium14White),
+                                  0,
                             ),
-                            const SizedBox(width: 10),
-                            ElevatedButton.icon(
-                              icon: const Icon(Icons.report_problem,
-                                  size: 18, color: Colors.white),
-                              onPressed: () {
-                                setState(() {
-                                  _status = 'rejected';
-                                });
-                                ticketProvider.rejectTicket(item);
-                              },
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xff051937)),
-                              label: Text('Rechazar',
-                                  style: AppStyle.txtPoppinsMedium14White),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        if (_status == 'accepted') buildAcceptedForm(),
-                        if (_status == 'rejected') buildRejectedForm(),
-                      ],
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
                     ),
                   ),
-                ]),
-              ),
+                ),
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: Column(
+                    children: [
+                      FloatingActionButton(
+                        onPressed: _showAcceptedFormModal,
+                        backgroundColor: const Color(0xff051937),
+                        child: const Icon(Icons.check_box, color: Colors.white),
+                      ),
+                      const SizedBox(height: 10),
+                      FloatingActionButton(
+                        onPressed: _showRejectedFormModal,
+                        backgroundColor: const Color(0xff051937),
+                        child: const Icon(Icons.report_problem,
+                            color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             );
           }
         },
@@ -260,7 +515,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
         ),
         const SizedBox(height: 10),
         ElevatedButton(
-          onPressed: _saveDetails,
+          onPressed: _saveDetails, // Asegúrate de no tener paréntesis aquí
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xff051937),
           ),
