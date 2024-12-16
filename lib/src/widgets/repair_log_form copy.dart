@@ -124,9 +124,10 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                 ? 'Nueva reparación'
                                 : reparacion['titulo']),
                             children: [
-                              RepairLogCard(
+                              Container()
+                              /*RepairLogCard(
                                 reparacion: reparacion,
-                              ),
+                              ),*/
                             ],
                           ),
                         );

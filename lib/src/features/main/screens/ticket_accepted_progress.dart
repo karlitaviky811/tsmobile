@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
+import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
 import 'package:tsmobile/src/widgets/close_ticket_form.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
@@ -27,11 +28,15 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   //final _inputController2 = TextEditingController();
   //final _replacementCodeController = TextEditingController();
   late Future<void> _loadTicketFuture;
+  late Future<void> _loadVisitFuture;
   @override
   void initState() {
     super.initState();
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.ticketId);
+
+    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    _loadVisitFuture = visitProvider.fetchVisits(widget.ticketId);
   }
 
   @override
@@ -179,7 +184,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                         print('Imágenes: $images');
                       },
                     ),
-                    RepairLogFormData(initialReparaciones: reparaciones),
+                    RepairLogFormData(ticketId:widget.ticketId),
                     CloseTicketForm(
                       idTicket: widget.ticketId,
                       onSave: (DateTime? date, String observations,
@@ -283,14 +288,6 @@ class _TicketDetailProgress extends StatelessWidget {
   }
 }
 
-/*
-
-     description: item.serviceCallDetail['descrption'], // Ajusta según sea necesario
-                            creationDateTime: item.createdAt,
-                            location: 'Cambiar formato de coordenadas',
-                            product:  item.serviceCallDetail['itemName'], 
- */
-
 class ClienteHandler extends StatefulWidget {
   @override
   _ClienteHandlerState createState() => _ClienteHandlerState();
@@ -318,16 +315,3 @@ class _ClienteHandlerState extends State<ClienteHandler> {
     );
   }
 }
-
-
-/*
-
-              code: item.serviceCallId?.toString() ?? 'N/A',
-                            clientName: item.customerName ?? 'N/A',
-                            status: item.status?.toString() ?? 'N/A',
-                            type: 'Reparación',
-                            title: item.title ?? 'N/A',
-                            description: 'N/A', // Ajusta según sea necesario
-                            creationDateTime: item.createdAt,
-
- */

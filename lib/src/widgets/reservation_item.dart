@@ -63,7 +63,7 @@ class ReservationItemElement extends StatelessWidget {
                     Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
                     Expanded(
                       child: Text(
-                        ticket.customerName,
+                        ticket.customerName ?? 'Customer name',
                         style: AppStyle.txtPoppinsRegular12Black,
                         overflow: TextOverflow.ellipsis, // Agregar esta línea
                         maxLines: 1, // Limitar el número de líneas

@@ -10,7 +10,7 @@ import 'package:tsmobile/src/widgets/reservation_item.dart';
 
 class Status {
   final int id;
-  final String title;
+  final String? title;
 
   Status(this.id, this.title);
 }
@@ -105,7 +105,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                       children: tags.map((tag) {
                         return FilterChip(
                           label: Text(
-                            tag.title,
+                            tag.title ?? 'Customer name',
                             style: TextStyle(
                               fontSize: 16.0,
                               height: 1.4,

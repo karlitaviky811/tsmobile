@@ -39,7 +39,7 @@ class User {
       nrejectedtickets: json['Tickets_rejected'] ?? 0,
       qualification: json['Qualification'] ?? 0,
       address: json['Address'] ?? '',
-      geographicalcoordinates: json['GeographicalCoordinates']['data'].toString(),
+      geographicalcoordinates: json['GeographicalCoordinates']['data'].toString() ?? '',
       latitude: json['latitude'] ?? '',
       longitude: json['longitude'] ?? '',
       agency: json['agency'] ?? '',

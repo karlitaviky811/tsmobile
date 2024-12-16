@@ -7,16 +7,15 @@ class ServiceTicket {
   final String? diagnosisDetail;
   final DateTime? solutionDate;
   final String? solutionDetail;
-  final String customerName;
+  final String? customerName;
   final int status;
   final int totalCost;
-  final String? meta;
+  final dynamic meta;
   final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Map<String,dynamic> serviceCallDetail;
+  final Map<String, dynamic> serviceCallDetail;
 
-  
   ServiceTicket({
     required this.id,
     required this.technicalId,
@@ -26,34 +25,34 @@ class ServiceTicket {
     this.diagnosisDetail,
     this.solutionDate,
     this.solutionDetail,
-    required this.customerName,
+    this.customerName,
     required this.status,
     required this.totalCost,
     this.meta,
     this.deletedAt,
     required this.createdAt,
     required this.updatedAt,
-    required this.serviceCallDetail
+    required this.serviceCallDetail,
   });
 
   factory ServiceTicket.fromJson(Map<String, dynamic> json) {
     return ServiceTicket(
-      id: json['id']  ?? '',
-      technicalId: json['technical_id']  ?? '',
-      serviceCallId: json['service_call_id']  ?? '',
+      id: json['id'] ?? 0,
+      technicalId: json['technical_id'] ?? 0,
+      serviceCallId: json['service_call_id'] ?? 0,
       title: json['title'] ?? '',
-      diagnosisDate: json['diagnosis_date'] != null ? DateTime.tryParse(json['diagnosis_date']) : null,
+      diagnosisDate: json['diagnosis_date'] != null ? DateTime.parse(json['diagnosis_date']) : null,
       diagnosisDetail: json['diagnosis_detail'],
-      solutionDate: json['solution_date'] != null ? DateTime.tryParse(json['solution_date']) : null,
+      solutionDate: json['solution_date'] != null ? DateTime.parse(json['solution_date']) : null,
       solutionDetail: json['solution_detail'] ?? '',
-      customerName: json['customer_name'] ?? '',
+      customerName: json['customer_name'],
       status: json['status'] ?? 1,
       totalCost: json['total_cost'] ?? 0,
       meta: json['meta'],
-      serviceCallDetail: json['service_call'] as Map<String, dynamic>,
-      deletedAt: json['deleted_at'] != null ? DateTime.tryParse(json['deleted_at']) : null,
+      deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
+      serviceCallDetail: json['service_call'] ?? {},
     );
   }
 }

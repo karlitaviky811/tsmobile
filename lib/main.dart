@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/splash_screen.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
+import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/providers/user_provider.dart';
+import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -47,7 +49,7 @@ Future<void> main() async {
       refresh();
     },
   );
-    PublicChannel myPublicChannel = client.publicChannel(
+  PublicChannel myPublicChannel = client.publicChannel(
     'public-channel',
   );
 
@@ -61,7 +63,9 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => MessageProvider()),
         ChangeNotifierProvider(create: (_) => GeolocationProvider()),
         ChangeNotifierProvider(create: (_) => TicketProvider()),
-        ChangeNotifierProvider(create: (_) => UserProvider())
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ImagePickerProvider()),
+        ChangeNotifierProvider(create: (_) => VisitProvider()),
       ],
       child: const MyApp(),
     ),

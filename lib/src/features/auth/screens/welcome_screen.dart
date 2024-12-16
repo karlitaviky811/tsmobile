@@ -1,3 +1,4 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:flutter/material.dart';
@@ -62,11 +63,11 @@ class _LoginForm extends StatelessWidget {
           loginForm.email,
           loginForm.password,
         );
-        print('Login successful: $response');
+        print('Login successful:');
         return true;
       } catch (e) {
-        return false;
         print('Login failed: $e');
+        return false;
       }
     }
 
@@ -119,17 +120,25 @@ class _LoginForm extends StatelessWidget {
                   height: 60,
                 ),
                 MaterialButton(
-                  
                   onPressed: () {
                     if (loginForm.isValidForm()) {
-                    final  res = _signIn();
-                      
+                      final res = _signIn();
+                       Navigator.pushReplacementNamed(context, TabsPage.route);
+                      print('res ${res}');
                       //_showLocationModal(context);
-                      Navigator.pushReplacementNamed(context, TabsPage.route);
+                      /*if (res) {
+                       
+                      } else {
+                        Fluttertoast.showToast(
+                            msg: "Error de autenticación",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      }*/
                     }
-
-            
-                    
                   },
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),

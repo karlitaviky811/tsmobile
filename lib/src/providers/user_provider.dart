@@ -42,7 +42,7 @@ class UserProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('Error al cargar los tickets: $e');
+      print('Error al cargar la data del user: $e');
     } finally {
       _isLoading = false;
       notifyListeners();

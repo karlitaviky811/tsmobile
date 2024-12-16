@@ -24,7 +24,7 @@ Future<void> sendFile(File file, String modelType, String modelId, String collec
   try {
     final response = await request.send();
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       print('Archivo enviado exitosamente.');
     } else {
       final responseBody = await response.stream.bytesToString();

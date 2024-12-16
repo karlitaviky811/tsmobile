@@ -94,19 +94,20 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
       return;
     }
 
-    final Map<String, dynamic> data = {
-      'start_date': _selectedDate!.toIso8601String(),
-      'additional_notes': _notesController.text,
-      'status': 4,
-    };
-
-    print('programado $data');
-
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final idTicket = widget.ticketId.toString();
       String? token = prefs.getString('auth_token');
       final visistService = VisitService();
+
+      final Map<String, dynamic> data = {
+        'start_date': _selectedDate!.toIso8601String(),
+        'additional_notes': _notesController.text,
+        'status': 4,
+      };
+
+      print('programado $data');
+
       final ticketProvider =
           Provider.of<TicketProvider>(context, listen: false);
       final item = ticketProvider.ticketInfo;
@@ -141,15 +142,15 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           fontSize: 16.0);
       print("Error al conectar con el servidor: $e");
     } finally {
-        Navigator.push(
+      Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              TicketAcceptedProgressDetailPage(ticketId: widget.ticketId.toString()),
+          builder: (context) => TicketAcceptedProgressDetailPage(
+              ticketId: widget.ticketId.toString()),
         ),
       );
-      _hideLoadingDialog(context); 
-      
+      _hideLoadingDialog(context);
+
       // Ocultar el diálogo de carga
     }
   }

@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
@@ -43,12 +44,17 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   Future<void> _pickImage() async {
+    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
+    imagePickerProvider.setImagePickerActive(true);
+    
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         _images.add(File(image.path));
       });
     }
+    
+    imagePickerProvider.setImagePickerActive(false);
   }
 
   void _removeImage(int index) {
@@ -67,6 +73,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.idTicket);
   }
+
 
   @override
   Widget build(BuildContext context) {

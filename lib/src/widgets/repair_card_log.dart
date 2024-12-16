@@ -4,12 +4,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 
 class RepairLogCard extends StatefulWidget {
   final Map<String, dynamic> reparacion;
+    final Visit visit;
 
-  RepairLogCard({required this.reparacion});
+  RepairLogCard({required this.reparacion, required this.visit});
 
   @override
   _RepairLogCardState createState() => _RepairLogCardState();

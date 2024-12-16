@@ -24,6 +24,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   final TextEditingController _observationsController = TextEditingController();
   final List<File> _images = [];
   final ImagePicker _picker = ImagePicker();
+  bool _isImagePickerActive = false;
   late Future<void> _loadTicketFuture;
   DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
   bool isDateInitialized = false;
@@ -45,11 +46,25 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    if (!_isImagePickerActive) {
       setState(() {
-        _images.add(File(image.path));
+        _isImagePickerActive = true;
       });
+
+      try {
+        final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+        if (image != null) {
+          setState(() {
+            _images.add(File(image.path));
+          });
+        }
+      } catch (e) {
+        print("Error al seleccionar imagen: $e");
+      } finally {
+        setState(() {
+          _isImagePickerActive = false;
+        });
+      }
     }
   }
 
