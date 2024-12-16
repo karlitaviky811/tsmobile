@@ -28,7 +28,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
   Future<void> _fetchVisits() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-    await visitProvider.fetchVisits(widget.ticketId);
+    await visitProvider.fetchVisitsByTicket(widget.ticketId);
   }
 
   Future<void> _selectDate(BuildContext context, Visit visit) async {
@@ -130,9 +130,10 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                     ? 'Nueva reparación'
                                     : visit.title),
                                 children: [
-                                  /*RepairLogCard(
+                                  RepairLogCard(
+                                    reparacion: {},
                                     visit: visit,
-                                  ),*/
+                                  ),
                                   Container()
                                 ],
                               ),
@@ -159,6 +160,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
           id: 0,
           title: 'Nueva reparación',
           type: 1,
+          status:0,
           ticketId: 0,
           visitDate: DateTime.now(),
           reprogramming: [],

@@ -7,6 +7,8 @@ import 'package:tsmobile/src/models/visit_model.dart';
 
 class VisitService {
   String apiUrl = 'http://3.137.100.242:3000/api/v1/technical-visits';
+
+
   Future<List<NeatCleanCalendarEvent>> fetchTechnicalVisits() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -98,4 +100,23 @@ class VisitService {
       return null;
     }
   }
+
+  Future<List<Visit>> fetchVisitsByTicket(String ticketId) async {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final response = await http.get(Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits?include=ticket_id=1')  ,headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },);
+    if (response.statusCode == 200) {
+      List<dynamic> body = json.decode(response.body);
+      List<Visit> visits = body.map((dynamic item) => Visit.fromJson(item)).toList();
+      return visits;
+    } else {
+      throw Exception('Failed to load visits for ticket');
+    }
+  }
 }
+
+

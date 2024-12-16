@@ -15,7 +15,10 @@ class AuthService {
         "password": password,
       }),
     );
-
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final String token = responseData['data']['token'];
+      await saveToken(
+          token);
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       final String token = responseData['data']['token'];

@@ -132,10 +132,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Chip(
-                  label: Text(reparacion['estado']),
-                  backgroundColor: _getChipColor(reparacion['estado']),
+                  label: Text(widget.visit.status.toString()),
+                  backgroundColor: _getChipColor(widget.visit.status.toString()),
                   avatar: Icon(
-                    _getChipIcon(reparacion['estado']),
+                    _getChipIcon(widget.visit.status.toString()),
                     color: Colors.white,
                   ),
                   shape: RoundedRectangleBorder(
@@ -368,3 +368,6 @@ class _RepairLogCardState extends State<RepairLogCard> {
     ;
   }
 }
+
+
+

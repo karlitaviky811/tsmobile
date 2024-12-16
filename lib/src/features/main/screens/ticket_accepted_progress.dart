@@ -35,8 +35,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.ticketId);
 
-    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-    _loadVisitFuture = visitProvider.fetchVisits(widget.ticketId);
+
   }
 
   @override
