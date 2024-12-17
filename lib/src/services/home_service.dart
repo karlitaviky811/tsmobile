@@ -8,6 +8,7 @@ Future<void> makeAuthenticatedRequest() async {
   // Encabezados
   Map<String, String> headers = {
     'Content-Type': 'application/json',
+    'Accept':'application/json',
     'Authorization': 'Bearer $token',  // Agregar el token aquí
   };
 

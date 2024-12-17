@@ -26,6 +26,7 @@ class MessageService {
       headers: {
         'Authorization': 'Bearer $token', // Agrega el token en las cabeceras
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
     );
 

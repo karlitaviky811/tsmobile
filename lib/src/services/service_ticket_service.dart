@@ -22,6 +22,7 @@ class TicketService {
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
+          "Accept": "application/json",
           'Authorization':
               'Bearer $token', // Asegúrate de reemplazar con tu token real
         },
@@ -48,6 +49,7 @@ class TicketService {
             'http://3.137.100.242:3000/api/v1/tickets/$idTicket?include=serviceCall'),
         headers: {
           'Content-Type': 'application/json',
+          "Accept": "application/json",
           'Authorization': 'Bearer $token',
         },
       );
@@ -73,7 +75,8 @@ class TicketService {
       final response = await http.put(
         Uri.parse('http://3.137.100.242:3000/api/v1/tickets/${idTicket}'),
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
           'Authorization': 'Bearer $token',
         },
         body: jsonEncode(data),

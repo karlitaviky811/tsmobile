@@ -1,15 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:tsmobile/src/models/tabulator_model.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
+import 'package:tsmobile/src/services/tabulator_service.dart';
+import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 
 class RepairLogCard extends StatefulWidget {
   final Map<String, dynamic> reparacion;
-    final Visit visit;
+  final Visit visit;
 
   RepairLogCard({required this.reparacion, required this.visit});
 
@@ -23,25 +28,39 @@ class _RepairLogCardState extends State<RepairLogCard> {
   late Map<String, dynamic> reparacion;
   TextEditingController _dateController = TextEditingController();
   late TextEditingController _tituloController;
-
+  final TabulatorService _tabulatorService = TabulatorService();
   late TextEditingController _observacionesController;
   late TextEditingController _comentariosGeneralesController;
-
+  List<MultiSelectItem<String>> _items = [];
   @override
   void initState() {
     super.initState();
+    _loadTabulators();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
-    _tituloController = TextEditingController(text: reparacion['titulo']);
+    _tituloController = TextEditingController(text: widget.visit.title);
     _observacionesController =
-        TextEditingController(text: reparacion['observaciones']);
+        TextEditingController(text: widget.visit.observations);
     _comentariosGeneralesController =
-        TextEditingController(text: reparacion['comentariosGenerales']);
+        TextEditingController(text: widget.visit.observations);
     _comentariosGeneralesController =
-        TextEditingController(text: reparacion['comentariosGenerales']);
-    _dateController.text = reparacion['selectedDate'] != null
-        ? reparacion['selectedDate'].toLocal().toString().split(' ')[0]
+        TextEditingController(text: widget.visit.observations);
+    _dateController.text = widget.visit.visitDate != null
+        ? widget.visit.visitDate.toLocal().toString().split(' ')[0]
         : '';
   }
+
+   Future<void> _loadTabulators() async {
+    final tabulatorData = await _tabulatorService.fetchTabulators();
+    if (tabulatorData != null && tabulatorData.containsKey('data')) {
+      List<dynamic> data = tabulatorData['data'];
+      setState(() {
+        _items = data
+            .map((item) => MultiSelectItem<String>(item['n'], item['repuestos']))
+            .toList();
+      });
+    }
+  }
+
 
   Future<void> _pickImage(BuildContext context, String imageType) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -60,14 +79,14 @@ class _RepairLogCardState extends State<RepairLogCard> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: reparacion['selectedDate'] ?? DateTime.now(),
+      initialDate: widget.visit.visitDate ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
 
     if (pickedDate != null) {
       setState(() {
-        reparacion['selectedDate'] = pickedDate;
+        widget.visit.visitDate = pickedDate;
         _dateController.text = pickedDate.toLocal().toString().split(' ')[0];
       });
     }
@@ -133,7 +152,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
               children: [
                 Chip(
                   label: Text(widget.visit.status.toString()),
-                  backgroundColor: _getChipColor(widget.visit.status.toString()),
+                  backgroundColor:
+                      _getChipColor(widget.visit.status.toString()),
                   avatar: Icon(
                     _getChipIcon(widget.visit.status.toString()),
                     color: Colors.white,
@@ -160,7 +180,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
               ),
               onChanged: (value) {
                 setState(() {
-                  reparacion['titulo'] = value;
+                  widget.visit.title = value;
                 });
               },
             ),
@@ -197,11 +217,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                       color: Colors.black54),
                 ),
                 MultiSelectDialogField(
-                  items: [
-                    MultiSelectItem<String>('Servicio 1', 'Servicio 1'),
-                    MultiSelectItem<String>('Servicio 2', 'Servicio 2'),
-                    // Agrega más servicios aquí
-                  ],
+                  items: _items,
                   title: const Text('Servicios realizados'),
                   backgroundColor: Colors.white,
                   selectedColor: const Color(0xff051937),
@@ -210,33 +226,30 @@ class _RepairLogCardState extends State<RepairLogCard> {
                     'Seleccione uno o más servicios',
                     style: TextStyle(color: Color(0xff051937), fontSize: 16),
                   ),
-                  initialValue: reparacion['selectedServicios'].cast<String>(),
+                  initialValue: widget.visit.selectedServicios.cast<String>(),
                   onConfirm: (values) {
                     setState(() {
-                      reparacion['selectedServicios'] = values.cast<String>();
+                      widget.visit.selectedServicios = values.cast<String>();
                     });
                   },
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: Colors.grey, width: 1),
-                    ),
-                  ),
                 ),
               ],
             ),
             const SizedBox(height: 10),
             CheckboxListTile(
               title: const Text('¿Necesita repuesto?'),
-              value: reparacion['necesitaRepuesto'],
+              value: widget.visit.necesitaRepuesto,
               onChanged: (bool? value) {
                 setState(() {
-                  reparacion['necesitaRepuesto'] = value ?? false;
-                  reparacion['estado'] =
-                      value == true ? 'Solicitud de Repuesto' : 'Reparación';
+                  widget.visit.status = value == true ? 1 : 0;
+                  widget.visit.necesitaRepuesto = value;
+                  widget.visit.necesitaRepuesto == true
+                      ? 'Solicitud de Repuesto'
+                      : 'Reparación';
                 });
               },
             ),
-            if (reparacion['necesitaRepuesto'])
+            if (widget.visit.necesitaRepuesto == true)
               ExpansionTile(
                 title: const Text('Solicitud de repuesto'),
                 children: [
@@ -255,11 +268,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
                       'Seleccione uno o más repuestos',
                       style: TextStyle(color: Color(0xff051937), fontSize: 16),
                     ),
-                    initialValue:
-                        reparacion['selectedRepuestos'].cast<String>(),
+                    initialValue: widget.visit.selectedRepuestos,
                     onConfirm: (values) {
                       setState(() {
-                        reparacion['selectedRepuestos'] = values.cast<String>();
+                        widget.visit.selectedRepuestos = values.cast<String>();
                       });
                     },
                     decoration: const BoxDecoration(
@@ -282,9 +294,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
                             BorderSide(color: Color(0xff051937), width: 1),
                       ),
                     ),
+                    controller: _comentariosGeneralesController,
                     onChanged: (value) {
                       setState(() {
-                        reparacion['observaciones'] = value;
+                        widget.visit.observations = value;
                       });
                     },
                   ),
@@ -336,7 +349,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                     ),
                 ],
               ),
-            if (reparacion['estado'] == 'Sin stock')
+            if (widget.visit.status == 'Sin stock')
               BuySparePart(
                 reparacion: const {
                   'nombreRepuesto': '',
@@ -355,7 +368,29 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 ),
-                onPressed: () {},
+                onPressed: () async {
+                  var serviceVisit = new VisitService();
+
+                  Map<String, dynamic> params = {
+                    "services":  widget.visit.selectedServicios,
+                    "spareparts": widget.visit.visitDate.toIso8601String(),
+                    "observations":
+                        'Probando el update de la visita deberian estar asociados los servicios por visita',
+                  };
+
+                  Map<String, dynamic> data = {
+                    "title": widget.visit.title,
+                    "visit_date": widget.visit.visitDate.toIso8601String(),
+                    "observations":
+                        'Probando el update de la visita deberian estar asociados los servicios por visita',
+                    "meta": jsonEncode(params)
+                  };
+
+                  var res = await serviceVisit.sendUpdateDataVisit(
+                      data, widget.visit.id.toString());
+
+                  print('rress $res');
+                },
                 icon: const Icon(Icons.save, color: Colors.white),
                 label: const Text('Guardar',
                     style: TextStyle(color: Colors.white)),
@@ -368,6 +403,3 @@ class _RepairLogCardState extends State<RepairLogCard> {
     ;
   }
 }
-
-
-

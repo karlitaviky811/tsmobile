@@ -307,8 +307,8 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                     
 
                     Map<String, dynamic> data = {
-                      "new_date": "2024-12-19 00:00:00.000",
-                      "extend_reason": "Motivo 1",
+                      "new_date": _scheduledVisit,
+                      "extend_reason": _rescheduleReason,
                       "reason": "3"
                     };
 

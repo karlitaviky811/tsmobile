@@ -34,6 +34,7 @@ class CommentService {
       Uri.parse('${apiUrl}commentable_type=Ticket&commentable_id=81'),
       headers: {
         "Content-Type": "application/json",
+        'Accept':'application/json',
         'Authorization': 'Bearer $token',
       },
     );
@@ -64,6 +65,7 @@ class CommentService {
       Uri.parse(apiUrl),
       headers: {
         'Content-Type': 'application/json',
+        'Accept':'application/json',
       },
       body: jsonEncode(message),
     );

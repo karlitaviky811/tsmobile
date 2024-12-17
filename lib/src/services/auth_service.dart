@@ -9,7 +9,7 @@ class AuthService {
   Future<Map<String, dynamic>> signIn(String email, String password) async {
     final response = await http.post(
       Uri.parse('$apiUrl/login'),
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json",  "Accept": "application/json"},
       body: jsonEncode({
         "email": email,
         "password": password,

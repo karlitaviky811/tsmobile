@@ -11,12 +11,12 @@ class Visit {
   DateTime createdAt;
   DateTime updatedAt;
   int? status;
+  bool? necesitaRepuesto;
   String? imageSolicitud;
   String? imagePresupuesto;
   String? imageReparacion;
-    List<String> selectedServicios;
+  List<String> selectedServicios;
   List<String> selectedRepuestos;
-  
 
   Visit({
     required this.id,
@@ -34,14 +34,16 @@ class Visit {
     this.imageSolicitud,
     this.imagePresupuesto,
     this.imageReparacion,
+    this.necesitaRepuesto,
     this.selectedServicios = const [],
     this.selectedRepuestos = const [],
   });
 
   factory Visit.fromJson(Map<String, dynamic> json) {
-    var reprogrammingList = json['reprogramming'] != null && json['reprogramming']['other'] != null
-        ? json['reprogramming']['other'] as List<dynamic>
-        : [];
+    var reprogrammingList =
+        json['reprogramming'] != null && json['reprogramming']['other'] != null
+            ? json['reprogramming']['other'] as List<dynamic>
+            : [];
     return Visit(
       id: json['id'],
       title: json['title'],
@@ -62,6 +64,9 @@ class Visit {
       imageSolicitud: json['image_solicitud'],
       imagePresupuesto: json['image_presupuesto'],
       imageReparacion: json['image_reparacion'],
+      necesitaRepuesto: true,
+      selectedRepuestos: [],
+      selectedServicios: [],
     );
   }
 }
@@ -88,4 +93,3 @@ class Reprogramming {
     );
   }
 }
-
