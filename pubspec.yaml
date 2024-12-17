@@ -62,6 +62,7 @@ dependencies:
   shared_preferences: ^2.3.3
   dart_pusher_channels: ^1.2.3
   pusher_channels_flutter: ^2.4.0
+  multiselect_formfield: ^0.1.7
   
   
   

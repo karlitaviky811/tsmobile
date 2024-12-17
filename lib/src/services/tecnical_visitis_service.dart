@@ -101,12 +101,12 @@ class VisitService {
     }
   }
 
-  Future<List<Visit>> fetchVisitsByTicket(String ticketId) async {
+  Future<List<Visit>> fetchVisitsByTicket(int ticketId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/technical-visits?include=ticket_id=1'),
+          'http://3.137.100.242:3000/api/v1/technical-visits?include=ticket_id=${ticketId}'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -124,10 +124,10 @@ class VisitService {
   }
 
   Future<bool> sendUpdateDataVisit(
-      Map<String, dynamic> data, String idTicket) async {
+      Map<String, dynamic> data, int idTicket) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    print('data $data');
+    print('data $data $apiUrl');
     try {
       final response = await http.put(
         Uri.parse(apiUrl + '/${idTicket}'),
@@ -144,6 +144,39 @@ class VisitService {
 
       if (response.statusCode == 200) {
         print('Datos enviados exitosamente.');
+        return true;
+      } else {
+        print('Error al enviar los datos: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error al enviar la solicitud: $e');
+      return false;
+    }
+  }
+
+  Future<bool> sendUpdateDataVisitPartRequest(
+      Map<String, dynamic> data, int idTicket) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    print('data $data $apiUrl');
+    try {
+      final response = await http.post(
+        Uri.parse('http://3.137.100.242:3000/api/v1//api/v1/part-requests'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
+
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('repuesto solicitado éxitosamente');
         return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');

@@ -22,7 +22,7 @@ class UserService {
       );
 
       // Analizar la respuesta JSON
-      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      Map<String, dynamic> jsonResponse  = jsonDecode(response.body);
       
       // Validar el estado de la respuesta
       if (jsonResponse['success'] == true) {

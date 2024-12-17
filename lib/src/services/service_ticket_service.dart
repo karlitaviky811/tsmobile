@@ -14,7 +14,7 @@ const String apiUrl =
     'http://3.137.100.242:3000/api/v1/tickets?include=serviceCall';
 
 class TicketService {
-  Future<List<ServiceTicket>> fetchServiceTickets() async {
+  Future<List<ServiceTicket>> fetchServiceTickets(int index) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');

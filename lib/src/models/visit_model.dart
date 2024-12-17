@@ -1,22 +1,48 @@
+import 'dart:ffi';
+
+class Reprogramming {
+  final String reason;
+  final DateTime newDate;
+  final String extendReason;
+  final DateTime oldDate;
+
+  Reprogramming({
+    required this.reason,
+    required this.newDate,
+    required this.extendReason,
+    required this.oldDate,
+  });
+
+  factory Reprogramming.fromJson(Map<String, dynamic> json) {
+    return Reprogramming(
+      reason: json['reason'],
+      newDate: DateTime.parse(json['new_date']),
+      extendReason: json['extend_reason'],
+      oldDate: DateTime.parse(json['old_date']),
+    );
+  }
+}
+
 class Visit {
-  int id;
+  final int id;
   String title;
-  int type;
-  int ticketId;
+  final int type;
+  final int ticketId;
   DateTime visitDate;
   String? observations;
   List<Reprogramming> reprogramming;
-  String? meta;
-  DateTime? deletedAt;
-  DateTime createdAt;
-  DateTime updatedAt;
-  int? status;
-  bool? necesitaRepuesto;
+  final String? meta;
+  final DateTime? deletedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  int status;
   String? imageSolicitud;
   String? imagePresupuesto;
   String? imageReparacion;
-  List<String> selectedServicios;
+  bool necesitaRepuesto;
+  List<String> services;
   List<String> selectedRepuestos;
+  List<String> selectedServicios;
 
   Visit({
     required this.id,
@@ -34,23 +60,27 @@ class Visit {
     this.imageSolicitud,
     this.imagePresupuesto,
     this.imageReparacion,
-    this.necesitaRepuesto,
-    this.selectedServicios = const [],
-    this.selectedRepuestos = const [],
+    required this.necesitaRepuesto,
+    required this.services,
+    required this.selectedRepuestos,
+    required this.selectedServicios,
   });
 
   factory Visit.fromJson(Map<String, dynamic> json) {
-    var reprogrammingList =
-        json['reprogramming'] != null && json['reprogramming']['other'] != null
-            ? json['reprogramming']['other'] as List<dynamic>
-            : [];
+    var reprogrammingList = json['reprogramming'] != null &&
+            json['reprogramming']['other'] != null
+        ? json['reprogramming']['other'] as List<dynamic>
+        : [];
+
     return Visit(
       id: json['id'],
-      title: json['title'],
+      title: json['title'] ?? '',
       type: json['type'],
       ticketId: json['ticket_id'],
-      visitDate: DateTime.parse(json['visit_date']),
-      observations: json['observations'],
+      visitDate: json['visit_date'] != null
+          ? DateTime.parse(json['visit_date'])
+          : DateTime.now(),
+      observations: json['observations'] ?? '',
       reprogramming: reprogrammingList
           .map((item) => Reprogramming.fromJson(item))
           .toList(),
@@ -60,36 +90,14 @@ class Visit {
           : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      status: json['status'],
-      imageSolicitud: json['image_solicitud'],
-      imagePresupuesto: json['image_presupuesto'],
-      imageReparacion: json['image_reparacion'],
-      necesitaRepuesto: true,
+      status: json['status'] ?? 1,
+      imageSolicitud: json['image_solicitud'] ?? '',
+      imagePresupuesto: json['image_presupuesto'] ?? '',
+      imageReparacion: json['image_reparacion'] ?? '',
+      necesitaRepuesto: json['necesitaRepuesto'] ?? false,
+      services: List<String>.from(json['services'] ?? []),
       selectedRepuestos: [],
       selectedServicios: [],
-    );
-  }
-}
-
-class Reprogramming {
-  final String reason;
-  final String newDate;
-  final String extendReason;
-  final String oldDate;
-
-  Reprogramming({
-    required this.reason,
-    required this.newDate,
-    required this.extendReason,
-    required this.oldDate,
-  });
-
-  factory Reprogramming.fromJson(Map<String, dynamic> json) {
-    return Reprogramming(
-      reason: json['reason'],
-      newDate: json['new_date'],
-      extendReason: json['extend_reason'],
-      oldDate: json['old_date'],
     );
   }
 }

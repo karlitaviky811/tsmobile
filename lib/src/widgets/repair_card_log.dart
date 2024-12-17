@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -32,6 +33,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
   late TextEditingController _observacionesController;
   late TextEditingController _comentariosGeneralesController;
   List<MultiSelectItem<String>> _items = [];
+  List<String> _initialValues = [];
+
   @override
   void initState() {
     super.initState();
@@ -49,18 +52,24 @@ class _RepairLogCardState extends State<RepairLogCard> {
         : '';
   }
 
-   Future<void> _loadTabulators() async {
+  Future<void> _loadTabulators() async {
     final tabulatorData = await _tabulatorService.fetchTabulators();
     if (tabulatorData != null && tabulatorData.containsKey('data')) {
       List<dynamic> data = tabulatorData['data'];
+
+      print('services ${widget.visit.services}');
       setState(() {
         _items = data
-            .map((item) => MultiSelectItem<String>(item['n'], item['repuestos']))
+            .map(
+                (item) => MultiSelectItem<String>(item['n'], item['repuestos']))
             .toList();
       });
+
+      // Establecer los valores iniciales que coincidan con los servicios de meta['services']
+      _initialValues =
+          widget.visit.services.map((service) => service.toString()).toList();
     }
   }
-
 
   Future<void> _pickImage(BuildContext context, String imageType) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -226,7 +235,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                     'Seleccione uno o más servicios',
                     style: TextStyle(color: Color(0xff051937), fontSize: 16),
                   ),
-                  initialValue: widget.visit.selectedServicios.cast<String>(),
+                  initialValue: _initialValues,
                   onConfirm: (values) {
                     setState(() {
                       widget.visit.selectedServicios = values.cast<String>();
@@ -241,8 +250,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
               value: widget.visit.necesitaRepuesto,
               onChanged: (bool? value) {
                 setState(() {
-                  widget.visit.status = value == true ? 1 : 0;
-                  widget.visit.necesitaRepuesto = value;
+                  widget.visit.status = (value == true ? 1 : 0) as int;
+                  widget.visit.necesitaRepuesto = value!;
                   widget.visit.necesitaRepuesto == true
                       ? 'Solicitud de Repuesto'
                       : 'Reparación';
@@ -318,7 +327,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text('Adjuntar imágenes de presupuesto',
+                    child: const Text('Adjuntar imágenes de repuesto',
                         style: TextStyle(color: Colors.white)),
                   ),
                   if (imagePaths.isNotEmpty)
@@ -357,7 +366,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   'presupuestoRepuesto': '',
                 },
               ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 30),
             Center(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
@@ -372,7 +381,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   var serviceVisit = new VisitService();
 
                   Map<String, dynamic> params = {
-                    "services":  widget.visit.selectedServicios,
+                    "services": widget.visit.selectedServicios,
                     "spareparts": widget.visit.visitDate.toIso8601String(),
                     "observations":
                         'Probando el update de la visita deberian estar asociados los servicios por visita',
@@ -381,13 +390,26 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   Map<String, dynamic> data = {
                     "title": widget.visit.title,
                     "visit_date": widget.visit.visitDate.toIso8601String(),
-                    "observations":
-                        'Probando el update de la visita deberian estar asociados los servicios por visita',
+                    "services": widget.visit.selectedServicios,
+                    "observations": widget.visit.observations,
+                    "tabulator_id": 50,
                     "meta": jsonEncode(params)
                   };
 
                   var res = await serviceVisit.sendUpdateDataVisit(
-                      data, widget.visit.id.toString());
+                      data, widget.visit.id);
+
+                  if (widget.visit.selectedRepuestos.length > 0) {
+                    Map<String, dynamic> repuestos = {
+                      "title": widget.visit.title,
+                      "tabulator_id": 50,
+                      "technical_visit_id": widget.visit.id,
+                      "observations": 'probando solicitud de repuestos',
+                    };
+
+                         var res = await serviceVisit.sendUpdateDataVisitPartRequest(
+                      data, widget.visit.id);
+                  }
 
                   print('rress $res');
                 },

@@ -86,7 +86,7 @@ class _BuySparePartState extends State<BuySparePart> {
               _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
             }
           },
-          child: const Text('Adjuntar imágenes de presupuesto'),
+          child: const Text('Adjuntar imágenes'),
         ),
         if (imagePaths.isNotEmpty)
           Column(

@@ -19,7 +19,7 @@ class VisitProvider with ChangeNotifier {
   
 
     try {
-      _visits = await _visitService.fetchVisitsByTicket(ticketId);
+      _visits = await _visitService.fetchVisitsByTicket(int.parse(ticketId));
         notifyListeners();
       _errorMessage = null;
     } catch (error) {

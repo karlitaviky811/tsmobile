@@ -1,0 +1,13 @@
+-72 horas cuando se acepta el ticket , mostrar solo 3 dias habiles a partir del dia de la llamada de servicio
+-blacklist
+Repuestos por visita y presupuesto
+-alimentarme de las imagenes 
+-Notificascioes manejar payload
+-recargar Chat hacer peticiones
+-scroll infinito
+
+
+
+include con partrequest
+
+tickets/idTicket?include=partRequest
