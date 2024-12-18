@@ -42,7 +42,7 @@ class VisitService {
     print('data $data');
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -104,19 +104,28 @@ class VisitService {
   Future<List<Visit>> fetchVisitsByTicket(int ticketId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/technical-visits?include=ticket_id=${ticketId}'),
+          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 200) {
-      List<dynamic> body = json.decode(response.body);
+      // Decodificar el cuerpo de la respuesta
+      Map<String, dynamic> body = json.decode(response.body)['data'];
+
+      // Obtener la lista de visitas desde la propiedad 'visits'
+      List<dynamic> visitsData = body['visits'];
+
+      // Mapear cada elemento de visitsData a un objeto Visit
       List<Visit> visits =
-          body.map((dynamic item) => Visit.fromJson(item)).toList();
+          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
+
       return visits;
     } else {
       throw Exception('Failed to load visits for ticket');
@@ -163,7 +172,7 @@ class VisitService {
     print('data $data $apiUrl');
     try {
       final response = await http.post(
-        Uri.parse('http://3.137.100.242:3000/api/v1//api/v1/part-requests'),
+        Uri.parse('http://3.137.100.242:3000/api/v1/part-requests'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -188,4 +197,41 @@ class VisitService {
       return false;
     }
   }
+
+  Future<bool> getDataVisitPartRequest(
+      Map<String, dynamic> data, int idVisit) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    print('data $data $apiUrl');
+    try {
+      final response = await http.post(
+        Uri.parse(' http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${idVisit}'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
+
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('repuesto solicitado éxitosamente');
+        return true;
+      } else {
+        print('Error al enviar los datos: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error al enviar la solicitud: $e');
+      return false;
+    }
+  }
+
+
+
+ 
 }

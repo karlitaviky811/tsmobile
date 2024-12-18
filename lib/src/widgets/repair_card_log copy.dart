@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
+import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 import 'dart:io';
 import 'package:tsmobile/src/widgets/repair_log_thumbnails.dart';
@@ -57,7 +58,7 @@ class RepairLogCard extends StatefulWidget {
     required this.reparacion,
     required this.selectDate,
     required this.pickImage,
-    required this.onSave,
+    required this.onSave, required Visit visit,
   });
 
   @override

@@ -5,7 +5,11 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'dart:io';
-import 'package:tsmobile/src/widgets/repair_card_log.dart';
+
+import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
+
+
+
 
 class RepairLogFormData extends StatefulWidget {
   final String ticketId;
@@ -29,6 +33,15 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
   Future<void> _fetchVisits() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
     await visitProvider.fetchVisitsByTicket(widget.ticketId);
+  }
+
+  void _navigateToEditPage(BuildContext context, Visit visit, String tipo) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditVisitPage(visit: visit,ticketId:widget.ticketId, type: tipo ),
+      ),
+    );
   }
 
   Future<void> _selectDate(BuildContext context, Visit visit) async {
@@ -98,47 +111,61 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                       ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: visitProvider.visits.length + 1,
+                          itemCount: visitProvider.visits.length,
                           itemBuilder: (context, index) {
-                            if (index == visitProvider.visits.length) {
-                              return Column(
-                                children: [
-                                  Center(
-                                    child: ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xff051937),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                      ),
-                                      onPressed: _agregarNuevaReparacion,
-                                      icon: const Icon(Icons.add, color: Colors.white),
-                                      label: const Text('Añadir nueva reparación',
-                                          style: TextStyle(color: Colors.white)),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-
                             final visit = visitProvider.visits[index];
 
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: ExpansionTile(
+                              child: ListTile(
                                 title: Text(visit.title.isEmpty
                                     ? 'Nueva reparación'
                                     : visit.title),
-                                children: [
-                                  RepairLogCard(
-                                    reparacion: {},
-                                    visit: visit,
-                                  ),
-                                  Container()
-                                ],
+                                subtitle: Text('Fecha: ${visit.visitDate.toLocal()}'.split(' ')[0]),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(Icons.edit),
+                                      onPressed: () => _navigateToEditPage(context, visit,  'Edit'),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () => _eliminarVisita(index),
+                                    ),
+                                  ],
+                                ),
+                                onTap: () => _navigateToEditPage(context, visit, 'Edit'),
                               ),
                             );
                           },
+                        ),
+                      ),
+                      Center(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xff051937),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                         onPressed: () {
+                           Visit newVisit = Visit( id: 0, title: 'Nueva reparación', 
+                           type: 1, 
+                           status: 1, 
+                           selectedRepuestos: [], 
+                           selectedServicios: [], 
+                           necesitaRepuesto: false, 
+                           ticketId: 0, 
+                           visitDate: DateTime.now(), 
+                           reprogramming: [], 
+                           services: [], 
+                           createdAt: DateTime.now(), 
+                           updatedAt: DateTime.now(), ); 
+                          _navigateToEditPage(context, newVisit, 'Nuevo'); },
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          label: const Text('Añadir nueva reparación',
+                              style: TextStyle(color: Colors.white)),
                         ),
                       ),
                     ],
@@ -160,8 +187,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
           id: 0,
           title: 'Nueva reparación',
           type: 1,
-          status:0,
-          selectedRepuestos:[],
+          status: 1,
+          selectedRepuestos: [],
           selectedServicios: [],
           necesitaRepuesto: false,
           ticketId: 0,
@@ -172,6 +199,13 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
           updatedAt: DateTime.now(),
         ),
       );
+    });
+  }
+
+  void _eliminarVisita(int index) {
+    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    setState(() {
+      visitProvider.visits.removeAt(index);
     });
   }
 }
