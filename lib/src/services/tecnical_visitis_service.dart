@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/neat_and_clean_calendar_event.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
@@ -87,7 +88,7 @@ class VisitService {
       final responseBody = json.decode(response.body);
       print('response $responseBody');
 
-      if (responseBody['status'] == 'success') {
+      if (responseBody['success'] == true) {
         print('Datos enviados exitosamente.');
         return Visit.fromJson(responseBody['data']);
       } else {
@@ -186,14 +187,38 @@ class VisitService {
 
       if (response.statusCode == 200) {
         print('repuesto solicitado éxitosamente');
+         Fluttertoast.showToast(
+          msg: "Solicitud de repuesto creada exitosamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
         return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
+         Fluttertoast.showToast(
+          msg: "Error al crear la solicitud",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
         return false;
       }
     } catch (e) {
       print('Error al enviar la solicitud: $e');
+       Fluttertoast.showToast(
+          msg: "Error al crear la solicitud",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
       return false;
     }
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/widgets/repair_log_card_original.dart';
 import 'package:tsmobile/src/widgets/request_part_visit.dart';
@@ -49,20 +51,27 @@ class _EditVisitPageState extends State<EditVisitPage> {
   }
 
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.type == 'Nuevo' ? 'Agregar Nueva Reparación' : 'Editar Reparación'),
-          bottom: TabBar(
+          title: Text(widget.type == 'Nuevo' ? 'Agregar Nueva Visita' : 'Editar Vista' , style: AppStyle.txtPoppinsRegular18Black),
+          bottom: const TabBar(
             tabs: [
               Tab(text: 'Información General'),
               Tab(text: 'Solicitudes de Repuesto'),
             ],
           ),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TabsPage()),
+              );
+            })
         ),
         body: TabBarView(
           children: [

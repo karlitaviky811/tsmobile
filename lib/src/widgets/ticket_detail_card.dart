@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/providers/visit_provider.dart';
+import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 
 import '../models/visit_model.dart';
@@ -37,9 +41,14 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
   late DateTime _scheduledVisit;
   String? _rescheduleReason;
   final visitService = new VisitService();
+  DateTime? _selectedDate;
+  TextEditingController _dateController = TextEditingController();
+  TextEditingController _notesController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
+    //Aquiii
     _scheduledVisit = widget.scheduledVisit;
   }
 
@@ -202,6 +211,44 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = DateFormat.yMd().format(picked);
+      });
+    }
+  }
+
+  void _saveDetails() async {
+    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    await visitProvider.fetchVisitsByTicket(widget.code);
+
+    var finalIdVisit = visitProvider.visits[0].id;
+    DateTime dateTime = DateFormat('MM/dd/yyyy').parse(_dateController.text);
+    Map<String, dynamic> data = {
+      "new_date": DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime).toString(),
+      "extend_reason": _notesController.text,
+      "reason": "3"
+    };
+    print('data $data');
+    Visit? visit = await visitService.sendDataVisitReprogramming(
+        data, finalIdVisit.toString());
+
+    if (visit != null) {
+      // Maneja la visita recibida en la respuesta
+      print('Visita recibida: ${visit.title}');
+    } else {
+      print('Error al enviar y recibir la visita.');
+    }
+  }
+
   String getStatusFromNumber(int number) {
     switch (number) {
       case 1:
@@ -238,19 +285,101 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.calendar_today),
-            onPressed: () => _showDatePicker(context),
+            icon: const Icon(Icons.calendar_today),
+            onPressed: () => _showAcceptedFormModal(context),
           ),
         ],
       ),
     );
   }
 
+  void _showAcceptedFormModal(BuildContext context) {
+    bool _isSaveButtonEnabled = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            void _validateModalForm() {
+              setModalState(() {
+                _isSaveButtonEnabled = _dateController.text.isNotEmpty &&
+                    _notesController.text.isNotEmpty;
+              });
+            }
+
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Aceptar Ticket de Servicio',
+                      style: AppStyle.txtPoppinsBold14Black),
+                  const SizedBox(height: 10),
+                  const Text('Programar primera visita'),
+                  TextField(
+                    controller: _dateController,
+                    decoration: InputDecoration(
+                      labelText: 'Fecha de inicio',
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.calendar_today),
+                        onPressed: () => _selectDate(context),
+                      ),
+                    ),
+                    readOnly: true,
+                    onChanged: (text) => _validateModalForm(),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _notesController,
+                    decoration:
+                        const InputDecoration(labelText: 'Notas adicionales'),
+                    maxLines: null,
+                    onChanged: (text) => _validateModalForm(),
+                  ),
+                  DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Motivo de Reprogramación',
+                    ),
+                    items: ['Motivo 1', 'Motivo 2', 'Motivo 3']
+                        .map((reason) => DropdownMenuItem<String>(
+                              value: reason,
+                              child: Text(reason),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _rescheduleReason = value;
+                      });
+                    },
+                    value: _rescheduleReason,
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: _isSaveButtonEnabled ? _saveDetails : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xff051937),
+                    ),
+                    child: Text('Guardar',
+                        style: AppStyle.txtPoppinsMedium14White),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+/*
   void _showDatePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
       ),
       builder: (BuildContext builder) {
@@ -265,7 +394,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                   'Reprogramar Visita',
                   style: AppStyle.txtPoppinsBold14Black,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
                     final DateTime? picked = await showDatePicker(
@@ -280,11 +409,11 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                       });
                     }
                   },
-                  child: Text('Seleccionar Fecha'),
+                  child: const Text('Seleccionar Fecha'),
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Motivo de Reprogramación',
                     border: OutlineInputBorder(),
                   ),
@@ -326,7 +455,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                     //Navigator.pop(context);
                     // Aquí puedes agregar la lógica para guardar la nueva fecha y el motivo
                   },
-                  child: Text('Guardar'),
+                  child: const Text('Guardar'),
                 ),
               ],
             ),
@@ -334,5 +463,5 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         );
       },
     );
-  }
+  }*/
 }

@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:intl/intl.dart';
+
 class Reprogramming {
   final String reason;
   final DateTime newDate;
@@ -12,6 +14,7 @@ class Reprogramming {
     required this.extendReason,
     required this.oldDate,
   });
+  
 
   factory Reprogramming.fromJson(Map<String, dynamic> json) {
     return Reprogramming(
@@ -21,7 +24,24 @@ class Reprogramming {
       oldDate: DateTime.parse(json['old_date']),
     );
   }
+
+    static DateTime _parseDate(String dateString) {
+    try {
+      // Intentar parsear el formato yyyy-MM-ddTHH:mm:ss
+      return DateTime.parse(dateString);
+    } catch (e) {
+      // Si falla, intentar con el formato dd/MM/yyyy
+      try {
+        return DateFormat('dd/MM/yyyy').parse(dateString);
+      } catch (e) {
+        throw FormatException("Invalid date format: $dateString");
+      }
+    }
+  }
+
 }
+
+
 
 class Visit {
   final int id;
@@ -101,3 +121,6 @@ class Visit {
     );
   }
 }
+
+
+

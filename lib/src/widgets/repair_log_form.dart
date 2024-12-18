@@ -8,9 +8,6 @@ import 'dart:io';
 
 import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
 
-
-
-
 class RepairLogFormData extends StatefulWidget {
   final String ticketId;
 
@@ -39,7 +36,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditVisitPage(visit: visit,ticketId:widget.ticketId, type: tipo ),
+        builder: (context) =>
+            EditVisitPage(visit: visit, ticketId: widget.ticketId, type: tipo),
       ),
     );
   }
@@ -58,7 +56,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     }
   }
 
-  Future<void> _pickImage(BuildContext context, Visit visit, String tipo) async {
+  Future<void> _pickImage(
+      BuildContext context, Visit visit, String tipo) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
@@ -79,14 +78,14 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
       future: _fetchVisitsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           return Consumer<VisitProvider>(
             builder: (context, visitProvider, child) {
               if (visitProvider.isLoading) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
 
               return Padding(
@@ -115,28 +114,76 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                           itemBuilder: (context, index) {
                             final visit = visitProvider.visits[index];
 
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ListTile(
-                                title: Text(visit.title.isEmpty
-                                    ? 'Nueva reparación'
-                                    : visit.title),
-                                subtitle: Text('Fecha: ${visit.visitDate.toLocal()}'.split(' ')[0]),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(Icons.edit),
-                                      onPressed: () => _navigateToEditPage(context, visit,  'Edit'),
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    color: Colors
+                                        .white, // Fondo blanco para el ListTile
+                                    child: ListTile(
+                                      title: Text(
+                                        visit.title.isEmpty
+                                            ? 'Nueva reparación'
+                                            : visit.title,
+                                        style: AppStyle.txtPoppinsBold14Black,
+                                      ),
+                                      subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              'Fecha: ${visit.visitDate.toIso8601String().split('T')[0]}'),
+                                          Chip(
+                                            label: Text(
+                                              visit.status == 1
+                                                  ? 'En progreso'
+                                                  : 'Finalizado',
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            backgroundColor: visit.status == 1
+                                                ? Colors.orangeAccent
+                                                : Colors.green,
+                                            avatar: Icon(
+                                              visit.status == 1
+                                                  ? Icons.timelapse
+                                                  : Icons.check_circle,
+                                              color: Colors.white,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25.0),
+                                              side: const BorderSide(
+                                                  color: Colors.transparent),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      trailing: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          IconButton(
+                                            icon: const Icon(Icons.edit),
+                                            onPressed: () =>
+                                                _navigateToEditPage(
+                                                    context, visit, 'Edit'),
+                                          ),
+                                          /*IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () => _eliminarVisita(index),
+              ),*/
+                                        ],
+                                      ),
+                                      onTap: () => _navigateToEditPage(
+                                          context, visit, 'Edit'),
                                     ),
-                                    IconButton(
-                                      icon: Icon(Icons.delete),
-                                      onPressed: () => _eliminarVisita(index),
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                                onTap: () => _navigateToEditPage(context, visit, 'Edit'),
-                              ),
+                                const Divider(), // Divider added here
+                              ],
                             );
                           },
                         ),
@@ -149,20 +196,24 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),
-                         onPressed: () {
-                           Visit newVisit = Visit( id: 0, title: 'Nueva reparación', 
-                           type: 1, 
-                           status: 1, 
-                           selectedRepuestos: [], 
-                           selectedServicios: [], 
-                           necesitaRepuesto: false, 
-                           ticketId: 0, 
-                           visitDate: DateTime.now(), 
-                           reprogramming: [], 
-                           services: [], 
-                           createdAt: DateTime.now(), 
-                           updatedAt: DateTime.now(), ); 
-                          _navigateToEditPage(context, newVisit, 'Nuevo'); },
+                          onPressed: () {
+                            Visit newVisit = Visit(
+                              id: 0,
+                              title: 'Nueva reparación',
+                              type: 1,
+                              status: 1,
+                              selectedRepuestos: [],
+                              selectedServicios: [],
+                              necesitaRepuesto: false,
+                              ticketId: 0,
+                              visitDate: DateTime.now(),
+                              reprogramming: [],
+                              services: [],
+                              createdAt: DateTime.now(),
+                              updatedAt: DateTime.now(),
+                            );
+                            _navigateToEditPage(context, newVisit, 'Nuevo');
+                          },
                           icon: const Icon(Icons.add, color: Colors.white),
                           label: const Text('Añadir nueva reparación',
                               style: TextStyle(color: Colors.white)),

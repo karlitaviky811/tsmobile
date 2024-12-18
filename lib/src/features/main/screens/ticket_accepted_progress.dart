@@ -34,8 +34,6 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
     super.initState();
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.ticketId);
-
-
   }
 
   @override
@@ -183,7 +181,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                         print('Imágenes: $images');
                       },
                     ),
-                    RepairLogFormData(ticketId:widget.ticketId),
+                    RepairLogFormData(ticketId: widget.ticketId),
                     CloseTicketForm(
                       idTicket: widget.ticketId,
                       onSave: (DateTime? date, String observations,

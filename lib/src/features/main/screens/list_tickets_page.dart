@@ -142,6 +142,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                     Expanded(
                       child: ListView.builder(
                         itemCount: filteredItems.length,
+                        
                         itemBuilder: (context, index) {
                           return Column(
                             children: [
