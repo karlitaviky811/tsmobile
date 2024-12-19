@@ -3,14 +3,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tsmobile/src/models/image_provider_diagnostic.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:tsmobile/src/widgets/image_loader.dart';
 
 class DiagnosticForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;
@@ -25,7 +28,8 @@ class DiagnosticForm extends StatefulWidget {
 class _DiagnosticFormState extends State<DiagnosticForm> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
-  final List<File> _images = [];
+  late List<File> _images = [];
+  late List<ImageData> _imagesSend = [];
   final ImagePicker _picker = ImagePicker();
   late Future<void> _loadTicketFuture;
   DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
@@ -48,17 +52,42 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
+    final imagePickerProvider =
+        Provider.of<ImagePickerProvider>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
-    
+
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
         _images.add(File(image.path));
       });
     }
-    
+
     imagePickerProvider.setImagePickerActive(false);
+  }
+
+  Future<void> _fetchImages() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+      setState(() {
+        _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
+      });
+    } else {
+      // Manejar errores
+      print('Error fetching images: ${response.statusCode}');
+    }
   }
 
   void _removeImage(int index) {
@@ -74,10 +103,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   @override
   void initState() {
     super.initState();
+    _fetchImages();
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.idTicket);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +130,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
 
             if (!isDateInitialized && item.diagnosisDate != null) {
               _selectedDate = item.diagnosisDate; // Guarda el DateTime
-              _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+              _dateController.text =
+                  DateFormat('dd/MM/yyyy').format(_selectedDate!);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.diagnosisDetail != null) {
@@ -145,7 +175,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
-                            decoration: const InputDecoration(labelText: 'Observaciones'),
+                            decoration: const InputDecoration(
+                                labelText: 'Observaciones'),
                           ),
                           const SizedBox(height: 16),
                           TextButton.icon(
@@ -154,7 +185,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                             onPressed: _pickImage,
                           ),
                           const SizedBox(height: 16),
-                          ImageThumbnailsWidget(ticketId: int.parse(widget.idTicket)),
+                          ImageUploaderDiagnostic(
+                            initialImages: _imagesSend,
+                          ),
+                          //ImageThumbnailsWidget(ticketId: int.parse(widget.idTicket)),
                           const SizedBox(height: 30),
                           Center(
                             child: ElevatedButton.icon(
@@ -164,13 +198,26 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                               ),
-                              icon: const Icon(Icons.save, size: 18, color: Colors.white),
+                              icon: const Icon(Icons.save,
+                                  size: 18, color: Colors.white),
                               onPressed: () async {
+                                // Obtener imágenes del proveedor
+                                final imageProvider =
+                                    Provider.of<ImageProviderDiagnostic>(
+                                        context,
+                                        listen: false);
+                                List<String> imagePaths =
+                                    imageProvider.imagePaths;
+                                List<File> imageFiles = imagePaths
+                                    .map((path) => File(path))
+                                    .toList();
+
                                 if (_selectedDate != null) {
                                   await serviceUpdateTicket.saveFormData(
-                                    _selectedDate!.toIso8601String(), // Convierte DateTime a String
+                                    _selectedDate!
+                                        .toIso8601String(), // Convierte DateTime a String
                                     _observationsController.text,
-                                    _images,
+                                    imageFiles,
                                     widget.idTicket,
                                   );
                                 } else {
@@ -242,9 +289,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 }
 
-
-
-
 class ImageThumbnailsWidget extends StatefulWidget {
   final int ticketId;
 
@@ -264,8 +308,16 @@ class _ImageThumbnailsWidgetState extends State<ImageThumbnailsWidget> {
   }
 
   Future<void> _fetchImages() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
     final response = await http.get(
-      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 200) {

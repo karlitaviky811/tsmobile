@@ -251,24 +251,24 @@ class _ClienteHandlerState extends State<ClienteHandler> {
     });
   }
 
-  Future<void> _getAddressFromCoordinates(
-      double latitude, double longitude) async {
+  Future<void> _getAddressFromCoordinates(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks[0];
-      setState(() {
-        _address =
-            "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
-      });
+      if (mounted) {  // Verificar si el widget aún está en el árbol
+        setState(() {
+          _address = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+        });
+      }
     } catch (e) {
       print(e);
-      setState(() {
-        _address = "Could not get address";
-      });
+      if (mounted) {  // Verificar si el widget aún está en el árbol
+        setState(() {
+          _address = "Could not get address";
+        });
+      }
     }
   }
-
   @override
   Widget build(BuildContext context) {
     _getAddressFromCoordinates(
