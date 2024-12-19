@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
 import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
@@ -11,6 +12,7 @@ import 'package:tsmobile/src/widgets/close_ticket_form.dart';
 import 'package:tsmobile/src/widgets/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 import '../../../widgets/diagnostic_log_ticket.dart';
+import 'package:geocoding/geocoding.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
   final String ticketId;
@@ -29,78 +31,24 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   //final _replacementCodeController = TextEditingController();
   late Future<void> _loadTicketFuture;
   late Future<void> _loadVisitFuture;
+  late Future<void> _loadDataFuture;
   @override
   void initState() {
     super.initState();
-    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    _loadTicketFuture = ticketProvider.loadTicketById(widget.ticketId);
+    _loadDataFuture = _loadData();
+  }
+
+  Future<void> _loadData() async {
+    await Provider.of<TicketProvider>(context, listen: false)
+        .loadTicketById(widget.ticketId);
+    await Provider.of<VisitProvider>(context, listen: false)
+        .fetchVisitsByTicket(widget.ticketId);
   }
 
   @override
   Widget build(BuildContext context) {
     final ticketProvider = Provider.of<TicketProvider>(context);
-
-    List<Map<String, dynamic>> reparaciones = [
-      // Ejemplo de datos iniciales provenientes del backend
-      {
-        'titulo': 'Cambio de pantalla',
-        'estado': 'Solicitud de Repuesto',
-        'selectedDate': DateTime.now(),
-        'selectedServicios': ['Servicio 1'],
-        'necesitaRepuesto': true,
-        'selectedRepuestos': ['Pantalla'],
-        'presupuestoRepuesto': '',
-        'comentarios': '',
-        'imagenSolicitud': '',
-        'imagenPresupuesto': '',
-        'imagenReparacion': '',
-        'comentariosGenerales': '',
-        'presupuestoAceptado': false,
-        'nombreRepuesto': '',
-        'precioRepuesto': '',
-        'repuestoSolicitado': false,
-        'estadoCompraRepuesto': 'Enviada',
-      },
-      {
-        'titulo': 'Cambio de antena',
-        'estado': 'Sin stock',
-        'selectedDate': DateTime.now(),
-        'selectedServicios': ['Servicio 1'],
-        'necesitaRepuesto': true,
-        'selectedRepuestos': ['Pantalla'],
-        'presupuestoRepuesto': '',
-        'comentarios': '',
-        'imagenSolicitud': '',
-        'imagenPresupuesto': '',
-        'imagenReparacion': '',
-        'comentariosGenerales': '',
-        'presupuestoAceptado': false,
-        'nombreRepuesto': '',
-        'precioRepuesto': '',
-        'repuestoSolicitado': false,
-        'estadoCompraRepuesto': 'Enviada',
-      },
-      {
-        'titulo': 'Cambio de antena',
-        'estado': 'Sin stock',
-        'selectedDate': DateTime.now(),
-        'selectedServicios': ['Servicio 1', 'Servicio 2'],
-        'necesitaRepuesto': true,
-        'selectedRepuestos': ['Pantalla'],
-        'presupuestoRepuesto': '',
-        'comentarios': '',
-        'imagenSolicitud': '',
-        'imagenPresupuesto': '',
-        'imagenReparacion': '',
-        'comentariosGenerales': '',
-        'presupuestoAceptado': false,
-        'nombreRepuesto': '',
-        'precioRepuesto': '',
-        'repuestoSolicitado': false,
-        'estadoCompraRepuesto': 'Enviada',
-      }
-    ];
-
+    final visitProvider = Provider.of<VisitProvider>(context);
     final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
     return DefaultTabController(
       length: 4,
@@ -155,7 +103,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         ),
         body: FutureBuilder(
             future:
-                _loadTicketFuture, // Utiliza el Future inicializado en initState
+                _loadDataFuture, // Utiliza el Future inicializado en initState
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -168,31 +116,37 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                   return const Center(child: Text('No se encontró el ticket'));
                 }
 
-                return TabBarView(
-                  children: [
-                    _TicketDetailProgress(ticketInfo: item),
-                    DiagnosticForm(
-                      idTicket: widget.ticketId,
-                      onSave: (DateTime? date, String observations,
-                          List<File> images) {
-                        // Lógica para manejar los datos guardados del formulario
-                        print('Fecha: $date');
-                        print('Observaciones: $observations');
-                        print('Imágenes: $images');
-                      },
-                    ),
-                    RepairLogFormData(ticketId: widget.ticketId),
-                    CloseTicketForm(
-                      idTicket: widget.ticketId,
-                      onSave: (DateTime? date, String observations,
-                          List<File> images) {
-                        // Lógica para manejar los datos guardados del formulario
-                        print('Fecha: $date');
-                        print('Observaciones: $observations');
-                        print('Imágenes: $images');
-                      },
-                    )
-                  ],
+                return Consumer2<TicketProvider, VisitProvider>(
+                  builder: (context, ticketProvider, visitProvider, child) {
+                    final itemVisit = visitProvider.visits;
+                    return TabBarView(
+                      children: [
+                        _TicketDetailProgress(
+                            ticketInfo: item, visit: itemVisit),
+                        DiagnosticForm(
+                          idTicket: widget.ticketId,
+                          onSave: (DateTime? date, String observations,
+                              List<File> images) {
+                            // Lógica para manejar los datos guardados del formulario
+                            print('Fecha: $date');
+                            print('Observaciones: $observations');
+                            print('Imágenes: $images');
+                          },
+                        ),
+                        RepairLogFormData(ticketId: widget.ticketId),
+                        CloseTicketForm(
+                          idTicket: widget.ticketId,
+                          onSave: (DateTime? date, String observations,
+                              List<File> images) {
+                            // Lógica para manejar los datos guardados del formulario
+                            print('Fecha: $date');
+                            print('Observaciones: $observations');
+                            print('Imágenes: $images');
+                          },
+                        )
+                      ],
+                    );
+                  },
                 );
               }
             }),
@@ -243,8 +197,9 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
 class _TicketDetailProgress extends StatelessWidget {
   final dynamic ticketInfo;
-
-  const _TicketDetailProgress({super.key, required this.ticketInfo});
+  final List<Visit> visit;
+  const _TicketDetailProgress(
+      {super.key, required this.ticketInfo, required this.visit});
 
   @override
   Widget build(BuildContext context) {
@@ -259,21 +214,14 @@ class _TicketDetailProgress extends StatelessWidget {
             child: ListView(
               children: [
                 TicketDetailCard(
-                  headerTitle: 'Ticket de Servicio',
-                  code: ticketInfo.serviceCallId?.toString() ?? 'N/A',
-                  clientName: ticketInfo.customerName ?? 'N/A',
-                  status: ticketInfo.status.toString(),
-                  type: 'Reparación',
-                  creationDate: formattedDate,
-                  title: ticketInfo.title,
-                  description: ticketInfo.serviceCallDetail['descrption'],
-                  scheduledVisit: new DateTime.now(),
+                  ticketId: ticketInfo.id?.toString() ?? 'N/A',
+                  scheduledVisit: visit[0].visitDate,
                 ),
                 const SizedBox(
                   height: 5,
                 ),
                 //Divider(),
-                ClienteHandler(),
+                ClienteHandler(ticketInfo: ticketInfo),
 
                 // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
               ],
@@ -286,27 +234,55 @@ class _TicketDetailProgress extends StatelessWidget {
 }
 
 class ClienteHandler extends StatefulWidget {
+  var ticketInfo;
+
+  ClienteHandler({super.key, required this.ticketInfo});
+
   @override
   _ClienteHandlerState createState() => _ClienteHandlerState();
 }
 
 class _ClienteHandlerState extends State<ClienteHandler> {
   String address = 'Calle 123, Ciudad, País';
-
+  String _address = 'Unknown';
   void _updateAddress(String newAddress) {
     setState(() {
       address = newAddress;
     });
   }
 
+  Future<void> _getAddressFromCoordinates(
+      double latitude, double longitude) async {
+    try {
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
+      Placemark place = placemarks[0];
+      setState(() {
+        _address =
+            "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        _address = "Could not get address";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    _getAddressFromCoordinates(
+        double.parse(widget.ticketInfo.serviceCallDetail['latitude']),
+        double.parse(widget.ticketInfo.serviceCallDetail['longitude']));
     return Center(
       child: ClienteDetailCard(
-        address: address,
-        phoneNumber: '+58 0412 4838 327',
-        email: 'cliente@ejemplo.com',
-        geolocation: '10.123456, -64.123456', // Ejemplo de coordenadas
+        address: widget.ticketInfo.serviceCallDetail['BPBillAddr'],
+        phoneNumber: widget.ticketInfo.serviceCallDetail['BPCellular'],
+        email: widget.ticketInfo.serviceCallDetail['BPE_Mail'],
+        geolocation: _address,
+        latitude: widget.ticketInfo.serviceCallDetail['latitude'],
+        longitude: widget.ticketInfo
+            .serviceCallDetail['longitude'], // Ejemplo de coordenadas
         onAddressChanged: _updateAddress,
       ),
     );

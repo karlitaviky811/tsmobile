@@ -270,4 +270,79 @@ class TicketService {
           fontSize: 16.0);
     }
   }
+
+
+  Future<void> obtainDataMediaDiagnostic(
+      String date, String observations, List<File> images, idTicket) async {
+   
+    String apiUrl =
+        '       http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${idTicket}&collection_name=diagnostic'; // Reemplaza con tu endpoint real
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    DateFormat dateFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    DateTime dateTime = dateFormat.parse(date.replaceAll('/', '-'));
+
+    print("DateTime: $dateTime");
+    //print("DateTime: $dateTime");
+
+    // Crea el cuerpo de la solicitud
+    Map<String, dynamic> formData = {
+      'solution_date': dateFormat.format(dateTime),
+      'solution_detail': observations,
+      'status': 2,
+      // Aquí podrías agregar la lógica para manejar las imágenes si es necesario
+    };
+
+    // Convierte el mapa a JSON
+    String body = json.encode(formData);
+
+    try {
+      final response = await http.put(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        // Enviar imágenes
+        for (File image in images) {
+          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+        }
+        Fluttertoast.showToast(
+            msg: "Datos guardados exitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        Fluttertoast.showToast(
+            msg: "Error al guardar los datos",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        print('Respuesta del servidor: ${response.body}');
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Error al enviar la solicitud",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+
 }

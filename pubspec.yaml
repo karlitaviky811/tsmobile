@@ -64,6 +64,7 @@ dependencies:
   pusher_channels_flutter: ^2.4.0
   multiselect_formfield: ^0.1.7
   infinite_scroll_pagination: ^3.0.0
+  geocoding: ^3.0.0
   
   
 

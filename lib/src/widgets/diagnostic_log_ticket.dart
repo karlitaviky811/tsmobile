@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
+import 'package:http/http.dart' as http;
 
 class DiagnosticForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;
@@ -145,12 +149,12 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                           ),
                           const SizedBox(height: 16),
                           TextButton.icon(
-                            icon: Icon(Icons.add_photo_alternate),
-                            label: Text('Añadir Imagen'),
+                            icon: const Icon(Icons.add_photo_alternate),
+                            label: const Text('Añadir Imagen'),
                             onPressed: _pickImage,
                           ),
                           const SizedBox(height: 16),
-                          _buildImageThumbnails(),
+                          ImageThumbnailsWidget(ticketId: int.parse(widget.idTicket)),
                           const SizedBox(height: 30),
                           Center(
                             child: ElevatedButton.icon(
@@ -197,7 +201,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Imágenes Añadidas:',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -221,7 +225,100 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                       right: 0,
                       child: GestureDetector(
                         onTap: () => _removeImage(index),
-                        child: Icon(
+                        child: const Icon(
+                          Icons.remove_circle,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
+
+
+class ImageThumbnailsWidget extends StatefulWidget {
+  final int ticketId;
+
+  ImageThumbnailsWidget({required this.ticketId});
+
+  @override
+  _ImageThumbnailsWidgetState createState() => _ImageThumbnailsWidgetState();
+}
+
+class _ImageThumbnailsWidgetState extends State<ImageThumbnailsWidget> {
+  List<ImageData> _images = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchImages();
+  }
+
+  Future<void> _fetchImages() async {
+    final response = await http.get(
+      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+      setState(() {
+        _images = data.map((item) => ImageData.fromJson(item)).toList();
+      });
+    } else {
+      // Manejar errores
+      print('Error fetching images: ${response.statusCode}');
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _images.removeAt(index);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildImageThumbnails();
+  }
+
+  Widget _buildImageThumbnails() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Imágenes Añadidas:',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _images.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Stack(
+                  children: [
+                    Image.network(
+                      _images[index].originalUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                    Positioned(
+                      right: 0,
+                      child: GestureDetector(
+                        onTap: () => _removeImage(index),
+                        child: const Icon(
                           Icons.remove_circle,
                           color: Colors.red,
                         ),

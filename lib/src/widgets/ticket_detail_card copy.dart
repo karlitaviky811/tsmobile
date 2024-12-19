@@ -11,14 +11,29 @@ import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import '../models/visit_model.dart';
 
 class TicketDetailCard extends StatefulWidget {
-  final String ticketId;
-
-  DateTime scheduledVisit; // Añadimos el campo de visita programada
+  final String headerTitle;
+  final String code;
+  final String id;
+  final String clientName;
+  final String status;
+  final String type;
+  final String creationDate;
+  final String title;
+  final String description;
+  final DateTime scheduledVisit; // Añadimos el campo de visita programada
 
   // Constructor con required
   TicketDetailCard({
-    required this.ticketId,
-    required DateTime this.scheduledVisit,
+    required this.headerTitle,
+    required this.code,
+    required this.id,
+    required this.clientName,
+    required this.status,
+    required this.type,
+    required this.creationDate,
+    required this.title,
+    required this.description,
+    required this.scheduledVisit,
   });
 
   @override
@@ -32,84 +47,47 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
   DateTime? _selectedDate;
   TextEditingController _dateController = TextEditingController();
   TextEditingController _notesController = TextEditingController();
-  late Future<void> _fetchDataFuture;
+
   @override
   void initState() {
     super.initState();
+    //Aquiii
     _scheduledVisit = widget.scheduledVisit;
-    _fetchDataFuture = _fetchData();
-  }
-
-  Future<void> _fetchData() async {
-    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-
-    await Future.wait([
-      ticketProvider.loadTicketById(widget.ticketId),
-      visitProvider.fetchVisitsByTicket(widget.ticketId)
-    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<void>(
-      future: _fetchDataFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else {
-          return Consumer2<TicketProvider, VisitProvider>(
-            builder: (context, ticketProvider, visitProvider, child) {
-              final ticket = ticketProvider.ticketInfo;
-              final visits = visitProvider.visits;
-
-              if (ticket == null) {
-                return Center(child: Text('No se encontró el ticket'));
-              }
-
-              return Card(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: _buildStatusChip(ticket.status.toString()),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /*Text(
-                            ticket.title,
-                            style: AppStyle.txtPoppinsSemiBold18Black,
-                          ),*/
-                          const SizedBox(height: 16),
-                          _buildDetailRow('Código:', ticket.id.toString()),
-                          _buildDetailRow(
-                              'Cliente:', ticket.customerName.toString()),
-                          _buildDetailRow('Tipo:', ticket.toString()),
-                          _buildDetailRow(
-                              'Fecha:', ticket.createdAt.toString()),
-                          _buildDetailRowLarge('Título:', ticket.title),
-                          _buildDetailRowLarge('Producto:',
-                              ticket.serviceCallDetail['itemName']),
-                          _buildDetailRowLarge('Detalle:',
-                              ticket.serviceCallDetail['descrption']),
-                          _buildScheduledVisitRow(visits),
-                        ],
-                      ),
-                    ],
-                  ),
+    return Card(
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Stack(
+          children: [
+            Positioned(
+              right: 0,
+              top: 0,
+              child: _buildStatusChip(widget.status),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.headerTitle,
+                  style: AppStyle.txtPoppinsSemiBold18Black,
                 ),
-              );
-            },
-          );
-        }
-      },
+                const SizedBox(height: 16),
+                _buildDetailRow('Código:', widget.code),
+                _buildDetailRow('Cliente:', widget.clientName),
+                _buildDetailRow('Tipo:', widget.type),
+                _buildDetailRow('Fecha:', widget.creationDate),
+                _buildDetailRowLarge('Título:', widget.title),
+                _buildDetailRowLarge('Detalle:', widget.description),
+                _buildScheduledVisitRow(),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -254,7 +232,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
   void _saveDetails() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    await visitProvider.fetchVisitsByTicket(widget.ticketId);
+    await visitProvider.fetchVisitsByTicket(widget.id);
 
     var finalIdVisit = visitProvider.visits[0].id;
     DateTime dateTime = DateFormat('MM/dd/yyyy').parse(_dateController.text);
@@ -266,9 +244,9 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
 
     Visit? visit = await visitService.sendDataVisitReprogramming(
         data, finalIdVisit.toString());
-    await visitProvider.fetchVisitsByTicket(widget.ticketId);
-    await ticketProvider.loadTicketById(widget.ticketId);
-
+    await visitProvider.fetchVisitsByTicket(widget.id);
+    await ticketProvider.loadTicketById(widget.id);
+   
     if (visit != null) {
       // Maneja la visita recibida en la respuest
       print('Visita recibida: ${visit.title}');
@@ -296,7 +274,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
     }
   }
 
-  Widget _buildScheduledVisitRow(visits) {
+  Widget _buildScheduledVisitRow() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -310,7 +288,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
           ),
           Expanded(
             child: Text(
-              DateFormat('dd/MM/yyyy').format(visits[0].visitDate),
+              DateFormat('dd/MM/yyyy').format(_scheduledVisit),
               style: AppStyle.txtPoppinsRegular14Black,
             ),
           ),
@@ -403,4 +381,95 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       },
     );
   }
+
+/*
+  void _showDatePicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (BuildContext builder) {
+        return FractionallySizedBox(
+          heightFactor: 0.7, // Ajusta la altura según sea necesario
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Reprogramar Visita',
+                  style: AppStyle.txtPoppinsBold14Black,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: _scheduledVisit,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (picked != null && picked != _scheduledVisit) {
+                      setState(() {
+                        _scheduledVisit = picked;
+                      });
+                    }
+                  },
+                  child: const Text('Seleccionar Fecha'),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(
+                    labelText: 'Motivo de Reprogramación',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: ['Motivo 1', 'Motivo 2', 'Motivo 3']
+                      .map((reason) => DropdownMenuItem<String>(
+                            value: reason,
+                            child: Text(reason),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _rescheduleReason = value;
+                    });
+                  },
+                  value: _rescheduleReason,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    
+
+                    Map<String, dynamic> data = {
+                      "new_date": _scheduledVisit,
+                      "extend_reason": _rescheduleReason,
+                      "reason": "3"
+                    };
+
+                    Visit? visit = await visitService
+                        .sendDataVisitReprogramming(data, widget.code);
+
+                    if (visit != null) {
+                      // Maneja la visita recibida en la respuesta
+                      print('Visita recibida: ${visit.title}');
+                    } else {
+                      print('Error al enviar y recibir la visita.');
+                    }
+
+                    //visitService.sendDataVisitReprogramming(data, widget.code);
+                    //Navigator.pop(context);
+                    // Aquí puedes agregar la lógica para guardar la nueva fecha y el motivo
+                  },
+                  child: const Text('Guardar'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }*/
 }

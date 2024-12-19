@@ -13,6 +13,10 @@ class ClienteDetailCard extends StatelessWidget {
   final String email;
   final String geolocation;
   final ValueChanged<String> onAddressChanged;
+  
+  var longitude;
+  
+  var latitude;
 
   ClienteDetailCard({
     required this.address,
@@ -20,6 +24,8 @@ class ClienteDetailCard extends StatelessWidget {
     required this.email,
     required this.geolocation,
     required this.onAddressChanged,
+    required this.longitude,
+    required this.latitude,
   });
 
   @override
@@ -42,7 +48,7 @@ class ClienteDetailCard extends StatelessWidget {
               _buildDetailRowLarge('Correo:', email),
               _buildDetailRowLarge('Ubicación:', geolocation),
               LocationCard(
-                initialCoordinates: LatLng(10.4806, -66.9036),
+                initialCoordinates: LatLng(double.parse(latitude),double.parse(longitude)),
               )
             ],
           ),
