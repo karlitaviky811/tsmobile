@@ -5,12 +5,11 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
-
 import 'package:tsmobile/src/services/service_ticket_service.dart';
+import 'package:tsmobile/src/widgets/image_loader_close_ticket.dart';
 
 class CloseTicketForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;
-
   var idTicket;
 
   CloseTicketForm({required this.onSave, required this.idTicket});
@@ -26,9 +25,10 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   final ImagePicker _picker = ImagePicker();
   bool _isImagePickerActive = false;
   late Future<void> _loadTicketFuture;
-  DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
+  DateTime? _selectedDate;
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
+  bool _isFormActive = false;
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -39,7 +39,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
     );
     if (picked != null) {
       setState(() {
-        _selectedDate = picked; //
+        _selectedDate = picked;
         _dateController.text = "${picked.day}/${picked.month}/${picked.year}";
       });
     }
@@ -110,11 +110,9 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
               return const Center(child: Text('No se encontró el ticket'));
             }
 
-            // Setea los valores de los campos de texto con los datos del ticket si no han sido inicializados
             if (!isDateInitialized && item.solutionDate != null) {
-               _selectedDate = item.solutionDate; 
-              _dateController.text = _dateController.text =
-                  getFormattedDate(item.solutionDate as DateTime);
+              _selectedDate = item.solutionDate!;
+              _dateController.text = getFormattedDate(_selectedDate!);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.solutionDetail != null) {
@@ -138,10 +136,23 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Cierre del ticket',
-                            textAlign: TextAlign.left,
-                            style: AppStyle.txtPoppinsMedium18Black,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Cierre del ticket',
+                                textAlign: TextAlign.left,
+                                style: AppStyle.txtPoppinsMedium18Black,
+                              ),
+                              IconButton(
+                                icon: Icon(_isFormActive ? Icons.edit_off : Icons.edit),
+                                onPressed: () {
+                                  setState(() {
+                                    _isFormActive = !_isFormActive;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           TextField(
@@ -150,60 +161,51 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                               labelText: 'Fecha',
                               prefixIcon: IconButton(
                                 icon: const Icon(Icons.calendar_today),
-                                onPressed: () => _pickDate(context),
+                                onPressed: _isFormActive ? () => _pickDate(context) : null,
                               ),
                             ),
-                            readOnly: true,
+                            readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
-                            decoration: const InputDecoration(
-                                labelText: 'Observaciones'),
-                            onChanged: (value) {
-                              setState(() {
-                                _observationsController.text = value;
-                              });
-                            },
+                            decoration: const InputDecoration(labelText: 'Observaciones'),
+                            readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
-                          TextButton.icon(
-                            icon: Icon(Icons.add_photo_alternate),
-                            label: Text('Añadir Imagen'),
-                            onPressed: _pickImage,
+                          ImageUploaderCloseTicket(
+                            initialImages: [],
+                            showAddButton: _isFormActive,
                           ),
-                          const SizedBox(height: 16),
-                          _buildImageThumbnails(),
                           const SizedBox(height: 30),
-                          Center(
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff051937),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                          if (_isFormActive)
+                            Center(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.save, size: 18, color: Colors.white),
+                                onPressed: () async {
+                                  if (_selectedDate != null) {
+                                    serviceUpdateTicket.savecloseTicketFormData(
+                                      _selectedDate!.toIso8601String(),
+                                      _observationsController.text,
+                                      _images,
+                                      widget.idTicket,
+                                    );
+                                  } else {
+                                    print('Por favor, selecciona una fecha.');
+                                  }
+                                },
+                                label: const Text(
+                                  'Guardar Información',
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                              icon: const Icon(Icons.save,
-                                  size: 18, color: Colors.white),
-                              onPressed: () async {
-                                if (_selectedDate != null) {
-                                  serviceUpdateTicket.savecloseTicketFormData(
-                                    _selectedDate!
-                                        .toIso8601String(), // Convierte DateTime a String
-                                    _observationsController.text,
-                                    _images,
-                                    widget.idTicket,
-                                  );
-                                } else {
-                                  print('Por favor, selecciona una fecha.');
-                                }
-                              },
-                              label: const Text(
-                                'Guardar Información',
-                                style: TextStyle(color: Colors.white),
-                              ),
                             ),
-                          ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -215,50 +217,6 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
           }
         },
       ),
-    );
-  }
-
-  Widget _buildImageThumbnails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Imágenes Añadidas:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _images.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Stack(
-                  children: [
-                    Image.file(
-                      _images[index],
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => _removeImage(index),
-                        child: Icon(
-                          Icons.remove_circle,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }

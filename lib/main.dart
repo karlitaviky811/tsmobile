@@ -7,6 +7,7 @@ import 'package:tsmobile/src/models/image_provider_ticket.dart';
 import 'package:tsmobile/src/models/image_provider_visit.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
+import 'package:tsmobile/src/providers/image_provider_close_ticket.dart';
 import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
 import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
@@ -76,6 +77,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ImageProviderVisit()),
         ChangeNotifierProvider(create: (_) => ImagesVisitProviderModel()),
         ChangeNotifierProvider(create: (_) => ImageProviderSpareParts()),
+        ChangeNotifierProvider(create: (_) => ImageProviderCloseTicketManagement())
       ],
       child: const MyApp(),
     ),

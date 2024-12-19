@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +31,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   late List<ImageData> _imagesSend = [];
   final ImagePicker _picker = ImagePicker();
   late Future<void> _loadTicketFuture;
-  DateTime? _selectedDate; // Variable para almacenar la fecha seleccionada
+  DateTime? _selectedDate;
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
+  bool _isFormActive = false; // Variable para controlar el estado del formulario
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -45,15 +45,14 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     );
     if (picked != null) {
       setState(() {
-        _selectedDate = picked; // Almacena la fecha seleccionada
+        _selectedDate = picked; 
         _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider =
-        Provider.of<ImagePickerProvider>(context, listen: false);
+    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
 
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -70,8 +69,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
+      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -85,7 +83,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
       });
     } else {
-      // Manejar errores
       print('Error fetching images: ${response.statusCode}');
     }
   }
@@ -129,9 +126,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
             }
 
             if (!isDateInitialized && item.diagnosisDate != null) {
-              _selectedDate = item.diagnosisDate; // Guarda el DateTime
-              _dateController.text =
-                  DateFormat('dd/MM/yyyy').format(_selectedDate!);
+              _selectedDate = item.diagnosisDate; 
+              _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.diagnosisDetail != null) {
@@ -155,10 +151,23 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Diagnóstico',
-                            textAlign: TextAlign.left,
-                            style: AppStyle.txtPoppinsMedium18Black,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Diagnóstico',
+                                textAlign: TextAlign.left,
+                                style: AppStyle.txtPoppinsMedium18Black,
+                              ),
+                              IconButton(
+                                icon: Icon(_isFormActive ? Icons.edit_off : Icons.edit),
+                                onPressed: () {
+                                  setState(() {
+                                    _isFormActive = !_isFormActive;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
                           TextField(
@@ -167,64 +176,56 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                               labelText: 'Fecha',
                               prefixIcon: IconButton(
                                 icon: const Icon(Icons.calendar_today),
-                                onPressed: () => _pickDate(context),
+                                onPressed: _isFormActive ? () => _pickDate(context) : null,
                               ),
                             ),
-                            readOnly: true,
+                            readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
-                            decoration: const InputDecoration(
-                                labelText: 'Observaciones'),
+                            decoration: const InputDecoration(labelText: 'Observaciones'),
+                            readOnly: !_isFormActive,
                           ),
-                          const SizedBox(height: 16),
                           const SizedBox(height: 16),
                           ImageUploaderDiagnostic(
                             initialImages: _imagesSend,
+                            showAddButton: _isFormActive, // Mostrar o no el botón de añadir imágenes
                           ),
-                          //ImageThumbnailsWidget(ticketId: int.parse(widget.idTicket)),
                           const SizedBox(height: 30),
-                          Center(
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xff051937),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                          if (_isFormActive) // Mostrar el botón de guardar solo si el formulario está activo
+                            Center(
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.save, size: 18, color: Colors.white),
+                                onPressed: () async {
+                                  // Obtener imágenes del proveedor
+                                  final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
+                                  List<String> imagePaths = imageProvider.newImagePaths;
+                                  List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+
+                                  if (_selectedDate != null) {
+                                    await serviceUpdateTicket.saveFormData(
+                                      _selectedDate!.toIso8601String(),
+                                      _observationsController.text,
+                                      imageFiles,
+                                      widget.idTicket,
+                                    );
+                                  } else {
+                                    print('Por favor, selecciona una fecha.');
+                                  }
+                                },
+                                label: const Text(
+                                  'Guardar Información',
+                                  style: TextStyle(color: Colors.white),
                                 ),
                               ),
-                              icon: const Icon(Icons.save,
-                                  size: 18, color: Colors.white),
-                              onPressed: () async {
-                                // Obtener imágenes del proveedor
-                                final imageProvider =
-                                    Provider.of<ImageProviderDiagnostic>(
-                                        context,
-                                        listen: false);
-                                List<String> imagePaths =
-                                    imageProvider.newImagePaths;
-                                List<File> imageFiles = imagePaths
-                                    .map((path) => File(path))
-                                    .toList();
-
-                                if (_selectedDate != null) {
-                                  await serviceUpdateTicket.saveFormData(
-                                    _selectedDate!
-                                        .toIso8601String(), // Convierte DateTime a String
-                                    _observationsController.text,
-                                    imageFiles,
-                                    widget.idTicket,
-                                  );
-                                } else {
-                                  print('Por favor, selecciona una fecha.');
-                                }
-                              },
-                              label: const Text(
-                                'Guardar Información',
-                                style: TextStyle(color: Colors.white),
-                              ),
                             ),
-                          ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -236,148 +237,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
           }
         },
       ),
-    );
-  }
-
-  Widget _buildImageThumbnails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Imágenes Añadidas:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _images.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Stack(
-                  children: [
-                    Image.file(
-                      _images[index],
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => _removeImage(index),
-                        child: const Icon(
-                          Icons.remove_circle,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class ImageThumbnailsWidget extends StatefulWidget {
-  final int ticketId;
-
-  ImageThumbnailsWidget({required this.ticketId});
-
-  @override
-  _ImageThumbnailsWidgetState createState() => _ImageThumbnailsWidgetState();
-}
-
-class _ImageThumbnailsWidgetState extends State<ImageThumbnailsWidget> {
-  List<ImageData> _images = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchImages();
-  }
-
-  Future<void> _fetchImages() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      setState(() {
-        _images = data.map((item) => ImageData.fromJson(item)).toList();
-      });
-    } else {
-      // Manejar errores
-      print('Error fetching images: ${response.statusCode}');
-    }
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _images.removeAt(index);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildImageThumbnails();
-  }
-
-  Widget _buildImageThumbnails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Imágenes Añadidas:',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _images.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Stack(
-                  children: [
-                    Image.network(
-                      _images[index].originalUrl,
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: () => _removeImage(index),
-                        child: const Icon(
-                          Icons.remove_circle,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 }

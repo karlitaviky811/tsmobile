@@ -191,7 +191,7 @@ class VisitService {
         print('repuesto solicitado éxitosamente ${jsonResponse}');
         // Enviar imágenes
         for (File image in images) {
-          await sendFile(image, 'PartRequest', idTicket.toString(), 'part');
+          await sendFile(image, 'PartRequest',jsonResponse['data']['id'], 'part');
         }
 
         Fluttertoast.showToast(

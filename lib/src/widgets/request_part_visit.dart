@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/models/visit_model.dart';
@@ -140,7 +142,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       "observation": _comentariosGeneralesController.text,
     };
     final imageProvider =
-    Provider.of<ImageProviderSpareParts>(context, listen: false);
+        Provider.of<ImageProviderSpareParts>(context, listen: false);
     List<String> imagePaths = imageProvider.newImagePaths;
     List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
     var serviceVisit = VisitService();
@@ -220,6 +222,30 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     );
   }
 
+  Future<List<ImageData>> getImagesForRequest(int requestPart) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestPart&collection_name=part'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+      return data.map((item) => ImageData.fromJson(item)).toList();
+    } else {
+      // Manejar errores
+      print('Error fetching images: ${response.statusCode}');
+      return []; // Retornar una lista vacía en caso de error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,6 +280,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                             itemCount: partRequests.length,
                             itemBuilder: (context, index) {
                               final request = partRequests[index];
+
                               return Column(
                                 children: [
                                   Card(
@@ -303,8 +330,41 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                             ),
                                           ),
                                         ),
+                                        FutureBuilder<List<ImageData>>(
+                                          future:
+                                              getImagesForRequest(request.id),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return CircularProgressIndicator();
+                                            } else if (snapshot.hasError) {
+                                              return Text(
+                                                  'Error al cargar imágenes');
+                                            } else if (!snapshot.hasData ||
+                                                snapshot.data!.isEmpty) {
+                                              return Text(
+                                                  'No hay imágenes disponibles');
+                                            }
+
+                                            final initialImages =
+                                                snapshot.data!;
+                                            return ChangeNotifierProvider(
+                                              create: (_) =>
+                                                  ImageProviderSpareParts(),
+                                              child: ImageUploaderSpareParts(
+                                                  showAddButton:
+                                                      request.status == 2,
+                                                  initialImages: initialImages),
+                                            );
+                                          },
+                                        ),
                                         if (request.status == 1)
                                           BuySparePart(
+                                            visitId: request.id,
+                                            name: _repuestoController.text,
+                                            observation:
+                                                _comentariosGeneralesController
+                                                    .text,
                                             reparacion: {
                                               'nombreRepuesto':
                                                   request.name ?? '',

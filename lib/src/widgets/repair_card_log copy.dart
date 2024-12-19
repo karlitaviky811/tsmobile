@@ -178,13 +178,13 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   ],
               ),
             if (widget.reparacion['estado'] == 'Sin stock')
-              BuySparePart(
+             /* BuySparePart(
                 reparacion: const {
                   'nombreRepuesto': '',
                   'montoRepuesto': '',
                   'presupuestoRepuesto': '',
                 },
-              ),
+              ),*/
             _MoreDetailsTicket(widget: widget),
             TextField(
           decoration:

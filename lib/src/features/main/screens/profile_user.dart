@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
@@ -8,6 +6,7 @@ import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:tsmobile/src/services/user_service.dart';
 
 class ProfileUser extends StatefulWidget {
   static const String route = 'profile-ticket-route';
@@ -27,7 +26,8 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   late TextEditingController _ubicationController;
   late TextEditingController _phoneController;
   final MapController mapController = MapController();
-  LatLng _selectedLocation = LatLng(10.1807, -68.0034);  // Coordenadas de ejemplo
+  LatLng _selectedLocation =
+      LatLng(10.1807, -68.0034); // Coordenadas de ejemplo
 
   @override
   void initState() {
@@ -36,36 +36,46 @@ class _EditProfileWidgetState extends State<ProfileUser> {
     userProvider.obatinUserData().then((_) {
       if (userProvider.user != null) {
         _nameController = TextEditingController(text: userProvider.user!.name);
-        _emailController = TextEditingController(text: userProvider.user!.email);
-        _addressController = TextEditingController(text: userProvider.user!.address);
-        _companyController = TextEditingController(text: userProvider.user!.nameComercial);
-        _ubicationController = TextEditingController(text: userProvider.user!.address);
-        _phoneController = TextEditingController(text: userProvider.user!.phone);
-        
+        _emailController =
+            TextEditingController(text: userProvider.user!.email);
+        _addressController =
+            TextEditingController(text: userProvider.user!.address);
+        _companyController =
+            TextEditingController(text: userProvider.user!.nameComercial);
+        _ubicationController =
+            TextEditingController(text: userProvider.user!.address);
+        _phoneController =
+            TextEditingController(text: userProvider.user!.phone);
+
         // Establecer la ubicación seleccionada a partir de las coordenadas del usuario
         setState(() {
-          _selectedLocation = LatLng(double.parse(userProvider.user!.latitude), double.parse( userProvider.user!.longitude));
+          _selectedLocation = LatLng(double.parse(userProvider.user!.latitude),
+              double.parse(userProvider.user!.longitude));
         });
       }
     });
   }
 
-  void _updateProfile() {
+  Future<void> _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      Fluttertoast.showToast(
-        msg: "Datos guardados con éxito",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.blue,
-        textColor: Colors.white,
-        fontSize: 16.0
-      );
+  
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
+      final serviceUser = new UserService();
+
+      final Map<String, dynamic> data = {
+        "User_name": _nameController.text,
+        "Email": _emailController.text,
+        "latitude": userProvider.user!.latitude,
+        "longitude": userProvider.user!.longitude,
+        "Address": _addressController.text,
+        "Phone": _phoneController.text
+      };
+      await serviceUser.fetchUserDataUpdate(data);
       //userProvider.
-      print('Perfil actualizado: Nombre: ${_nameController.text}, Email: ${_emailController.text}, Teléfono: ${_phoneController.text}');
+      print(
+          'Perfil actualizado: Nombre: ${_nameController.text}, Email: ${_emailController.text}, Teléfono: ${_phoneController.text}');
     }
   }
 
@@ -100,14 +110,16 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hola, ${userProvider.user?.name ?? ''}', style: AppStyle.txtPoppinsRegular18Black),
+                        Text('Hola, ${userProvider.user?.name ?? ''}',
+                            style: AppStyle.txtPoppinsRegular18Black),
                         const SizedBox(height: 30),
                         Form(
                           key: _formKey,
                           child: Column(
                             children: <Widget>[
                               Container(
-                                child: Text('Información de la cuenta', style: AppStyle.txtPoppinsRegular18Black),
+                                child: Text('Información de la cuenta',
+                                    style: AppStyle.txtPoppinsRegular18Black),
                               ),
                               const SizedBox(height: 20),
                               TextFormField(
@@ -196,11 +208,15 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                                 onPressed: _updateProfile,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xff051937),
-                                  minimumSize: const Size(150, 50), // Tamaño del botón
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                  minimumSize:
+                                      const Size(150, 50), // Tamaño del botón
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
                                 ),
-                                label: const Text('Guardar', style: TextStyle(color: Colors.white)),
-                                icon: const Icon(Icons.save, color: Colors.white),
+                                label: const Text('Guardar',
+                                    style: TextStyle(color: Colors.white)),
+                                icon:
+                                    const Icon(Icons.save, color: Colors.white),
                               ),
                             ],
                           ),

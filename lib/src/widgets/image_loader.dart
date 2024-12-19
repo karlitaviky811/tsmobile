@@ -8,8 +8,10 @@ import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
 
 class ImageUploaderDiagnostic extends StatefulWidget {
   final List<ImageData> initialImages;
+  
+  bool showAddButton;
 
-  ImageUploaderDiagnostic({Key? key, this.initialImages = const []}) : super(key: key);
+  ImageUploaderDiagnostic({Key? key, this.initialImages = const [], required bool this.showAddButton}) : super(key: key);
 
   @override
   _ImageUploaderDiagnosticState createState() => _ImageUploaderDiagnosticState();
@@ -40,18 +42,17 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: _pickImage,
-              style: ElevatedButton.styleFrom(
-                
-                backgroundColor: const Color(0xff051937),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+           if (widget.showAddButton) // Mostrar condicionalmente el botón
+              ElevatedButton(
+                onPressed: _pickImage,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff051937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
-                
+                child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
-            ),
             if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
