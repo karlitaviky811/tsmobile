@@ -4,23 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
+import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 
-class ImageUploaderDiagnostic extends StatefulWidget {
+
+class ImageUploaderSpareParts extends StatefulWidget {
   final List<ImageData> initialImages;
 
-  ImageUploaderDiagnostic({Key? key, this.initialImages = const []}) : super(key: key);
+  ImageUploaderSpareParts({Key? key, this.initialImages = const []}) : super(key: key);
 
   @override
   _ImageUploaderDiagnosticState createState() => _ImageUploaderDiagnosticState();
 }
 
-class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
+class _ImageUploaderDiagnosticState extends State<ImageUploaderSpareParts> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
+      final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
       imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     });
   }
@@ -28,14 +29,14 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
+      final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
       imageProvider.addImage(pickedFile.path);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ImageProviderDiagnostic>(
+    return Consumer<ImageProviderSpareParts>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,12 +44,10 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
             ElevatedButton(
               onPressed: _pickImage,
               style: ElevatedButton.styleFrom(
-                
                 backgroundColor: const Color(0xff051937),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                
               ),
               child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
             ),

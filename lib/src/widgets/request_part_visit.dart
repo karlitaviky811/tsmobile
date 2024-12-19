@@ -3,13 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/models/visit_model.dart';
+import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
+import 'package:tsmobile/src/widgets/image_uploader_spare_parts.dart';
 
 class RepuestoScreen extends StatefulWidget {
   final Visit visit;
@@ -91,14 +94,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
           partRequests =
               partRequestsJson.map((json) => Repuesto.fromJson(json)).toList();
         });
-          
-      
       }
-        _isLoading = false;
+      _isLoading = false;
     } else {
       print('Error fetching part requests: ${response.body}');
-      
-      
     }
   }
 
@@ -125,7 +124,8 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (_repuestoController.text.isEmpty || _comentariosGeneralesController.text.isEmpty) {
+    if (_repuestoController.text.isEmpty ||
+        _comentariosGeneralesController.text.isEmpty) {
       _showToast('Por favor, complete todos los campos.');
       return;
     }
@@ -135,12 +135,17 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     });
 
     Map<String, dynamic> repuestos = {
-      "title": _repuestoController.text,
       "technical_visit_id": widget.visit.id,
-      "observations": _comentariosGeneralesController.text,
+      "name": _repuestoController.text,
+      "observation": _comentariosGeneralesController.text,
     };
+    final imageProvider =
+    Provider.of<ImageProviderSpareParts>(context, listen: false);
+    List<String> imagePaths = imageProvider.newImagePaths;
+    List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
     var serviceVisit = VisitService();
-    var res = await serviceVisit.sendUpdateDataVisitPartRequest(repuestos, widget.visit.id);
+    var res = await serviceVisit.sendUpdateDataVisitPartRequest(
+        repuestos, widget.visit.id, imageFiles);
 
     setState(() {
       _isSubmitting = false; // Ocultar indicador de envío
@@ -149,7 +154,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     Navigator.pop(context); // Cerrar el modal después del envío
   }
 
- void _openRepuestoForm() {
+  void _openRepuestoForm() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -159,6 +164,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Text('Solcitud de repuesto',
+                  style: AppStyle.txtPoppinsBold14Black),
+              const SizedBox(height: 10),
+              const Text('Información necesaria'),
               TextField(
                 decoration: const InputDecoration(
                   labelText: 'Nombre del repuesto',
@@ -187,49 +196,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                 controller: _comentariosGeneralesController,
               ),
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  if (imagePaths.length < 5) {
-                    await _pickImage();
-                  } else {
-                    _showToast('Solo se pueden cargar hasta 5 imágenes');
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff051937),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text('Adjuntar imágenes de repuesto',
-                    style: TextStyle(color: Colors.white)),
+              ImageUploaderSpareParts(
+                initialImages: [],
               ),
-              if (imagePaths.isNotEmpty)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
-                      child: Text(
-                        'Imágenes cargadas:',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    Wrap(
-                      children: imagePaths.map((path) {
-                        return Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.file(
-                            File(path),
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
               const SizedBox(height: 10),
               _isSubmitting // Mostrar el indicador de carga mientras se envía el formulario
                   ? CircularProgressIndicator()
@@ -250,7 +219,6 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -281,66 +249,77 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                   ? CircularProgressIndicator() // Mostrar indicador de carga
                   : partRequests.isEmpty
                       ? const Text('No hay solicitudes de repuesto.')
-              : Expanded(
-                        child: ListView.builder(
-                          itemCount: partRequests.length,
-                          itemBuilder: (context, index) {
-                            final request = partRequests[index];
-                            return Column(
-                              children: [
-                                Card(
-                                  margin: EdgeInsets.all(8.0),
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                      : Expanded(
+                          child: ListView.builder(
+                            itemCount: partRequests.length,
+                            itemBuilder: (context, index) {
+                              final request = partRequests[index];
+                              return Column(
+                                children: [
+                                  Card(
+                                    margin: EdgeInsets.all(8.0),
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        ListTile(
+                                          leading: Icon(
+                                            Icons.build,
+                                            color:
+                                                _getChipColor(request.status),
+                                          ),
+                                          title: Text(
+                                            request.name ??
+                                                'Repuesto Desconocido',
+                                            style: AppStyle
+                                                .txtPoppinsRegular12Gray,
+                                          ),
+                                          subtitle: Text(
+                                            request.observation,
+                                            style: AppStyle
+                                                .txtPoppinsRegular12Gray,
+                                          ),
+                                          trailing: Chip(
+                                            label: Text(
+                                              request.status == 1
+                                                  ? 'Solicitado'
+                                                  : 'Entregado',
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            backgroundColor:
+                                                _getChipColor(request.status),
+                                            avatar: Icon(
+                                              _getChipIcon(request.status),
+                                              color: Colors.white,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(25.0),
+                                              side: const BorderSide(
+                                                  color: Colors.transparent),
+                                            ),
+                                          ),
+                                        ),
+                                        if (request.status == 1)
+                                          BuySparePart(
+                                            reparacion: {
+                                              'nombreRepuesto':
+                                                  request.name ?? '',
+                                              'montoRepuesto': '',
+                                              'presupuestoRepuesto': '',
+                                            },
+                                          ),
+                                      ],
+                                    ),
                                   ),
-                                  child: Column(
-                                    children: [
-                                      ListTile(
-                                        leading: Icon(
-                                          Icons.build,
-                                          color: _getChipColor(request.status),
-                                        ),
-                                        title: Text(
-                                          request.name ?? 'Repuesto Desconocido',
-                                          style: AppStyle.txtPoppinsRegular12Gray,
-                                        ),
-                                        subtitle: Text(
-                                          request.observation,
-                                          style: AppStyle.txtPoppinsRegular12Gray,
-                                        ),
-                                        trailing: Chip(
-                                          label: Text(
-                                            request.status == 1 ? 'Solicitado' : 'Entregado',
-                                            style: const TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: _getChipColor(request.status),
-                                          avatar: Icon(
-                                            _getChipIcon(request.status),
-                                            color: Colors.white,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(25.0),
-                                            side: const BorderSide(color: Colors.transparent),
-                                          ),
-                                        ),
-                                      ),
-                                      if (request.status == 1)
-                                        BuySparePart(
-                                          reparacion: {
-                                            'nombreRepuesto': request.name ?? '',
-                                            'montoRepuesto': '',
-                                            'presupuestoRepuesto': '',
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                      ),
             ],
           ),
         ),
@@ -348,6 +327,3 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     );
   }
 }
-
-
-

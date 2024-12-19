@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
 
 class ImageProviderVisit with ChangeNotifier {
-  List<String> _imagePaths = [];
+  List<String> _initialImagePaths = [];
+  List<String> _newImagePaths = [];
 
-  List<String> get imagePaths => _imagePaths;
+  List<String> get initialImagePaths => _initialImagePaths;
+  List<String> get newImagePaths => _newImagePaths;
 
-  void addImagePath(String path) {
-    _imagePaths.add(path);
+  void setInitialImages(List<String> paths) {
+    _initialImagePaths = paths;
     notifyListeners();
   }
 
-  void removeImagePath(String path) {
-    _imagePaths.remove(path);
+  void addImage(String path) {
+    _newImagePaths.add(path);
     notifyListeners();
   }
 
-  void setImagePaths(List<String> paths) {
-    _imagePaths = paths;
+  void removeImage(String path) {
+    if (_initialImagePaths.contains(path)) {
+      _initialImagePaths.remove(path);
+    } else {
+      _newImagePaths.remove(path);
+    }
     notifyListeners();
   }
 
-  void clearImagePaths() {
-    _imagePaths.clear();
+  void clearImages() {
+    _initialImagePaths.clear();
+    _newImagePaths.clear();
     notifyListeners();
   }
 }

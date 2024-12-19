@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-class ImageProviderSpareParts with ChangeNotifier {
+class ImagesVisitProviderModel with ChangeNotifier {
 List<String> _initialImagePaths = [];
   List<String> _newImagePaths = [];
 
@@ -33,6 +32,5 @@ List<String> _initialImagePaths = [];
     notifyListeners();
   }
 }
-
 
 

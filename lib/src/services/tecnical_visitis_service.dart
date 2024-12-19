@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/neat_and_clean_calendar_event.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
+import 'package:tsmobile/src/services/send_file_service.dart';
 
 class VisitService {
   String apiUrl = 'http://3.137.100.242:3000/api/v1/technical-visits';
@@ -167,7 +169,7 @@ class VisitService {
   }
 
   Future<bool> sendUpdateDataVisitPartRequest(
-      Map<String, dynamic> data, int idTicket) async {
+      Map<String, dynamic> data, int idTicket, List<File> images) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     print('data $data $apiUrl');
@@ -186,32 +188,37 @@ class VisitService {
       var jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        print('repuesto solicitado éxitosamente');
-         Fluttertoast.showToast(
-          msg: "Solicitud de repuesto creada exitosamente",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
+        print('repuesto solicitado éxitosamente ${jsonResponse}');
+        // Enviar imágenes
+        for (File image in images) {
+          await sendFile(image, 'PartRequest', idTicket.toString(), 'part');
+        }
+
+        Fluttertoast.showToast(
+            msg: "Solicitud de repuesto creada exitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
         return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
-         Fluttertoast.showToast(
-          msg: "Error al crear la solicitud",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+        Fluttertoast.showToast(
+            msg: "Error al crear la solicitud",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
         return false;
       }
     } catch (e) {
       print('Error al enviar la solicitud: $e');
-       Fluttertoast.showToast(
+      Fluttertoast.showToast(
           msg: "Error al crear la solicitud",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
@@ -230,7 +237,42 @@ class VisitService {
     print('data $data $apiUrl');
     try {
       final response = await http.post(
-        Uri.parse(' http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${idVisit}'),
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${idVisit}'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
+
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('repuesto solicitado éxitosamente');
+        return true;
+      } else {
+        print('Error al enviar los datos: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      print('Error al enviar la solicitud: $e');
+      return false;
+    }
+  }
+
+  Future<bool> getDataImagePartRequest(
+      Map<String, dynamic> data, int idPartRequest) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    print('data $data $apiUrl');
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${idPartRequest}&collection_name=part'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -258,5 +300,5 @@ class VisitService {
 
 
 
- 
+
 }

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tsmobile/src/models/image_provider_diagnostic.dart';
+import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
@@ -179,11 +179,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                 labelText: 'Observaciones'),
                           ),
                           const SizedBox(height: 16),
-                          TextButton.icon(
-                            icon: const Icon(Icons.add_photo_alternate),
-                            label: const Text('Añadir Imagen'),
-                            onPressed: _pickImage,
-                          ),
                           const SizedBox(height: 16),
                           ImageUploaderDiagnostic(
                             initialImages: _imagesSend,
@@ -207,7 +202,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                         context,
                                         listen: false);
                                 List<String> imagePaths =
-                                    imageProvider.imagePaths;
+                                    imageProvider.newImagePaths;
                                 List<File> imageFiles = imagePaths
                                     .map((path) => File(path))
                                     .toList();
