@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
@@ -28,6 +26,9 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   List<ServiceTicket> filteredItems = [];
   List<Status> selectedTags = [];
   String searchQuery = "";
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+  int _currentPage = 1;
 
   List<Status> tags = [
     Status(0, "Todos"),
@@ -44,11 +45,39 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
     // Seleccionar "Todos" por defecto
     selectedTags.add(tags.firstWhere((tag) => tag.title == "Todos"));
     
-    ticketProvider.loadTickets().then((_) {
+    ticketProvider.loadTickets(page: _currentPage).then((_) {
       setState(() {
         filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
       });
     });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.atEdge && _scrollController.position.pixels != 0) {
+        _loadMoreTickets();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadMoreTickets() async {
+    if (!_isLoadingMore) {
+      setState(() {
+        _isLoadingMore = true;
+        _currentPage++;
+      });
+
+      final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+      await ticketProvider.loadTickets(page: _currentPage);
+      setState(() {
+        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
+        _isLoadingMore = false;
+      });
+    }
   }
 
   void updateFilteredItems() {
@@ -79,7 +108,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
           },
         ),
       ),
-      body: ticketProvider.isLoading
+      body: ticketProvider.isLoading && _currentPage == 1
           ? const Center(child: CircularProgressIndicator())
           : Container(
               color: Colors.white,
@@ -141,9 +170,12 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                     ),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: filteredItems.length,
-                        
+                        controller: _scrollController,
+                        itemCount: filteredItems.length + (_isLoadingMore ? 1 : 0),
                         itemBuilder: (context, index) {
+                          if (index == filteredItems.length) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
                           return Column(
                             children: [
                               Container(
@@ -180,9 +212,9 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
 
 List<ServiceTicket> filterItems(List<ServiceTicket> items, List<Status> selectedTags, String searchQuery) {
   if (selectedTags.any((tag) => tag.title == "Todos")) {
-    return items.where((item) => item.title.contains(searchQuery)).toList(); // Si "Todos" está seleccionado, filtrar por título
+    return items.where((item) => item.title.contains(searchQuery)).toList();
   }
   return items.where((item) {
-    return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery); // Filtrar por id de estatus y título
+    return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery);
   }).toList();
 }

@@ -19,7 +19,7 @@ class TicketService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
       final response = await http.get(
-        Uri.parse(apiUrl),
+        Uri.parse('http://3.137.100.242:3000/api/v1/tickets?include=serviceCall&page=${index}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",

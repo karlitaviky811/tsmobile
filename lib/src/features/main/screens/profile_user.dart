@@ -26,6 +26,8 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   late TextEditingController _ubicationController;
   late TextEditingController _phoneController;
   final MapController mapController = MapController();
+  bool _isFormEnabled = false;
+  bool _showSaveButton = false; // Variable para controlar la visibilidad del botón de guardar
   LatLng _selectedLocation =
       LatLng(10.1807, -68.0034); // Coordenadas de ejemplo
 
@@ -59,7 +61,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   Future<void> _updateProfile() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-  
+
       final userProvider = Provider.of<UserProvider>(context, listen: false);
 
       final serviceUser = new UserService();
@@ -79,7 +81,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
     }
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
 
@@ -117,9 +119,20 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                           key: _formKey,
                           child: Column(
                             children: <Widget>[
-                              Container(
-                                child: Text('Información de la cuenta',
-                                    style: AppStyle.txtPoppinsRegular18Black),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Información de la cuenta',
+                                      style: AppStyle.txtPoppinsRegular18Black),
+                                  IconButton(
+                                    icon: Icon(_showSaveButton ? Icons.edit_off : Icons.edit),
+                                    onPressed: () {
+                                      setState(() {
+                                        _showSaveButton = !_showSaveButton;
+                                      });
+                                    },
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 20),
                               TextFormField(
@@ -204,20 +217,20 @@ class _EditProfileWidgetState extends State<ProfileUser> {
                               // Añadir el mapa aquí
                               LocationCard(),
                               const SizedBox(height: 20),
-                              ElevatedButton.icon(
-                                onPressed: _updateProfile,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xff051937),
-                                  minimumSize:
-                                      const Size(150, 50), // Tamaño del botón
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
+                              if (_showSaveButton)
+                                ElevatedButton.icon(
+                                  onPressed: _updateProfile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xff051937),
+                                    minimumSize:
+                                        const Size(150, 50), // Tamaño del botón
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                  ),
+                                  label: const Text('Guardar',
+                                      style: TextStyle(color: Colors.white)),
+                                  icon: const Icon(Icons.save, color: Colors.white),
                                 ),
-                                label: const Text('Guardar',
-                                    style: TextStyle(color: Colors.white)),
-                                icon:
-                                    const Icon(Icons.save, color: Colors.white),
-                              ),
                             ],
                           ),
                         ),

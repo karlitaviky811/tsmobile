@@ -19,12 +19,13 @@ class VisitService {
       Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits'),
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': 'Bearer $token',
       },
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body);
+       List<dynamic> data = json.decode(response.body)['data'];
       return data.map((eventData) {
         return NeatCleanCalendarEvent(
           eventData['title'] ?? 'Sin título',
