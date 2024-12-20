@@ -34,6 +34,7 @@ class _BuySparePartState extends State<BuySparePart> {
   @override
   void initState() {
     super.initState();
+    _fetchImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
   }
 
