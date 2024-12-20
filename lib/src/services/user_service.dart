@@ -95,8 +95,7 @@ class UserService {
 
       // Validar el estado de la respuesta
       if (jsonResponse['success'] == true) {
-        if (jsonResponse.containsKey('data')) {
-          Map<String, dynamic> userJson = jsonResponse['data'];
+  
           Fluttertoast.showToast(
             msg: "Se han actualizado los datos exitosamente",
             toastLength: Toast.LENGTH_SHORT,
@@ -106,9 +105,7 @@ class UserService {
             textColor: Colors.white,
             fontSize: 16.0,
           );
-        } else {
-          print('La clave "data" no existe en el JSON de respuesta.');
-        }
+         
       } else {
         print('Error al obtener el JSON: ${response.statusCode}');
         Fluttertoast.showToast(

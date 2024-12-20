@@ -25,7 +25,7 @@ class VisitService {
     );
 
     if (response.statusCode == 200) {
-       List<dynamic> data = json.decode(response.body)['data'];
+      List<dynamic> data = json.decode(response.body)['data'];
       return data.map((eventData) {
         return NeatCleanCalendarEvent(
           eventData['title'] ?? 'Sin título',
@@ -58,7 +58,7 @@ class VisitService {
       print('response ${response}');
       Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
+      if (jsonResponse['sucess'] == true) {
         print('Datos enviados exitosamente.');
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
@@ -127,8 +127,7 @@ class VisitService {
       List<dynamic> visitsData = body['visits'];
 
       // Mapear cada elemento de visitsData a un objeto Visit
-      List<Visit> visits =
-          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
+      List<Visit> visits =visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
 
       return visits;
     } else {
@@ -189,10 +188,12 @@ class VisitService {
       var jsonResponse = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        print('repuesto solicitado éxitosamente ${jsonResponse}');
+        print(
+            'repuesto solicitado éxitosamente ${jsonResponse} ${jsonResponse['data']['id']}');
         // Enviar imágenes
         for (File image in images) {
-          await sendFile(image, 'PartRequest',jsonResponse['data']['id'], 'part');
+          await sendFile(image, 'PartRequest',
+              jsonResponse['data']['id'].toString(), 'part');
         }
 
         Fluttertoast.showToast(
@@ -298,8 +299,4 @@ class VisitService {
       return false;
     }
   }
-
-
-
-
 }

@@ -1,7 +1,8 @@
+
 import 'package:flutter/material.dart';
 
-class ImageProviderDiagnostic with ChangeNotifier {
-  List<String> _initialImagePaths = [];
+class ImageProviderTechnicalBuySpareParts with ChangeNotifier {
+List<String> _initialImagePaths = [];
   List<String> _newImagePaths = [];
 
   List<String> get initialImagePaths => _initialImagePaths;
@@ -9,12 +10,6 @@ class ImageProviderDiagnostic with ChangeNotifier {
 
   void setInitialImages(List<String> paths) {
     _initialImagePaths = paths;
-    notifyListeners();
-  }
-
-  void resetImage() {
-    _newImagePaths.clear();
-    _initialImagePaths.clear();
     notifyListeners();
   }
 
@@ -38,3 +33,6 @@ class ImageProviderDiagnostic with ChangeNotifier {
     notifyListeners();
   }
 }
+
+
+

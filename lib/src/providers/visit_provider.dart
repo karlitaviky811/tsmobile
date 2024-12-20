@@ -6,6 +6,7 @@ import 'package:tsmobile/src/models/part_request.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:http/http.dart' as http;
+
 class VisitProvider with ChangeNotifier {
   final VisitService _visitService = VisitService();
   List<Visit> _visits = [];
@@ -17,19 +18,41 @@ class VisitProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  Future<void> fetchVisitsByTicket(String ticketId) async {
-    _isLoading = true;
+  Future<List<Visit>> fetchVisitsByTicket(String ticketId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
 
-    try {
-      _visits = await _visitService.fetchVisitsByTicket(int.parse(ticketId));
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    Map<String, dynamic> body = json.decode(response.body);
+    final jsonResponse = jsonDecode(response.body);
+    if (jsonResponse['success'] == true) {
+      // Decodificar el cuerpo de la respuesta
+      Map<String, dynamic> body = json.decode(response.body)['data'];
+
+      // Obtener la lista de visitas desde la propiedad 'visits'
+      List<dynamic> visitsData = body['visits'];
+
+      if (visitsData.isEmpty) {
+        print('No se encontraron visitas para el ticket.');
+        return [];
+      }
+
+      // Mapear cada elemento de visitsData a un objeto Visit
+      _visits = visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
       notifyListeners();
-      _errorMessage = null;
-    } catch (error) {
-      _errorMessage = error.toString();
+      return visits;
+    } else {
+      print('Error al obtener las visitas: ${response.statusCode}');
+      throw Exception('Failed to load visits for ticket');
     }
-
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<void> fetchRepuestos(int technicalVisitId) async {

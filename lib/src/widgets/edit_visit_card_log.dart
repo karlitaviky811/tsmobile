@@ -6,16 +6,15 @@ import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/widgets/repair_log_card_original.dart';
 import 'package:tsmobile/src/widgets/request_part_visit.dart';
 
-
 class EditVisitPage extends StatefulWidget {
   final Visit visit;
-  
+
   var type;
-  
+
   String ticketId;
 
-  EditVisitPage({super.key,
-  
+  EditVisitPage(
+      {super.key,
       required this.visit,
       required this.type,
       required String this.ticketId});
@@ -32,7 +31,8 @@ class _EditVisitPageState extends State<EditVisitPage> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.visit.title);
-    _dateController = TextEditingController(text: widget.visit.visitDate.toLocal().toString().split(' ')[0]);
+    _dateController = TextEditingController(
+        text: widget.visit.visitDate.toLocal().toString().split(' ')[0]);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -50,38 +50,41 @@ class _EditVisitPageState extends State<EditVisitPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.type == 'Nuevo' ? 'Agregar Nueva Visita' : 'Editar Vista' , style: AppStyle.txtPoppinsRegular18Black),
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Información General'),
-              Tab(text: 'Solicitudes de Repuesto'),
-            ],
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const TabsPage()),
-              );
-            })
-        ),
+            title: Text(
+                widget.type == 'Nuevo'
+                    ? 'Agregar Nueva Visita'
+                    : 'Editar Vista',
+                style: AppStyle.txtPoppinsRegular18Black),
+            bottom: const TabBar(
+              tabs: [
+                Tab(text: 'Información General'),
+                Tab(text: 'Solicitudes de Repuesto'),
+              ],
+            ),
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new),
+                onPressed: () {
+                  Navigator.pop(context);
+                })),
         body: TabBarView(
           children: [
-            RepairLogCard(reparacion: {}, visit: widget.visit, type: widget.type
-            , ticketId: widget.ticketId),
-            RepuestoScreen(visit:  widget.visit,),
+            RepairLogCard(
+                reparacion: {},
+                visit: widget.visit,
+                type: widget.type,
+                ticketId: widget.ticketId),
+            RepuestoScreen(
+              visit: widget.visit,
+            ),
           ],
         ),
       ),
     );
   }
-
 }

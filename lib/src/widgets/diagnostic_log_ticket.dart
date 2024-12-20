@@ -34,7 +34,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   DateTime? _selectedDate;
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
-  bool _isFormActive = false; // Variable para controlar el estado del formulario
+  bool _isFormActive =
+      false; // Variable para controlar el estado del formulario
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -45,14 +46,15 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     );
     if (picked != null) {
       setState(() {
-        _selectedDate = picked; 
+        _selectedDate = picked;
         _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
+    final imagePickerProvider =
+        Provider.of<ImagePickerProvider>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
 
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -69,7 +71,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final response = await http.get(
-      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -97,6 +100,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     }
   }
 
+  void _resetProvider() {
+    Provider.of<ImageProviderDiagnostic>(context, listen: false).resetImage();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -115,7 +122,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         future: _loadTicketFuture,
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: Center(child: CircularProgressIndicator()));
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -126,8 +133,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
             }
 
             if (!isDateInitialized && item.diagnosisDate != null) {
-              _selectedDate = item.diagnosisDate; 
-              _dateController.text = DateFormat('dd/MM/yyyy').format(_selectedDate!);
+              _selectedDate = item.diagnosisDate;
+              _dateController.text =
+                  DateFormat('dd/MM/yyyy').format(_selectedDate!);
               isDateInitialized = true;
             }
             if (!isObservationsInitialized && item.diagnosisDetail != null) {
@@ -160,7 +168,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                 style: AppStyle.txtPoppinsMedium18Black,
                               ),
                               IconButton(
-                                icon: Icon(_isFormActive ? Icons.edit_off : Icons.edit),
+                                icon: Icon(_isFormActive
+                                    ? Icons.edit_off
+                                    : Icons.edit),
                                 onPressed: () {
                                   setState(() {
                                     _isFormActive = !_isFormActive;
@@ -176,7 +186,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                               labelText: 'Fecha',
                               prefixIcon: IconButton(
                                 icon: const Icon(Icons.calendar_today),
-                                onPressed: _isFormActive ? () => _pickDate(context) : null,
+                                onPressed: _isFormActive
+                                    ? () => _pickDate(context)
+                                    : null,
                               ),
                             ),
                             readOnly: !_isFormActive,
@@ -184,13 +196,15 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
-                            decoration: const InputDecoration(labelText: 'Observaciones'),
+                            decoration: const InputDecoration(
+                                labelText: 'Observaciones'),
                             readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
                           ImageUploaderDiagnostic(
                             initialImages: _imagesSend,
-                            showAddButton: _isFormActive, // Mostrar o no el botón de añadir imágenes
+                            showAddButton:
+                                _isFormActive, // Mostrar o no el botón de añadir imágenes
                           ),
                           const SizedBox(height: 30),
                           if (_isFormActive) // Mostrar el botón de guardar solo si el formulario está activo
@@ -202,13 +216,20 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                icon: const Icon(Icons.save, size: 18, color: Colors.white),
+                                icon: const Icon(Icons.save,
+                                    size: 18, color: Colors.white),
                                 onPressed: () async {
                                   // Obtener imágenes del proveedor
-                                  final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
-                                  List<String> imagePaths = imageProvider.newImagePaths;
-                                  List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
-
+                                  final imageProvider =
+                                      Provider.of<ImageProviderDiagnostic>(
+                                          context,
+                                          listen: false);
+                                  List<String> imagePaths =
+                                      imageProvider.newImagePaths;
+                                  List<File> imageFiles = imagePaths
+                                      .map((path) => File(path))
+                                      .toList();
+                                  _resetProvider;
                                   if (_selectedDate != null) {
                                     await serviceUpdateTicket.saveFormData(
                                       _selectedDate!.toIso8601String(),
@@ -216,6 +237,18 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                       imageFiles,
                                       widget.idTicket,
                                     );
+                                    setState(() {
+                                      _isFormActive = false;
+                                      _imagesSend.clear();
+                                      imageProvider.clearImages();
+                                    });
+
+                                    _fetchImages();
+                                    final ticketProvider =
+                                        Provider.of<TicketProvider>(context,
+                                            listen: false);
+                                    _loadTicketFuture = ticketProvider
+                                        .loadTicketById(widget.idTicket);
                                   } else {
                                     print('Por favor, selecciona una fecha.');
                                   }

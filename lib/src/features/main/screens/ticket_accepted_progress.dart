@@ -63,19 +63,13 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                       )),
             );
           },
+          backgroundColor: Colors.white,
           child: const Icon(
             Icons.chat_rounded,
             color: Colors.blueAccent,
           ),
-          backgroundColor: Colors.white,
         ),
         appBar: AppBar(
-          /*leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),*/
           leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new),
               onPressed: () {
@@ -115,38 +109,21 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                 if (item == null) {
                   return const Center(child: Text('No se encontró el ticket'));
                 }
-
-                return Consumer2<TicketProvider, VisitProvider>(
-                  builder: (context, ticketProvider, visitProvider, child) {
-                    final itemVisit = visitProvider.visits;
-                    return TabBarView(
-                      children: [
-                        _TicketDetailProgress(
-                            ticketInfo: item, visit: itemVisit),
-                        DiagnosticForm(
-                          idTicket: widget.ticketId,
-                          onSave: (DateTime? date, String observations,
-                              List<File> images) {
-                            // Lógica para manejar los datos guardados del formulario
-                            print('Fecha: $date');
-                            print('Observaciones: $observations');
-                            print('Imágenes: $images');
-                          },
-                        ),
-                        RepairLogFormData(ticketId: widget.ticketId),
-                        CloseTicketForm(
-                          idTicket: widget.ticketId,
-                          onSave: (DateTime? date, String observations,
-                              List<File> images) {
-                            // Lógica para manejar los datos guardados del formulario
-                            print('Fecha: $date');
-                            print('Observaciones: $observations');
-                            print('Imágenes: $images');
-                          },
-                        )
-                      ],
-                    );
-                  },
+                return TabBarView(
+                  children: [
+                    _TicketDetailProgress(ticketInfo: item),
+                    DiagnosticForm(
+                      idTicket: widget.ticketId,
+                      onSave: (DateTime? date, String observations,List<File> images) {
+                      },
+                    ),
+                    RepairLogFormData(ticketId: widget.ticketId),
+                    CloseTicketForm(
+                      idTicket: widget.ticketId,
+                      onSave: (DateTime? date, String observations,List<File> images) {
+                      },
+                    )
+                  ],
                 );
               }
             }),
@@ -197,9 +174,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
 
 class _TicketDetailProgress extends StatelessWidget {
   final dynamic ticketInfo;
-  final List<Visit> visit;
-  const _TicketDetailProgress(
-      {super.key, required this.ticketInfo, required this.visit});
+  const _TicketDetailProgress({super.key, required this.ticketInfo});
 
   @override
   Widget build(BuildContext context) {
@@ -215,7 +190,6 @@ class _TicketDetailProgress extends StatelessWidget {
               children: [
                 TicketDetailCard(
                   ticketId: ticketInfo.id?.toString() ?? 'N/A',
-                  scheduledVisit: visit[0].visitDate,
                 ),
                 const SizedBox(
                   height: 5,
@@ -251,24 +225,30 @@ class _ClienteHandlerState extends State<ClienteHandler> {
     });
   }
 
-  Future<void> _getAddressFromCoordinates(double latitude, double longitude) async {
+  Future<void> _getAddressFromCoordinates(
+      double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks[0];
-      if (mounted) {  // Verificar si el widget aún está en el árbol
+      if (mounted) {
+        // Verificar si el widget aún está en el árbol
         setState(() {
-          _address = "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
+          _address =
+              "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
         });
       }
     } catch (e) {
       print(e);
-      if (mounted) {  // Verificar si el widget aún está en el árbol
+      if (mounted) {
+        // Verificar si el widget aún está en el árbol
         setState(() {
           _address = "Could not get address";
         });
       }
     }
   }
+
   @override
   Widget build(BuildContext context) {
     _getAddressFromCoordinates(
@@ -276,13 +256,15 @@ class _ClienteHandlerState extends State<ClienteHandler> {
         double.parse(widget.ticketInfo.serviceCallDetail['longitude']));
     return Center(
       child: ClienteDetailCard(
-        address: widget.ticketInfo.serviceCallDetail['BPBillAddr'],
-        phoneNumber: widget.ticketInfo.serviceCallDetail['BPCellular'],
-        email: widget.ticketInfo.serviceCallDetail['BPE_Mail'],
-        geolocation: _address,
-        latitude: widget.ticketInfo.serviceCallDetail['latitude'],
-        longitude: widget.ticketInfo
-            .serviceCallDetail['longitude'], // Ejemplo de coordenadas
+        address:
+            widget.ticketInfo.serviceCallDetail['BPBillAddr'] ?? 'No tiene',
+        phoneNumber:
+            widget.ticketInfo.serviceCallDetail['BPCellular'] ?? 'No tiene',
+        email: widget.ticketInfo.serviceCallDetail['BPE_Mail'] ?? 'No tiene',
+        geolocation: _address ?? 'No tiene',
+        latitude: widget.ticketInfo.serviceCallDetail['latitude'] ?? 0.0,
+        longitude: widget.ticketInfo.serviceCallDetail['longitude'] ??
+            0.0, // Ejemplo de coordenadas
         onAddressChanged: _updateAddress,
       ),
     );

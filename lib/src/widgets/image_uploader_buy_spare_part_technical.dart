@@ -4,46 +4,45 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
+import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 
-class ImageUploaderSpareParts extends StatefulWidget {
+
+class ImageUploaderBuySparePartTechnical extends StatefulWidget {
   final List<ImageData> initialImages;
-  final bool showAddButton;
+  final bool showAddButton; // Nuevo parámetro
 
-  ImageUploaderSpareParts({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
+  ImageUploaderBuySparePartTechnical({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
 
   @override
   _ImageUploaderSparePartsState createState() => _ImageUploaderSparePartsState();
 }
 
-class _ImageUploaderSparePartsState extends State<ImageUploaderSpareParts> {
+class _ImageUploaderSparePartsState extends State<ImageUploaderBuySparePartTechnical> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
-        imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
-      }
+      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     });
   }
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null && mounted) {
-      final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
+    if (pickedFile != null) {
+      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
       imageProvider.addImage(pickedFile.path);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ImageProviderSpareParts>(
+    return Consumer<ImageProviderTechnicalBuySpareParts>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.showAddButton)
+            if (widget.showAddButton) // Mostrar condicionalmente el botón
               ElevatedButton(
                 onPressed: _pickImage,
                 style: ElevatedButton.styleFrom(

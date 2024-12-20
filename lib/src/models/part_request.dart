@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Repuesto {
   final int id;
   final int status;
@@ -9,6 +11,7 @@ class Repuesto {
   final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final double? budgetAmount;
 
   Repuesto({
     required this.id,
@@ -21,6 +24,7 @@ class Repuesto {
     this.deletedAt,
     required this.createdAt,
     required this.updatedAt,
+    required this.budgetAmount
   });
 
   factory Repuesto.fromJson(Map<String, dynamic> json) {
@@ -35,6 +39,7 @@ class Repuesto {
       deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-    );
+      budgetAmount: json['budget_amount'] != null ? (json['budget_amount'] as num).toDouble() : null,    
+      );
   }
 }

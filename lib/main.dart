@@ -13,6 +13,8 @@ import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
 import 'package:tsmobile/src/providers/images_provider.dart';
 import 'package:tsmobile/src/providers/message_provider.dart';
+import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
+import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
@@ -20,11 +22,13 @@ import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
+import 'package:tsmobile/src/widgets/image_uploader_invoice_spare_parts.dart';
 // Importa la pantalla de splash
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   final oneSignalAppId = dotenv.env['APP_ID'];
+  String _debugLabelString = "";
   WidgetsFlutterBinding.ensureInitialized();
 
   await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -33,14 +37,27 @@ Future<void> main() async {
 
   // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
   // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
-  OneSignal.User.addAlias('external_id', 'userId-test-1');
-  OneSignal.login('userId-test-1');
+  OneSignal.User.addAlias('external_id', 'technical-20');
+  OneSignal.User.addTagWithKey('external_id', 'technical-20');
+  OneSignal.login('technical-20');
   if ((OneSignal.User.pushSubscription.id == null)) {
     OneSignal.Notifications.requestPermission(true);
   }
+
+  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    print(
+        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+    /// Display Notification, preventDefault to not display
+    event.preventDefault();
+
+    /// Do async work
+
+    /// notification.display() to display after preventing default
+    event.notification.display();
+  });
   PusherChannelsPackageLogger.enableLogs();
-  // Create an instance PusherChannelsOptions
-  // The test options can be accessed from test.pusher.com (using only for test purposes)
+
   const testOptions = PusherChannelsOptions.fromCluster(
     scheme: 'wss',
     cluster: 'mt1',
@@ -77,7 +94,11 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ImageProviderVisit()),
         ChangeNotifierProvider(create: (_) => ImagesVisitProviderModel()),
         ChangeNotifierProvider(create: (_) => ImageProviderSpareParts()),
-        ChangeNotifierProvider(create: (_) => ImageProviderCloseTicketManagement())
+        ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalBuySpareParts()),
+        ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalInvoice()),
+        
+        ChangeNotifierProvider(
+            create: (_) => ImageProviderCloseTicketManagement())
       ],
       child: const MyApp(),
     ),

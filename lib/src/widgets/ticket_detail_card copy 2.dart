@@ -229,6 +229,8 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
     }
   }
 
+  
+
   void _saveDetails() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
@@ -246,7 +248,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         data, finalIdVisit.toString());
     await visitProvider.fetchVisitsByTicket(widget.id);
     await ticketProvider.loadTicketById(widget.id);
-   
+
     if (visit != null) {
       // Maneja la visita recibida en la respuest
       print('Visita recibida: ${visit.title}');

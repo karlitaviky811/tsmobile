@@ -15,6 +15,7 @@ import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/widgets/buy_spare_part.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:tsmobile/src/widgets/image_uploader_spare_parts.dart';
+import 'package:tsmobile/src/widgets/invoice_spare_parts.dart';
 
 class RepuestoScreen extends StatefulWidget {
   final Visit visit;
@@ -40,41 +41,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   void initState() {
     super.initState();
     _fetchPartRequests();
+    
   }
 
-  Color _getChipColor(int estado) {
-    switch (estado) {
-      case 1:
-        return Colors.lightBlue.shade300;
-      case 2:
-        return Colors.lightGreen.shade300;
-      case 3:
-        return Colors.deepOrange.shade200;
-      case 4:
-        return Colors.deepPurple.shade200;
-      case 5:
-        return Colors.pink.shade200;
-      default:
-        return Colors.grey.shade300;
-    }
-  }
-
-  IconData _getChipIcon(int estado) {
-    switch (estado) {
-      case 1:
-        return Icons.create;
-      case 2:
-        return Icons.check_circle;
-      case 3:
-        return Icons.work;
-      case 4:
-        return Icons.done;
-      case 5:
-        return Icons.close;
-      default:
-        return Icons.info;
-    }
-  }
 
   Future<void> _fetchPartRequests() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -125,6 +94,77 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     );
   }
 
+
+String _getStatusLabel(int status) {
+  switch (status) {
+    case 1:
+      return 'Nueva solicitud';
+    case 2:
+      return 'Repuesto aprobado';
+    case 3:
+      return 'Repuesto rechazado';
+    case 4:
+      return 'Entregado';
+    case 5:
+      return 'Compra requerida';
+    case 6:
+      return 'Presupuesto nuevo';
+    case 7:
+      return 'Presupuesto aprobado';
+    case 8:
+      return 'Repuesto comprado';
+    default:
+      return 'Desconocido';
+  }
+}
+
+Color _getChipColor(int status) {
+  switch (status) {
+    case 1:
+      return Colors.blue;
+    case 2:
+      return Colors.green;
+    case 3:
+      return Colors.red;
+    case 4:
+      return Colors.purple;
+    case 5:
+      return Colors.orange;
+    case 6:
+      return Colors.amber;
+    case 7:
+      return Colors.teal;
+    case 8:
+      return Colors.indigo;
+    default:
+      return Colors.grey;
+  }
+}
+
+IconData _getChipIcon(int status) {
+  switch (status) {
+    case 1:
+      return Icons.new_releases;
+    case 2:
+      return Icons.check_circle;
+    case 3:
+      return Icons.cancel;
+    case 4:
+      return Icons.local_shipping;
+    case 5:
+      return Icons.shopping_cart;
+    case 6:
+      return Icons.attach_money;
+    case 7:
+      return Icons.approval;
+    case 8:
+      return Icons.shopping_bag;
+    default:
+      return Icons.help;
+  }
+}
+
+
   Future<void> _submitForm() async {
     if (_repuestoController.text.isEmpty ||
         _comentariosGeneralesController.text.isEmpty) {
@@ -135,6 +175,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     setState(() {
       _isSubmitting = true; // Mostrar indicador de envío
     });
+
+    // Implementa tu lógica de guardado aquí await
+    Future.delayed(const Duration(seconds: 2));
 
     Map<String, dynamic> repuestos = {
       "technical_visit_id": widget.visit.id,
@@ -152,7 +195,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     setState(() {
       _isSubmitting = false; // Ocultar indicador de envío
     });
-
+    _fetchPartRequests();
     Navigator.pop(context); // Cerrar el modal después del envío
   }
 
@@ -203,7 +246,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
               ),
               const SizedBox(height: 10),
               _isSubmitting // Mostrar el indicador de carga mientras se envía el formulario
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _submitForm,
                       style: ElevatedButton.styleFrom(
@@ -247,143 +290,186 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        child: Card(
-          color: Colors.white,
-          elevation: 20,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: _openRepuestoForm,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff051937),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Container(
+      width: double.infinity,
+      child: Card(
+        color: Colors.white,
+        elevation: 20,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _openRepuestoForm,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff051937),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text('Solicitar nuevo repuesto',
-                    style: TextStyle(color: Colors.white)),
               ),
-              _isLoading
-                  ? CircularProgressIndicator() // Mostrar indicador de carga
-                  : partRequests.isEmpty
-                      ? const Text('No hay solicitudes de repuesto.')
-                      : Expanded(
-                          child: ListView.builder(
-                            itemCount: partRequests.length,
-                            itemBuilder: (context, index) {
-                              final request = partRequests[index];
-
-                              return Column(
-                                children: [
-                                  Card(
-                                    margin: EdgeInsets.all(8.0),
-                                    color: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        ListTile(
-                                          leading: Icon(
-                                            Icons.build,
-                                            color:
-                                                _getChipColor(request.status),
-                                          ),
-                                          title: Text(
-                                            request.name ??
-                                                'Repuesto Desconocido',
-                                            style: AppStyle
-                                                .txtPoppinsRegular12Gray,
-                                          ),
-                                          subtitle: Text(
-                                            request.observation,
-                                            style: AppStyle
-                                                .txtPoppinsRegular12Gray,
-                                          ),
-                                          trailing: Chip(
-                                            label: Text(
-                                              request.status == 1
-                                                  ? 'Solicitado'
-                                                  : 'Entregado',
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            backgroundColor:
-                                                _getChipColor(request.status),
-                                            avatar: Icon(
-                                              _getChipIcon(request.status),
-                                              color: Colors.white,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(25.0),
-                                              side: const BorderSide(
-                                                  color: Colors.transparent),
-                                            ),
-                                          ),
-                                        ),
-                                        FutureBuilder<List<ImageData>>(
-                                          future:
-                                              getImagesForRequest(request.id),
-                                          builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
-                                              return CircularProgressIndicator();
-                                            } else if (snapshot.hasError) {
-                                              return Text(
-                                                  'Error al cargar imágenes');
-                                            } else if (!snapshot.hasData ||
-                                                snapshot.data!.isEmpty) {
-                                              return Text(
-                                                  'No hay imágenes disponibles');
-                                            }
-
-                                            final initialImages =
-                                                snapshot.data!;
-                                            return ChangeNotifierProvider(
-                                              create: (_) =>
-                                                  ImageProviderSpareParts(),
-                                              child: ImageUploaderSpareParts(
-                                                  showAddButton:
-                                                      request.status == 2,
-                                                  initialImages: initialImages),
-                                            );
-                                          },
-                                        ),
-                                        if (request.status == 1)
-                                          BuySparePart(
-                                            visitId: request.id,
-                                            name: _repuestoController.text,
-                                            observation:
-                                                _comentariosGeneralesController
-                                                    .text,
-                                            reparacion: {
-                                              'nombreRepuesto':
-                                                  request.name ?? '',
-                                              'montoRepuesto': '',
-                                              'presupuestoRepuesto': '',
-                                            },
-                                          ),
-                                      ],
-                                    ),
+              child: const Text('Solicitar nuevo repuesto',
+                  style: TextStyle(color: Colors.white)),
+            ),
+            _isLoading
+                ? const CircularProgressIndicator()
+                : partRequests.isEmpty
+                    ? const Text('No hay solicitudes de repuesto.')
+                    : Expanded(
+                        child: ListView.builder(
+                          itemCount: partRequests.length,
+                          itemBuilder: (context, index) {
+                            final request = partRequests[index];
+                            return Column(
+                              children: [
+                                Card(
+                                  margin: const EdgeInsets.all(8.0),
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                ],
-                              );
-                            },
-                          ),
+                                  child: Column(
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(
+                                          Icons.build,
+                                          color: _getChipColor(request.status),
+                                        ),
+                                        title: Text(
+                                          request.name ??
+                                              'Repuesto Desconocido',
+                                          style: AppStyle
+                                              .txtPoppinsRegular12Gray,
+                                        ),
+                                        subtitle: Text(
+                                          request.observation,
+                                          style: AppStyle
+                                              .txtPoppinsRegular12Gray,
+                                        ),
+                                        trailing: Chip(
+                                          label: Text(
+                                            _getStatusLabel(request.status),
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          backgroundColor:
+                                              _getChipColor(request.status),
+                                          avatar: Icon(
+                                            _getChipIcon(request.status),
+                                            color: Colors.white,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(25.0),
+                                            side: const BorderSide(
+                                                color: Colors.transparent),
+                                          ),
+                                        ),
+                                      ),
+                                      if (request.status == 1)
+                                        BuySparePart(
+                                          visitId: request.id,
+                                          name: _repuestoController.text,
+                                          observation:
+                                              _comentariosGeneralesController
+                                                  .text,
+                                          reparacion: {
+                                            'nombreRepuesto':
+                                                request.name ?? '',
+                                            'montoRepuesto':
+                                                request.budgetAmount,
+                                            'presupuestoRepuesto': '',
+                                          },
+                                          //status: request.status,
+                                        ),
+                                      if (request.status == 5)
+                                        Column(
+                                          children: [
+                                            BuySparePart(
+                                              visitId: request.id,
+                                              name: _repuestoController.text,
+                                              observation:
+                                                  _comentariosGeneralesController
+                                                      .text,
+                                              reparacion: {
+                                                'nombreRepuesto':
+                                                    request.name ?? '',
+                                                'montoRepuesto':
+                                                    request.budgetAmount,
+                                                'presupuestoRepuesto': '',
+                                              },
+                                              //status: request.status,
+                                            ),
+                                            FutureBuilder<List<ImageData>>(
+                                              future: getImagesForRequest(
+                                                  request.id),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const CircularProgressIndicator();
+                                                } else if (snapshot.hasError) {
+                                                  return const Text(
+                                                      'Error al cargar imágenes');
+                                                } else if (!snapshot.hasData ||
+                                                    snapshot.data!.isEmpty) {
+                                                  return const Text(
+                                                      'No hay imágenes disponibles');
+                                                }
+
+                                                final initialImages =
+                                                    snapshot.data!;
+                                                return ChangeNotifierProvider(
+                                                  create: (_) =>
+                                                      ImageProviderSpareParts(),
+                                                  child:
+                                                      ImageUploaderSpareParts(
+                                                          showAddButton: true,
+                                                          initialImages:
+                                                              initialImages),
+                                                );
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      if (request.status == 6)
+                                        Column(
+                                          children: [
+                                            BuySparePart(
+                                              visitId: request.id,
+                                              name: _repuestoController.text,
+                                              observation:
+                                                  _comentariosGeneralesController
+                                                      .text,
+                                              reparacion: {
+                                                'nombreRepuesto':
+                                                    request.name ?? '',
+                                                'montoRepuesto':
+                                                    request.budgetAmount,
+                                                'presupuestoRepuesto': '',
+                                              },
+                                              //status: request.status,
+                                            ),
+                                          ],
+                                        ),
+                                      if (request.status == 7)
+                                        InvoiceSparePart(
+                                            visitId: request.id,
+                                            initialImages: [])
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-            ],
-          ),
+                      ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

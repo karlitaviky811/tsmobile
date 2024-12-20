@@ -12,13 +12,11 @@ import '../models/visit_model.dart';
 
 class TicketDetailCard extends StatefulWidget {
   final String ticketId;
-
-  DateTime scheduledVisit; // Añadimos el campo de visita programada
+// Añadimos el campo de visita programada
 
   // Constructor con required
   TicketDetailCard({
-    required this.ticketId,
-    required DateTime this.scheduledVisit,
+    required this.ticketId
   });
 
   @override
@@ -36,7 +34,6 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
   @override
   void initState() {
     super.initState();
-    _scheduledVisit = widget.scheduledVisit;
     _fetchDataFuture = _fetchData();
   }
 
@@ -250,6 +247,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       });
     }
   }
+  
 
   void _saveDetails() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
@@ -310,7 +308,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
           ),
           Expanded(
             child: Text(
-              DateFormat('dd/MM/yyyy').format(visits[0].visitDate),
+              DateFormat('dd/MM/yyyy').format(visits.length > 0 ? visits[0].visitDate : new DateTime.now()),
               style: AppStyle.txtPoppinsRegular14Black,
             ),
           ),
@@ -345,7 +343,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Aceptar Ticket de Servicio',
+                  Text('Agendar visita',
                       style: AppStyle.txtPoppinsBold14Black),
                   const SizedBox(height: 10),
                   const Text('Programar primera visita'),

@@ -323,7 +323,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Aceptar Ticket de Servicio',
+                  Text('Agendar Visita',
                       style: AppStyle.txtPoppinsBold14Black),
                   const SizedBox(height: 10),
                   const Text('Programar primera visita'),
@@ -381,95 +381,4 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       },
     );
   }
-
-/*
-  void _showDatePicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
-      ),
-      builder: (BuildContext builder) {
-        return FractionallySizedBox(
-          heightFactor: 0.7, // Ajusta la altura según sea necesario
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Reprogramar Visita',
-                  style: AppStyle.txtPoppinsBold14Black,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: _scheduledVisit,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-                    if (picked != null && picked != _scheduledVisit) {
-                      setState(() {
-                        _scheduledVisit = picked;
-                      });
-                    }
-                  },
-                  child: const Text('Seleccionar Fecha'),
-                ),
-                const SizedBox(height: 20),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Motivo de Reprogramación',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: ['Motivo 1', 'Motivo 2', 'Motivo 3']
-                      .map((reason) => DropdownMenuItem<String>(
-                            value: reason,
-                            child: Text(reason),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _rescheduleReason = value;
-                    });
-                  },
-                  value: _rescheduleReason,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    
-
-                    Map<String, dynamic> data = {
-                      "new_date": _scheduledVisit,
-                      "extend_reason": _rescheduleReason,
-                      "reason": "3"
-                    };
-
-                    Visit? visit = await visitService
-                        .sendDataVisitReprogramming(data, widget.code);
-
-                    if (visit != null) {
-                      // Maneja la visita recibida en la respuesta
-                      print('Visita recibida: ${visit.title}');
-                    } else {
-                      print('Error al enviar y recibir la visita.');
-                    }
-
-                    //visitService.sendDataVisitReprogramming(data, widget.code);
-                    //Navigator.pop(context);
-                    // Aquí puedes agregar la lógica para guardar la nueva fecha y el motivo
-                  },
-                  child: const Text('Guardar'),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }*/
 }

@@ -84,7 +84,7 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
   }
 
   void startPeriodicFetch() {
-    _timer = Timer.periodic(Duration(minutes: 1), (Timer timer) {
+    _timer = Timer.periodic(Duration(seconds: 5), (Timer timer) {
       fetchMessages();
     });
   }
@@ -223,7 +223,6 @@ class _ChatScreenState extends State<ChatScreen> with WidgetsBindingObserver {
         commentatorType: "",
         commentatorId: 17, // Example ID
         comment: text,
-        deletedAt: null,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

@@ -11,3 +11,23 @@ Repuestos por visita y presupuesto
 include con partrequest
 
 tickets/idTicket?include=partRequest
+
+-20/12/2024
+-imagenes de cierre*
+-imagenes de presupuesto*
+-imagenes de factura*
+-boton de compra*
+-validar los provider de diagnostic imagenes
+-reubicar el login con one-signal
+-manejo de payload de notificaciones
+-loadings en la peticion de Repuestos
+-update de info de usuarios
+-loadings
+-modales de confirmación
+-72 horas cuando se acepta el ticket , mostrar solo 3 dias habiles a partir del dia de la llamada de servicio
+-blacklist
+-Validar 3 reprogramaciones por visita y deshabilitar el botón
+-Alimentar home y redirigir a la lista de servicios
+-No se puede hacer update de la solicitud de repuestos
+-Botón de agregar nueva visita
+-Hora en el datepicker
