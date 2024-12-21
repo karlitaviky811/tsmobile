@@ -366,9 +366,14 @@ class _RepairLogCardState extends State<RepairLogCard> {
                         if (widget.type == 'Nuevo') {
                           var createVisit =
                               await serviceVisit.sendDataVisit(dataVisit);
+
+                                 _loadTabulators();
+                                _fetchPartRequests();
                         } else {
                           var res = await serviceVisit.sendUpdateDataVisit(
                               data, widget.visit.id);
+                                 _loadTabulators();
+                                  _fetchPartRequests();
                         }
                       },
                       icon: const Icon(Icons.save, color: Colors.white),

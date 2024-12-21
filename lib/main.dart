@@ -9,6 +9,7 @@ import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/image_provider_close_ticket.dart';
 import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
+import 'package:tsmobile/src/providers/image_provider_new.dart';
 import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
 import 'package:tsmobile/src/providers/images_provider.dart';
@@ -22,7 +23,7 @@ import 'package:tsmobile/src/routes/router_app.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
-import 'package:tsmobile/src/widgets/image_uploader_invoice_spare_parts.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_uploader_invoice_spare_parts.dart';
 // Importa la pantalla de splash
 
 Future<void> main() async {
@@ -96,6 +97,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ImageProviderSpareParts()),
         ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalBuySpareParts()),
         ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalInvoice()),
+        ChangeNotifierProvider(create: (_)=> ImageProviderSparePartsNew()),
         
         ChangeNotifierProvider(
             create: (_) => ImageProviderCloseTicketManagement())

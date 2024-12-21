@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
-import 'package:tsmobile/src/widgets/buy_spare_part.dart';
+import 'package:tsmobile/src/widgets/buy_spare_parts/buy_spare_part.dart';
 import 'dart:io';
 import 'package:tsmobile/src/widgets/repair_log_thumbnails.dart';
 

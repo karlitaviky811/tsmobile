@@ -7,15 +7,15 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
-import 'package:tsmobile/src/widgets/image_uploader_buy_spare_part_technical.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 
-class BuySparePart extends StatefulWidget {
+class BuySparePartInitial extends StatefulWidget {
   final Map<String, dynamic> reparacion;
   final int visitId;
   final String name;
   final String observation;
 
-  BuySparePart({
+  BuySparePartInitial({
     required this.reparacion,
     required this.visitId,
     required this.name,
@@ -26,11 +26,12 @@ class BuySparePart extends StatefulWidget {
   _BuySparePartState createState() => _BuySparePartState();
 }
 
-class _BuySparePartState extends State<BuySparePart> {
+class _BuySparePartState extends State<BuySparePartInitial> {
   final ImagePicker _picker = ImagePicker();
   List<String> imagePaths = [];
   late Map<String, dynamic> reparacion;
   late List<ImageData> _imagesSend = [];
+  
   @override
   void initState() {
     super.initState();
@@ -41,14 +42,16 @@ class _BuySparePartState extends State<BuySparePart> {
   Future<void> _pickImage(BuildContext context, String imageType) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        if (imagePaths.length < 5) {
-          imagePaths.add(pickedFile.path);
-          reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
-        } else {
-          _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (imagePaths.length < 5) {
+            imagePaths.add(pickedFile.path);
+            reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
+          } else {
+            _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
+          }
+        });
+      }
     }
   }
 
@@ -57,7 +60,7 @@ class _BuySparePartState extends State<BuySparePart> {
     String? token = prefs.getString('auth_token');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=budget'),
+          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -67,9 +70,11 @@ class _BuySparePartState extends State<BuySparePart> {
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body)['data'];
-      setState(() {
-        _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
-      });
+      if (mounted) {
+        setState(() {
+          _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
+        });
+      }
     } else {
       print('Error fetching images: ${response.statusCode}');
     }
@@ -103,6 +108,10 @@ class _BuySparePartState extends State<BuySparePart> {
         for (String path in imagePaths) {
           await sendFile(path, 'PartRequest',
               jsonResponse['data']['id'].toString(), 'budget');
+        }
+
+        if (mounted) {
+          setState(() {});
         }
 
         Fluttertoast.showToast(
@@ -165,7 +174,7 @@ class _BuySparePartState extends State<BuySparePart> {
       'status': 6,
       'budget_amount': reparacion['montoRepuesto'],
     };
-
+//cuidado con el perro
     await sendUpdateDataVisitPartRequestPresupuest(data, widget.visitId, []);
   }
 
@@ -186,22 +195,11 @@ class _BuySparePartState extends State<BuySparePart> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ExpansionTile(
-        title: Text('Compra de Repuesto'),
+        title: Text('Imagenes del repuesto solicitado'),
         children: [
-          TextField(
-            decoration: const InputDecoration(labelText: 'Costo del repuesto'),
-            onChanged: (value) {
-              setState(() {
-                reparacion['montoRepuesto'] = value;
-              });
-            },
-          ),
-          ElevatedButton(
-            onPressed: _submitForm,
-            child: const Text('Enviar presupuesto'),
-          ),
-          ImageUploaderBuySparePartTechnical(
+          ImageUploaderSpareParts(
             initialImages: _imagesSend,
+            showAddButton: false,
           )
         ],
       ),

@@ -1,47 +1,45 @@
-
-
-
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
 import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 
-
-class ImageUploaderInvoiceThecnical extends StatefulWidget {
+class ImageUploaderBuySparePartTechnical extends StatefulWidget {
   final List<ImageData> initialImages;
   final bool showAddButton; // Nuevo parámetro
 
-  ImageUploaderInvoiceThecnical({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
+  ImageUploaderBuySparePartTechnical({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
 
   @override
   _ImageUploaderSparePartsState createState() => _ImageUploaderSparePartsState();
 }
 
-class _ImageUploaderSparePartsState extends State<ImageUploaderInvoiceThecnical> {
+class _ImageUploaderSparePartsState extends State<ImageUploaderBuySparePartTechnical> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
-      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
+      if (mounted) {
+        final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+        imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
+      }
     });
   }
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
-      imageProvider.addImage(pickedFile.path);
+      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+      if (mounted) {
+        imageProvider.addImage(pickedFile.path);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ImageProviderTechnicalInvoice>(
+    return Consumer<ImageProviderTechnicalBuySpareParts>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +62,7 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderInvoiceThecnical>
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'Imágenes cargadas:',
+                      'Imágenes de presupuesto:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

@@ -17,11 +17,11 @@ tickets/idTicket?include=partRequest
 -imagenes de presupuesto*
 -imagenes de factura*
 -boton de compra*
--validar los provider de diagnostic imagenes
+-validar los provider de diagnostic imagenes - hecho
 -reubicar el login con one-signal
 -manejo de payload de notificaciones
 -loadings en la peticion de Repuestos
--update de info de usuarios
+-update de info de usuarios - hecho
 -loadings
 -modales de confirmación
 -72 horas cuando se acepta el ticket , mostrar solo 3 dias habiles a partir del dia de la llamada de servicio
@@ -30,4 +30,4 @@ tickets/idTicket?include=partRequest
 -Alimentar home y redirigir a la lista de servicios
 -No se puede hacer update de la solicitud de repuestos
 -Botón de agregar nueva visita
--Hora en el datepicker
+-Hora en el datepicker*****

@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
-import 'package:tsmobile/src/widgets/image_loader_close_ticket.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_loader_close_ticket.dart';
 
 class CloseTicketForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;

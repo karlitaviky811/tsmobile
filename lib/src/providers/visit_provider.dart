@@ -42,6 +42,8 @@ class VisitProvider with ChangeNotifier {
 
       if (visitsData.isEmpty) {
         print('No se encontraron visitas para el ticket.');
+        _visits = [];
+        notifyListeners();
         return [];
       }
 

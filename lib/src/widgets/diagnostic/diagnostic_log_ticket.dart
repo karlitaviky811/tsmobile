@@ -12,7 +12,7 @@ import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:http/http.dart' as http;
-import 'package:tsmobile/src/widgets/image_loader.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_loader.dart';
 
 class DiagnosticForm extends StatefulWidget {
   final Function(DateTime?, String, List<File>) onSave;

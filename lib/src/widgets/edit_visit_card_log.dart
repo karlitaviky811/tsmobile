@@ -3,8 +3,8 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
-import 'package:tsmobile/src/widgets/repair_log_card_original.dart';
-import 'package:tsmobile/src/widgets/request_part_visit.dart';
+import 'package:tsmobile/src/widgets/visits/repair_log_card_original.dart';
+import 'package:tsmobile/src/widgets/visits/request_part_visit.dart';
 
 class EditVisitPage extends StatefulWidget {
   final Visit visit;

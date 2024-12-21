@@ -1,58 +1,87 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
+import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
 
-
-class ImageUploaderBuySparePartTechnical extends StatefulWidget {
+class ImageUploaderInvoiceThecnical extends StatefulWidget {
   final List<ImageData> initialImages;
-  final bool showAddButton; // Nuevo parámetro
 
-  ImageUploaderBuySparePartTechnical({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
+  ImageUploaderInvoiceThecnical({Key? key, this.initialImages = const [], required bool showAddButton}) : super(key: key);
 
   @override
-  _ImageUploaderSparePartsState createState() => _ImageUploaderSparePartsState();
+  _ImageUploaderInvoiceThecnicalState createState() => _ImageUploaderInvoiceThecnicalState();
 }
 
-class _ImageUploaderSparePartsState extends State<ImageUploaderBuySparePartTechnical> {
+class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThecnical> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
       imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     });
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
-      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
-      imageProvider.addImage(pickedFile.path);
+      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
+      if (mounted) {
+        imageProvider.addImage(pickedFile.path);
+      }
     }
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Seleccionar desde la galería'),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Tomar una foto'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ImageProviderTechnicalBuySpareParts>(
+    return Consumer<ImageProviderTechnicalInvoice>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.showAddButton) // Mostrar condicionalmente el botón
-              ElevatedButton(
-                onPressed: _pickImage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff051937),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+            ElevatedButton.icon(
+              onPressed: () => _showPickerOptions(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xff051937),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
               ),
+              icon: const Icon(Icons.insert_drive_file, color: Colors.white),
+              label: const Text('Añadir fotos de la factura', style: TextStyle(color: Colors.white)),
+            ),
             if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

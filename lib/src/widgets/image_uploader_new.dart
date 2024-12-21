@@ -4,25 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
+import 'package:tsmobile/src/providers/image_provider_new.dart';
 import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 
-class ImageUploaderSpareParts extends StatefulWidget {
+class ImageUploaderSparePartsNew extends StatefulWidget {
   final List<ImageData> initialImages;
   final bool showAddButton;
 
-  ImageUploaderSpareParts({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
+  ImageUploaderSparePartsNew({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
 
   @override
-  _ImageUploaderSparePartsState createState() => _ImageUploaderSparePartsState();
+  _ImageUploaderSparePartsStateNew createState() => _ImageUploaderSparePartsStateNew();
 }
 
-class _ImageUploaderSparePartsState extends State<ImageUploaderSpareParts> {
+class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
+        final imageProvider = Provider.of<ImageProviderSparePartsNew>(context, listen: false);
         imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
       }
     });
@@ -31,14 +32,14 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderSpareParts> {
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null && mounted) {
-      final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
+      final imageProvider = Provider.of<ImageProviderSparePartsNew>(context, listen: false);
       imageProvider.addImage(pickedFile.path);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ImageProviderSpareParts>(
+    return Consumer<ImageProviderSparePartsNew>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +62,7 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderSpareParts> {
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'Imágenes cargadas:',
+                      'Imágenes de repuesto cargadas:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

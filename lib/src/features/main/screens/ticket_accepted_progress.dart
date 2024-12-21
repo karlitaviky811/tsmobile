@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
-import 'package:tsmobile/src/interfaces/ticket.dart';
-import 'package:tsmobile/src/models/visit_model.dart';
+
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
-import 'package:tsmobile/src/widgets/close_ticket_form.dart';
-import 'package:tsmobile/src/widgets/repair_log_form.dart';
+import 'package:tsmobile/src/widgets/close_ticket/close_ticket_form.dart';
+
+import 'package:tsmobile/src/widgets/visits/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
-import '../../../widgets/diagnostic_log_ticket.dart';
+import '../../../widgets/diagnostic/diagnostic_log_ticket.dart';
 import 'package:geocoding/geocoding.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
