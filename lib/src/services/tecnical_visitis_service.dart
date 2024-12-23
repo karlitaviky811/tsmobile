@@ -55,10 +55,9 @@ class VisitService {
         body: json.encode(data),
       );
 
-     
-    final responseBody = json.decode(response.body);
-    print('response $responseBody');
-    if (responseBody['status'] == true) {
+      final responseBody = json.decode(response.body);
+      print('response $responseBody');
+      if (responseBody['status'] == true) {
         print('Datos enviados exitosamente.');
         return true;
       } else {
@@ -68,7 +67,7 @@ class VisitService {
       }
     } catch (e) {
       print('Error al enviar la solicitud: $e');
-        return false;
+      return false;
     }
   }
 
@@ -130,7 +129,8 @@ class VisitService {
       List<dynamic> visitsData = body['visits'];
 
       // Mapear cada elemento de visitsData a un objeto Visit
-      List<Visit> visits =visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
+      List<Visit> visits =
+          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
 
       return visits;
     } else {
@@ -171,11 +171,11 @@ class VisitService {
     }
   }
 
-  Future<bool> sendUpdateDataVisitPartRequest(
+  Future<void> sendUpdateDataVisitPartRequest(
       Map<String, dynamic> data, int idTicket, List<File> images) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl');
+    print('data $data $apiUrl $images');
     try {
       final response = await http.post(
         Uri.parse('http://3.137.100.242:3000/api/v1/part-requests'),
@@ -187,51 +187,43 @@ class VisitService {
         body: json.encode(data),
       );
 
-    
-      var jsonResponse = jsonDecode(response.body);
-        print('response ${response} ${jsonResponse['status'] == true}');
-      if (jsonResponse['success'] == true) {
-        print(
-            'repuesto solicitado éxitosamente ${jsonResponse} ${jsonResponse['data']['id']}');
-        // Enviar imágenes
-        for (File image in images) {
-          await sendFile(image, 'PartRequest',
-              jsonResponse['data']['id'].toString(), 'part');
-        }
+       if (response.statusCode == 200) {
+        print('Datos guardados exitosamente.');
 
         Fluttertoast.showToast(
-            msg: "Solicitud de repuesto creada exitosamente",
+            msg: "Datos guardados exitosamente",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.green,
             textColor: Colors.white,
             fontSize: 16.0);
-        return true;
+        // Enviar imágenes
+        for (File image in images) {
+          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+        }
+
+
       } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
         Fluttertoast.showToast(
-            msg: "Error al crear la solicitud",
+            msg: "Error al guardar los datos",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        return false;
+        print('Respuesta del servidor: ${response.body}');
       }
     } catch (e) {
-      print('Error al enviar la solicitud: $e');
       Fluttertoast.showToast(
-          msg: "Error al crear la solicitud",
+          msg: "Error al enviar la solicitud",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      return false;
     }
   }
 

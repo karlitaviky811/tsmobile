@@ -4,8 +4,11 @@ import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
+import 'package:tsmobile/src/providers/image_provider_new.dart';
+import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/services/send_file_service.dart';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
@@ -42,7 +45,8 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final response = await http.get(
-      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -50,10 +54,10 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
       },
     );
 
-      print('response ${response}');
-      var jsonResponse = jsonDecode(response.body);
+    print('response ${response}');
+    var jsonResponse = jsonDecode(response.body);
 
-      if (jsonResponse['success'] == true) {
+    if (jsonResponse['success'] == true) {
       List<dynamic> data = json.decode(response.body)['data'];
       return data.map((item) => ImageData.fromJson(item)).toList();
     } else {
@@ -66,11 +70,12 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
       Map<String, dynamic> data, int idTicket, List<String> imagePaths) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl');
+    print('data $data');
 
     try {
       final response = await http.put(
-        Uri.parse('http://3.137.100.242:3000/api/v1/part-requests/${widget.visitId}'),
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/part-requests/${widget.visitId}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -81,9 +86,8 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
       var jsonResponse = jsonDecode(response.body);
       print('response ${response} ${jsonResponse['success'] == true}');
 
-
-      if (jsonResponse['success'] == true) {
-        print('Presupuesto solicitado éxitosamente ${jsonResponse}');
+      if (response.statusCode == 200) {
+        print('Factura enviada éxitosamente ${jsonResponse}');
 
         // Enviar imágenes
         for (String path in imagePaths) {
@@ -91,8 +95,7 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
               jsonResponse['data']['id'].toString(), 'budget');
         }
 
-
-     Fluttertoast.showToast(
+        Fluttertoast.showToast(
             msg: "Presupuesto creado exitosamente",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
@@ -103,8 +106,6 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
         if (mounted) {
           setState(() {});
         }
-
-     
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
@@ -129,8 +130,7 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
           fontSize: 16.0);
     }
   }
-
- /* Future<void> sendFile(String path, String modelType, String modelId,
+  /* Future<void> sendFile(String path, String modelType, String modelId,
       String collectionName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -158,7 +158,11 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
       'budget_amount': reparacion['montoRepuesto'],
     };
 //cuidado con el perro
-    await sendUpdateDataVisitPartRequestPresupuest(data, widget.visitId, []);
+    final imageProvider =
+        Provider.of<ImageProviderSpareParts>(context, listen: false);
+    print('${imageProvider.newImagePaths} ${imageProvider.initialImagePaths}');
+    await sendUpdateDataVisitPartRequestPresupuest(
+        data, widget.visitId, imageProvider.newImagePaths);
   }
 
   void _showToast(BuildContext context, String message) {

@@ -23,7 +23,6 @@ import 'package:tsmobile/src/widgets/image_uploader_new.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 import 'package:tsmobile/src/widgets/invoice_spare_parts/invoice_spare_parts.dart';
 
-
 class RepuestoScreen extends StatefulWidget {
   final Visit visit;
 
@@ -207,6 +206,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
         Provider.of<ImageProviderSpareParts>(context, listen: false);
     List<String> imagePaths = imageProvider.newImagePaths;
     List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+    print('images $imageFiles');
     var serviceVisit = VisitService();
     var res = await serviceVisit.sendUpdateDataVisitPartRequest(
         repuestos, widget.visit.id, imageFiles);
@@ -214,7 +214,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     setState(() {
       _isSubmitting = false; // Ocultar indicador de envío
     });
-    _fetchPartRequests();
+    //_fetchPartRequests();
     Navigator.pop(context); // Cerrar el modal después del envío
   }
 
@@ -391,7 +391,6 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                         ),
                                         if (request.status == 1)
                                           BuySparePartInitial(
-                                 
                                             name: _repuestoController.text,
                                             observation:
                                                 _comentariosGeneralesController
@@ -402,7 +401,8 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               'montoRepuesto':
                                                   request.budgetAmount,
                                               'presupuestoRepuesto': '',
-                                            }, visitId:3,
+                                            },
+                                            visitId: 3,
                                             //status: request.status,
                                           ),
                                         if (request.status == 5)
