@@ -23,7 +23,6 @@ import 'package:tsmobile/src/widgets/image_uploader_new.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 import 'package:tsmobile/src/widgets/invoice_spare_parts/invoice_spare_parts.dart';
 
-
 class RepuestoScreen extends StatefulWidget {
   final Visit visit;
 
@@ -41,9 +40,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   final ImagePicker _picker = ImagePicker();
   final Map<int, List<String>> _imagePaths = {};
   bool _isSubmitting = false;
-  bool _isImagePickerActive = false; 
-  TextEditingController _repuestoController = TextEditingController();
-  TextEditingController _comentariosGeneralesController =
+  bool _isImagePickerActive = false;
+  final TextEditingController _repuestoController = TextEditingController();
+  final TextEditingController _comentariosGeneralesController =
       TextEditingController();
   bool _isLoading = true; // Añadir estado de carga
   @override
@@ -52,7 +51,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     _fetchPartRequests();
   }
 
-   Future<void> _fetchPartRequests() async {
+  Future<void> _fetchPartRequests() async {
     setState(() {
       _isLoading = true;
     });
@@ -67,6 +66,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
         'Authorization': 'Bearer $token',
       },
     );
+
+    final responseBody = json.decode(response.body);
+    print('response $responseBody');
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       if (data.containsKey('data')) {
@@ -78,21 +81,33 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       }
     } else {
       print('Error fetching part requests: ${response.body}');
+      setState(() {
+        partRequests = [];
+      });
+      setState(() {
+        _isLoading = false;
+      });
     }
     setState(() {
       _isLoading = false;
     });
   }
 
-
-
-  void _pickImage(int index, ImageProviderSpareParts imageProvider) async { if (_isImagePickerActive) return; // No abrir si ya está activo 
-  _isImagePickerActive = true; 
-  try { final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery); 
-  if (pickedFile != null) { imageProvider.addImage(pickedFile.path); } } 
-  catch (e) { print('Error picking image: $e'); } 
-  finally { _isImagePickerActive = false; } }
-  
+  void _pickImage(int index, ImageProviderSpareParts imageProvider) async {
+    if (_isImagePickerActive) return; // No abrir si ya está activo
+    _isImagePickerActive = true;
+    try {
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        imageProvider.addImage(pickedFile.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    } finally {
+      _isImagePickerActive = false;
+    }
+  }
 
   void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -299,8 +314,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     }
   }
 
-  
- bool _isUrl(String path) {
+  bool _isUrl(String path) {
     try {
       Uri uri = Uri.parse(path);
       return uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
@@ -308,10 +322,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       return false;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-    
       body: Container(
         width: double.infinity,
         child: Card(
@@ -358,18 +372,23 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                           ListTile(
                                             leading: Icon(
                                               Icons.build,
-                                              color: _getChipColor(request.status),
+                                              color:
+                                                  _getChipColor(request.status),
                                             ),
                                             title: Text(
-                                              request.name ?? 'Repuesto Desconocido',
-                                              style: AppStyle.txtPoppinsRegular12Gray,
+                                              request.name ??
+                                                  'Repuesto Desconocido',
+                                              style: AppStyle
+                                                  .txtPoppinsRegular12Gray,
                                             ),
                                             subtitle: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   request.observation,
-                                                  style: AppStyle.txtPoppinsRegular12Gray,
+                                                  style: AppStyle
+                                                      .txtPoppinsRegular12Gray,
                                                 ),
                                                 /*Consumer<ImageProviderSpareParts>(
                                                   builder: (context, imageProvider, child) {
@@ -387,30 +406,41 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                             trailing: Chip(
                                               label: Text(
                                                 _getStatusLabel(request.status),
-                                                style: const TextStyle(color: Colors.white),
+                                                style: const TextStyle(
+                                                    color: Colors.white),
                                               ),
-                                              backgroundColor: _getChipColor(request.status),
+                                              backgroundColor:
+                                                  _getChipColor(request.status),
                                               avatar: Icon(
                                                 _getChipIcon(request.status),
                                                 color: Colors.white,
                                               ),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(25.0),
-                                                side: const BorderSide(color: Colors.transparent),
+                                                borderRadius:
+                                                    BorderRadius.circular(25.0),
+                                                side: const BorderSide(
+                                                    color: Colors.transparent),
                                               ),
                                             ),
                                             onTap: () {
-                                              final imageProvider = Provider.of<ImageProviderSpareParts>(context, listen: false);
+                                              final imageProvider = Provider.of<
+                                                      ImageProviderSpareParts>(
+                                                  context,
+                                                  listen: false);
                                               _pickImage(index, imageProvider);
                                             },
                                           ),
                                           if (request.status == 1)
                                             BuySparePartInitial(
                                               name: _repuestoController.text,
-                                              observation: _comentariosGeneralesController.text,
+                                              observation:
+                                                  _comentariosGeneralesController
+                                                      .text,
                                               reparacion: {
-                                                'nombreRepuesto': request.name ?? '',
-                                                'montoRepuesto': request.budgetAmount,
+                                                'nombreRepuesto':
+                                                    request.name ?? '',
+                                                'montoRepuesto':
+                                                    request.budgetAmount,
                                                 'presupuestoRepuesto': '',
                                               },
                                               visitId: request.id,
@@ -422,12 +452,20 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                                 BuySparePartPresupuest(
                                                   visitId: request.id,
                                                   status: 1,
-                                                  name: _repuestoController.text,
-                                                  montoRepuesto: request.budgetAmount ?? 0.0,
-                                                  observation: _comentariosGeneralesController.text,
+                                                  name:
+                                                      _repuestoController.text,
+                                                  montoRepuesto:
+                                                      request.budgetAmount ??
+                                                          0.0,
+                                                  observation:
+                                                      _comentariosGeneralesController
+                                                          .text,
                                                   reparacion: {
-                                                    'nombreRepuesto': request.name ?? '',
-                                                    'montoRepuesto': request.budgetAmount ?? 0.0,
+                                                    'nombreRepuesto':
+                                                        request.name ?? '',
+                                                    'montoRepuesto':
+                                                        request.budgetAmount ??
+                                                            0.0,
                                                     'presupuestoRepuesto': '',
                                                   },
                                                   //status: request.status,
@@ -459,5 +497,4 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       ),
     );
   }
-  
 }

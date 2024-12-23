@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
+import 'package:tsmobile/src/services/send_file_service.dart';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 
@@ -23,44 +24,25 @@ class BuySparePartInitial extends StatefulWidget {
   });
 
   @override
-  _BuySparePartState createState() => _BuySparePartState();
+  _BuySparePartInitialState createState() => _BuySparePartInitialState();
 }
 
-class _BuySparePartState extends State<BuySparePartInitial> {
+class _BuySparePartInitialState extends State<BuySparePartInitial> {
   final ImagePicker _picker = ImagePicker();
   List<String> imagePaths = [];
   late Map<String, dynamic> reparacion;
-  late List<ImageData> _imagesSend = [];
-  
+
   @override
   void initState() {
     super.initState();
-    _fetchImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
   }
 
-  Future<void> _pickImage(BuildContext context, String imageType) async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      if (mounted) {
-        setState(() {
-          if (imagePaths.length < 5) {
-            imagePaths.add(pickedFile.path);
-            reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
-          } else {
-            _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
-          }
-        });
-      }
-    }
-  }
-
-  Future<void> _fetchImages() async {
+  Future<List<ImageData>> _fetchImages() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
+      Uri.parse('http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -68,15 +50,15 @@ class _BuySparePartState extends State<BuySparePartInitial> {
       },
     );
 
-    if (response.statusCode == 200) {
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse['success'] == true) {
       List<dynamic> data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
-        });
-      }
+      return data.map((item) => ImageData.fromJson(item)).toList();
     } else {
       print('Error fetching images: ${response.statusCode}');
+      return [];
     }
   }
 
@@ -88,8 +70,7 @@ class _BuySparePartState extends State<BuySparePartInitial> {
 
     try {
       final response = await http.put(
-        Uri.parse(
-            'http://3.137.100.242:3000/api/v1/part-requests/${widget.visitId}'),
+        Uri.parse('http://3.137.100.242:3000/api/v1/part-requests/${widget.visitId}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -97,24 +78,21 @@ class _BuySparePartState extends State<BuySparePartInitial> {
         },
         body: json.encode(data),
       );
-
-      print('response ${response}');
       var jsonResponse = jsonDecode(response.body);
+      print('response ${response} ${jsonResponse['success'] == true}');
 
-      if (response.statusCode == 200) {
+
+      if (jsonResponse['success'] == true) {
         print('Presupuesto solicitado éxitosamente ${jsonResponse}');
 
         // Enviar imágenes
         for (String path in imagePaths) {
-          await sendFile(path, 'PartRequest',
+          await sendFile(File(path), 'PartRequest',
               jsonResponse['data']['id'].toString(), 'budget');
         }
 
-        if (mounted) {
-          setState(() {});
-        }
 
-        Fluttertoast.showToast(
+     Fluttertoast.showToast(
             msg: "Presupuesto creado exitosamente",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
@@ -122,6 +100,11 @@ class _BuySparePartState extends State<BuySparePartInitial> {
             backgroundColor: Colors.green,
             textColor: Colors.white,
             fontSize: 16.0);
+        if (mounted) {
+          setState(() {});
+        }
+
+     
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
@@ -147,7 +130,7 @@ class _BuySparePartState extends State<BuySparePartInitial> {
     }
   }
 
-  Future<void> sendFile(String path, String modelType, String modelId,
+ /* Future<void> sendFile(String path, String modelType, String modelId,
       String collectionName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -167,7 +150,7 @@ class _BuySparePartState extends State<BuySparePartInitial> {
     } else {
       print('Error al enviar archivo: ${response.statusCode}');
     }
-  }
+  }*/
 
   Future<void> _submitForm() async {
     final data = {
@@ -192,17 +175,31 @@ class _BuySparePartState extends State<BuySparePartInitial> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ExpansionTile(
-        title: Text('Imagenes del repuesto solicitado'),
-        children: [
-          ImageUploaderSpareParts(
-            initialImages: _imagesSend,
-            showAddButton: false,
-          )
-        ],
-      ),
+    return FutureBuilder<List<ImageData>>(
+      future: _fetchImages(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No hay imágenes disponibles.'));
+        } else {
+          final images = snapshot.data!;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ExpansionTile(
+              title: Text('Imagenes del repuesto solicitado'),
+              children: [
+                ImageUploaderSpareParts(
+                  initialImages: images,
+                  showAddButton: false,
+                )
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 }

@@ -10,11 +10,13 @@ import 'package:http/http.dart' as http;
 class VisitProvider with ChangeNotifier {
   final VisitService _visitService = VisitService();
   List<Visit> _visits = [];
+Visit? _visitData;
   bool _isLoading = false;
   String? _errorMessage;
   List<Repuesto> _repuestos = [];
   List<Repuesto> get repuestos => _repuestos;
   List<Visit> get visits => _visits;
+ Visit? get visitData => _visitData;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -54,6 +56,45 @@ class VisitProvider with ChangeNotifier {
     } else {
       print('Error al obtener las visitas: ${response.statusCode}');
       throw Exception('Failed to load visits for ticket');
+    }
+  }
+
+  Future<void> fetchVisitById(String visitId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits/$visitId'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['success'] == true) {
+          // Decodificar el cuerpo de la respuesta
+          Map<String, dynamic> body = jsonResponse['data'];
+
+          // Obtener la visita desde la propiedad 'data'
+          Visit visitData = Visit.fromJson(body);
+
+          if (visitData != null) {
+            print('Visita encontrada y cargada.');
+            _visitData = visitData;
+            notifyListeners();
+          }
+        } else {
+          print('Error al obtener la visita: ${jsonResponse['message']}');
+        }
+      } else {
+        print('Error al obtener la visita: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error al obtener la visita: $e');
     }
   }
 

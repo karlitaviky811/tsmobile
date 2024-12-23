@@ -40,7 +40,7 @@ class VisitService {
     }
   }
 
-  Future<void> sendDataVisit(Map<String, dynamic> data) async {
+  Future<bool> sendDataVisit(Map<String, dynamic> data) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     print('data $data');
@@ -55,17 +55,20 @@ class VisitService {
         body: json.encode(data),
       );
 
-      print('response ${response}');
-      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-
-      if (jsonResponse['sucess'] == true) {
+     
+    final responseBody = json.decode(response.body);
+    print('response $responseBody');
+    if (responseBody['status'] == true) {
         print('Datos enviados exitosamente.');
+        return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
         print('Respuesta del servidor: ${response.body}');
+        return false;
       }
     } catch (e) {
       print('Error al enviar la solicitud: $e');
+        return false;
     }
   }
 
@@ -89,7 +92,7 @@ class VisitService {
       );
 
       final responseBody = json.decode(response.body);
-      print('response $responseBody');
+      print('response ${responseBody['success']}');
 
       if (responseBody['success'] == true) {
         print('Datos enviados exitosamente.');
@@ -154,7 +157,7 @@ class VisitService {
       print('response ${response}');
       var jsonResponse = jsonDecode(response.body);
 
-      if (response.statusCode == 200) {
+      if (jsonResponse['status'] == true) {
         print('Datos enviados exitosamente.');
         return true;
       } else {
@@ -184,10 +187,10 @@ class VisitService {
         body: json.encode(data),
       );
 
-      print('response ${response}');
+    
       var jsonResponse = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
+        print('response ${response} ${jsonResponse['status'] == true}');
+      if (jsonResponse['success'] == true) {
         print(
             'repuesto solicitado éxitosamente ${jsonResponse} ${jsonResponse['data']['id']}');
         // Enviar imágenes

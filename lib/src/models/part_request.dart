@@ -7,7 +7,7 @@ class Repuesto {
   final String? name;
   final String observation;
   final DateTime? dateHanded;
-  final String? meta;
+  final List<String>? meta; // Cambiar a List<String>?
   final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -31,15 +31,15 @@ class Repuesto {
     return Repuesto(
       id: json['id'],
       status: json['status'] ?? 1,
-      technicalVisitId: json['technical_visit_id']  ?? '',
+      technicalVisitId: json['technical_visit_id'] ?? '',
       name: json['name'] ?? '',
       observation: json['observation'] != null ? json['observation'] : 'Sin nombre de repuesto',
       dateHanded: json['date_handed'] != null ? DateTime.parse(json['date_handed']) : null,
-      meta: json['meta'],
+      meta: json['meta'] != null ? List<String>.from(json['meta']) : null, // Ajustar a List<String>?
       deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      budgetAmount: json['budget_amount'] != null ? (json['budget_amount'] as num).toDouble() : null,    
-      );
+      budgetAmount: json['budget_amount'] != null ? (json['budget_amount'] as num).toDouble() : null,
+    );
   }
 }
