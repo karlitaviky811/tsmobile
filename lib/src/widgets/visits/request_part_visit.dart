@@ -451,7 +451,8 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               visitId: request.id,
                                               //status: request.status,
                                             ),
-                                          if (request.status == 5 || request.status == 6)
+                                          if (request.status == 5 ||
+                                              request.status == 6)
                                             Column(
                                               children: [
                                                 BuySparePartPresupuest(
@@ -484,8 +485,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                             ),
                                           if (request.status == 8)
                                             InvoiceSparePartFinal(
-                                              visitId: request.id,
+                                              requestId: request.id.toString(),
                                               initialImages: [],
+                                              budgetAmount:
+                                              request.budgetAmount ?? 0.0,
                                             ),
                                         ],
                                       ),

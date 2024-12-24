@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
@@ -13,12 +12,14 @@ import 'package:tsmobile/src/widgets/images_loaders/image_uploader_invoice_spare
 import 'package:http/http.dart' as http;
 
 class InvoiceSparePartFinal extends StatefulWidget {
-  final int visitId;
   final List<ImageData> initialImages;
+  final double budgetAmount;
+  final String requestId;
 
   InvoiceSparePartFinal({
-    required this.visitId,
     required this.initialImages,
+    required this.budgetAmount,
+    required this.requestId,
   });
 
   @override
@@ -29,168 +30,74 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
   List<ImageData> _partImages = [];
   List<ImageData> _budgetImages = [];
   List<ImageData> _invoiceImages = [];
-  double budgetAmount = 0.0;
+  late double budgetAmount;
 
   @override
   void initState() {
     super.initState();
+    budgetAmount = widget.budgetAmount;
     _fetchImagesAndBudget();
   }
 
   Future<void> _fetchImagesAndBudget() async {
     try {
-      await getImagesForRequest1(widget.visitId, 'part', _partImages);
-      await getImagesForRequest2(widget.visitId, 'budget', _budgetImages);
-      await getImagesForRequest3(widget.visitId, 'invoice', _invoiceImages);
+      print('Fetching images and budget started');
+      await _getImagesForRequest(int.parse(widget.requestId), 'part', _partImages);
+      await _getImagesForRequest(int.parse(widget.requestId), 'budget', _budgetImages);
+      await _getImagesForRequest(int.parse(widget.requestId), 'invoice', _invoiceImages);
+      print('Fetched all images successfully.');
     } catch (e) {
       print('Error during fetch: $e');
       throw e; // Rethrow the exception after logging it
     }
   }
 
-  Future<void> getImagesForRequest1(
+  Future<void> _getImagesForRequest(
       int requestId, String collectionName, List<ImageData> targetList) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
     print('Fetching images for $collectionName...');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final response = await http
+        .get(
+          Uri.parse(
+              'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
+          headers: {
+            'Content-Type': 'application/json',
+            "Accept": "application/json",
+            'Authorization': 'Bearer $token',
+          },
+        )
+        .timeout(Duration(seconds: 15)); // Set a timeout for the request
 
     print('Response status for $collectionName: ${response.statusCode}');
-
-    var data = json.decode(response.body)['success'];
-
-    final responseBody = json.decode(response.body);
-    print('response $responseBody');
-
-    if (responseBody['status'] == true) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          targetList
-              .addAll(data.map((item) => ImageData.fromJson(item)).toList());
-        });
-        print('Images fetched for $collectionName: ${targetList.length}');
-      }
-    } else {
-      print(
-          'Error fetching images from $collectionName: ${response.statusCode}');
-    }
-  }
-
-  Future<void> getImagesForRequest2(
-      int requestId, String collectionName, List<ImageData> targetList) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    print('Fetching images for $collectionName...');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    print('Response status for $collectionName: ${response.statusCode}');
-
-    final responseBody = json.decode(response.body);
-    print('response $responseBody');
-    if (responseBody['status'] == true) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          targetList
-              .addAll(data.map((item) => ImageData.fromJson(item)).toList());
-        });
-        print('Images fetched for $collectionName: ${targetList.length}');
-      }
-    } else {
-      print(
-          'Error fetching images from $collectionName: ${response.statusCode}');
-    }
-  }
-
-  Future<void> getImagesForRequest3(
-      int requestId, String collectionName, List<ImageData> targetList) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    print('Fetching images for $collectionName...');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    print('Response status for $collectionName: ${response.statusCode}');
-
-    final responseBody = json.decode(response.body);
-    print('response $responseBody');
-    if (responseBody['status'] == true) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          targetList
-              .addAll(data.map((item) => ImageData.fromJson(item)).toList());
-        });
-        print('Images fetched for $collectionName: ${targetList.length}');
-      }
-    } else {
-      print(
-          'Error fetching images from $collectionName: ${response.statusCode}');
-    }
-  }
-
-  Future<void> getBudgetAmount(int requestId) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    print('Fetching budget amount...');
-    final response = await http.get(
-      Uri.parse('http://3.137.100.242:3000/api/v1/part-requests/$requestId'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
-
-    print('Response status for budget amount: ${response.statusCode}');
+    print('Response body for $collectionName: ${response.body}');
 
     if (response.statusCode == 200) {
-      var data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          budgetAmount = data['budget_amount']?.toDouble() ?? 0.0;
-        });
-        print('Budget amount fetched: $budgetAmount');
+      final jsonResponse = json.decode(response.body);
+      if (jsonResponse['success'] == true) {
+        List<dynamic> data = jsonResponse['data'];
+        if (data.isEmpty) {
+          print('No images found for $collectionName.');
+        } else if (mounted) {
+          setState(() {
+            targetList.addAll(data.map((item) => ImageData.fromJson(item)).toList());
+          });
+          print('Images fetched for $collectionName: ${targetList.length}');
+        }
+      } else {
+        print('Error fetching images from $collectionName: ${response.statusCode}');
       }
     } else {
-      print('Error fetching budget amount: ${response.statusCode}');
+      print('Error fetching images from $collectionName: ${response.statusCode}');
     }
   }
 
   Future<void> _submitForm() async {
-    final imageProvider =
-        Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
+    final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
     for (String path in imageProvider.newImagePaths) {
       await sendFile(
-          File(path), 'PartRequest', widget.visitId.toString(), 'invoice');
+          File(path), 'PartRequest', widget.requestId.toString(), 'invoice');
     }
 
     // Limpiar imágenes después de guardarlas
@@ -201,14 +108,17 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<void>(
       future: _fetchImagesAndBudget(),
       builder: (context, snapshot) {
+        print('Snapshot state: ${snapshot.connectionState} ${context}');
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
+          print('Error snapshot: ${snapshot.error}');
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
+          print('Images loaded successfully.');
           return ExpansionTile(
             title: const Text('Detalles de la compra del repuesto'),
             children: [
@@ -220,18 +130,24 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
                     if (budgetAmount > 0.0)
                       Text(
                           'Monto del Presupuesto: \$${budgetAmount.toStringAsFixed(2)}'),
-                    ImageUploaderSparePartsNew(
-                      initialImages: _partImages,
-                      showAddButton: false,
-                    ),
-                    ImageUploaderBuySparePartTechnical(
-                      initialImages: _budgetImages,
-                      showAddButton: false,
-                    ),
-                    ImageUploaderInvoiceThecnical(
-                      initialImages: _invoiceImages,
-                      showAddButton: false,
-                    ),
+                    _partImages.isEmpty
+                        ? Text('No se encontraron imágenes del repuesto solicitado.')
+                        : ImageUploaderSparePartsNew(
+                            initialImages: _partImages,
+                            showAddButton: false,
+                          ),
+                    _budgetImages.isEmpty
+                        ? Text('No se encontraron imágenes del presupuesto.')
+                        : ImageUploaderBuySparePartTechnical(
+                            initialImages: _budgetImages,
+                            showAddButton: false,
+                          ),
+                    _invoiceImages.isEmpty
+                        ? Text('No se encontraron imágenes de la factura.')
+                        : ImageUploaderInvoiceThecnical(
+                            initialImages: _invoiceImages,
+                            showAddButton: false,
+                          ),
                     Consumer<ImageProviderTechnicalInvoice>(
                       builder: (context, imageProvider, child) {
                         return ElevatedButton.icon(

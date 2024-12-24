@@ -130,27 +130,6 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
           fontSize: 16.0);
     }
   }
-  /* Future<void> sendFile(String path, String modelType, String modelId,
-      String collectionName) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    var request = http.MultipartRequest(
-        'POST', Uri.parse('http://3.137.100.242:3000/api/v1/media'));
-    request.headers['Authorization'] = 'Bearer $token';
-    request.fields['model_type'] = modelType;
-    request.fields['model_id'] = modelId;
-    request.fields['collection_name'] = collectionName;
-    request.files.add(await http.MultipartFile.fromPath('file', path));
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      print('Archivo enviado correctamente');
-    } else {
-      print('Error al enviar archivo: ${response.statusCode}');
-    }
-  }*/
 
   Future<void> _submitForm() async {
     final data = {
@@ -187,13 +166,13 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No hay imágenes disponiblessssssss.'));
+          return const Center(child: const Text('No hay imágenes disponiblessssssss.'));
         } else {
           final images = snapshot.data!;
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ExpansionTile(
-              title: Text('Imagenes del repuesto solicitado'),
+              title: const Text('Imagenes del repuesto solicitado'),
               children: [
                 ImageUploaderSpareParts(
                   initialImages: images,
