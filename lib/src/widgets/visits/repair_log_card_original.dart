@@ -44,7 +44,6 @@ class _RepairLogCardState extends State<RepairLogCard> {
     _dateController = TextEditingController();
     _fetchVisitDetails();
     _fetchPartRequests();
-  
   }
 
   Color _getChipColor(int estado) {
@@ -104,7 +103,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
     final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
     final visitData = visitProvider.visitData;
     if (visitData != null) {
-        _loadTabulators();
+      _loadTabulators();
       setState(() {
         widget.visit = visitData;
         _tituloController.text = visitData.title;
@@ -155,6 +154,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
   Future<void> _fetchPartRequests() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+
+    print('token ${widget.visit.id}');	
     final response = await http.get(
       Uri.parse(
           'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
@@ -337,7 +338,12 @@ class _RepairLogCardState extends State<RepairLogCard> {
                             'ticket_id': widget.ticketId
                           };
 
-                          if (widget.type == 'Agregar Nueva Visita') {
+                          var createVisit =
+                              await serviceVisit.sendDataVisit(dataVisit);
+                          await _fetchVisitDetails;
+                          await _loadTabulators();
+
+                          /*if (widget.type == 'Agregar Nueva Visita') {
                             var createVisit =
                                 await serviceVisit.sendDataVisit(dataVisit);
                             if (createVisit == true) {
@@ -370,7 +376,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                 backgroundColor: Colors.green,
                                 textColor: Colors.white,
                                 fontSize: 16.0);
-                          }
+                          } */
                         },
                         icon: const Icon(Icons.save, color: Colors.white),
                         label: const Text('Guardar',

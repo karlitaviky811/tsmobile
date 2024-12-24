@@ -171,11 +171,12 @@ class VisitService {
     }
   }
 
-  Future<void> sendUpdateDataVisitPartRequest(
-      Map<String, dynamic> data, int idTicket, List<File> images) async {
+  Future<bool> sendUpdateDataVisitPartRequest(
+      Map<String, dynamic> data, int idVisit, List<File> images) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl $images');
+    print('data $data $images $idVisit');
+
     try {
       final response = await http.post(
         Uri.parse('http://3.137.100.242:3000/api/v1/part-requests'),
@@ -187,9 +188,8 @@ class VisitService {
         body: json.encode(data),
       );
 
-       if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         print('Datos guardados exitosamente.');
-
         Fluttertoast.showToast(
             msg: "Datos guardados exitosamente",
             toastLength: Toast.LENGTH_SHORT,
@@ -198,13 +198,19 @@ class VisitService {
             backgroundColor: Colors.green,
             textColor: Colors.white,
             fontSize: 16.0);
-        // Enviar imágenes
+
+        // Verificar y enviar las imágenes
+          var jsonResponse = jsonDecode(response.body);
         for (File image in images) {
-          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+          if (await image.exists()) {
+            await sendFile(image, 'PartRequest', jsonResponse['data']['id'].toString(), 'part');
+          } else {
+            print('El archivo no existe: ${image.path}');
+          }
         }
-
-
+        return true;
       } else {
+        print('Respuesta del servidor: ${response.body}');
         Fluttertoast.showToast(
             msg: "Error al guardar los datos",
             toastLength: Toast.LENGTH_SHORT,
@@ -213,9 +219,10 @@ class VisitService {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        print('Respuesta del servidor: ${response.body}');
+        return false;
       }
     } catch (e) {
+      print('Error al enviar la solicitud: $e');
       Fluttertoast.showToast(
           msg: "Error al enviar la solicitud",
           toastLength: Toast.LENGTH_SHORT,
@@ -224,6 +231,7 @@ class VisitService {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
+      return false;
     }
   }
 

@@ -40,7 +40,7 @@ Future<void> sendFile(File file, String modelType, String modelId, String collec
 Future<void> sendFileSpareParts(File file, String modelType, String modelId, String collectionName) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? token = prefs.getString('auth_token');
-  
+  print('modeltype: $modelType $collectionName');
   final uri = Uri.parse('http://3.137.100.242:3000/api/v1/media');
   
   var request = http.MultipartRequest('POST', uri)

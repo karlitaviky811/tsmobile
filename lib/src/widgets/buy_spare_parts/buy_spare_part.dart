@@ -187,7 +187,7 @@ class _BuySparePartInitialState extends State<BuySparePartInitial> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No hay imágenes disponibles.'));
+          return Center(child: Text('No hay imágenes disponiblessssssss.'));
         } else {
           final images = snapshot.data!;
           return Padding(

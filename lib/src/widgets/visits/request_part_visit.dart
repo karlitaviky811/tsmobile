@@ -11,9 +11,11 @@ import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/models/visit_model.dart';
+import 'package:tsmobile/src/providers/image_provider_new.dart';
 import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
 import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
+import 'package:tsmobile/src/services/send_file_service.dart';
 
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:tsmobile/src/widgets/buy_spare_parts/buy_spare_part.dart';
@@ -191,6 +193,10 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   }
 
   Future<void> _submitForm() async {
+    final imageProvider =
+        Provider.of<ImageProviderSparePartsNew>(context, listen: false);
+    final List<File> imageFiles =
+        imageProvider.newImagePaths.map((path) => File(path)).toList();
     if (_repuestoController.text.isEmpty ||
         _comentariosGeneralesController.text.isEmpty) {
       _showToast('Por favor, complete todos los campos.');
@@ -201,26 +207,25 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       _isSubmitting = true; // Mostrar indicador de envío
     });
 
-    // Implementa tu lógica de guardado aquí await
-    Future.delayed(const Duration(seconds: 2));
-
     Map<String, dynamic> repuestos = {
       "technical_visit_id": widget.visit.id,
       "name": _repuestoController.text,
       "observation": _comentariosGeneralesController.text,
     };
-    final imageProvider =
-        Provider.of<ImageProviderSpareParts>(context, listen: false);
-    List<String> imagePaths = imageProvider.newImagePaths;
-    List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+
     var serviceVisit = VisitService();
+    print('iamges files ${imageFiles}');
+
     var res = await serviceVisit.sendUpdateDataVisitPartRequest(
         repuestos, widget.visit.id, imageFiles);
 
+    if (res) {
+      _fetchPartRequests();
+    }
     setState(() {
       _isSubmitting = false; // Ocultar indicador de envío
     });
-    _fetchPartRequests();
+
     Navigator.pop(context); // Cerrar el modal después del envío
   }
 
@@ -446,7 +451,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               visitId: request.id,
                                               //status: request.status,
                                             ),
-                                          if (request.status == 6)
+                                          if (request.status == 5 || request.status == 6)
                                             Column(
                                               children: [
                                                 BuySparePartPresupuest(

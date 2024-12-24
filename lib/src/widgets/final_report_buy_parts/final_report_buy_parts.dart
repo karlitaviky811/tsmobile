@@ -220,25 +220,13 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
                     if (budgetAmount > 0.0)
                       Text(
                           'Monto del Presupuesto: \$${budgetAmount.toStringAsFixed(2)}'),
-                    const Text(
-                      'Imágenes del Repuesto Solicitado',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     ImageUploaderSparePartsNew(
                       initialImages: _partImages,
                       showAddButton: false,
                     ),
-                    const Text(
-                      'Imágenes del Presupuesto',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
                     ImageUploaderBuySparePartTechnical(
                       initialImages: _budgetImages,
                       showAddButton: false,
-                    ),
-                    const Text(
-                      'Imágenes de la Factura',
-                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     ImageUploaderInvoiceThecnical(
                       initialImages: _invoiceImages,
