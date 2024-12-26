@@ -1,48 +1,3 @@
-import 'dart:ffi';
-
-import 'package:intl/intl.dart';
-
-class Reprogramming {
-  final String reason;
-  final DateTime newDate;
-  final String extendReason;
-  final DateTime oldDate;
-
-  Reprogramming({
-    required this.reason,
-    required this.newDate,
-    required this.extendReason,
-    required this.oldDate,
-  });
-  
-
-  factory Reprogramming.fromJson(Map<String, dynamic> json) {
-    return Reprogramming(
-      reason: json['reason'],
-      newDate: DateTime.parse(json['new_date']),
-      extendReason: json['extend_reason'],
-      oldDate: DateTime.parse(json['old_date']),
-    );
-  }
-
-    static DateTime _parseDate(String dateString) {
-    try {
-      // Intentar parsear el formato yyyy-MM-ddTHH:mm:ss
-      return DateTime.parse(dateString);
-    } catch (e) {
-      // Si falla, intentar con el formato dd/MM/yyyy
-      try {
-        return DateFormat('dd/MM/yyyy').parse(dateString);
-      } catch (e) {
-        throw FormatException("Invalid date format: $dateString");
-      }
-    }
-  }
-
-}
-
-
-
 class Visit {
   final int id;
   String title;
@@ -88,8 +43,8 @@ class Visit {
 
   factory Visit.fromJson(Map<String, dynamic> json) {
     var reprogrammingList = json['reprogramming'] != null &&
-            json['reprogramming']['other'] != null
-        ? json['reprogramming']['other'] as List<dynamic>
+            json['reprogramming'] is List
+        ? json['reprogramming'] as List<dynamic>
         : [];
 
     return Visit(
@@ -116,11 +71,64 @@ class Visit {
       imageReparacion: json['image_reparacion'] ?? '',
       necesitaRepuesto: json['necesitaRepuesto'] ?? false,
       services: List<String>.from(json['services'] ?? []),
-      selectedRepuestos: [],
-      selectedServicios: [],
+      selectedRepuestos: List<String>.from(json['selectedRepuestos'] ?? []),
+      selectedServicios: List<String>.from(json['selectedServicios'] ?? []),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'type': type,
+      'ticket_id': ticketId,
+      'visit_date': visitDate.toIso8601String(),
+      'observations': observations,
+      'reprogramming': reprogramming.map((item) => item.toJson()).toList(),
+      'meta': meta,
+      'deleted_at': deletedAt?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'status': status,
+      'image_solicitud': imageSolicitud,
+      'image_presupuesto': imagePresupuesto,
+      'image_reparacion': imageReparacion,
+      'necesitaRepuesto': necesitaRepuesto,
+      'services': services,
+      'selectedRepuestos': selectedRepuestos,
+      'selectedServicios': selectedServicios,
+    };
   }
 }
 
+class Reprogramming {
+  final String reason;
+  final DateTime newDate;
+  final String extendReason;
+  final DateTime oldDate;
 
+  Reprogramming({
+    required this.reason,
+    required this.newDate,
+    required this.extendReason,
+    required this.oldDate,
+  });
 
+  factory Reprogramming.fromJson(Map<String, dynamic> json) {
+    return Reprogramming(
+      reason: json['reason'],
+      newDate: DateTime.parse(json['new_date']),
+      extendReason: json['extend_reason'],
+      oldDate: DateTime.parse(json['old_date']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'reason': reason,
+      'new_date': newDate.toIso8601String(),
+      'extend_reason': extendReason,
+      'old_date': oldDate.toIso8601String(),
+    };
+  }
+}

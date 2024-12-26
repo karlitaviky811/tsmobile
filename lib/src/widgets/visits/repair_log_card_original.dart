@@ -37,6 +37,12 @@ class _RepairLogCardState extends State<RepairLogCard> {
   List<MultiSelectItem<String>> _items = [];
   final TabulatorService _tabulatorService = TabulatorService();
   List<Repuesto> partRequests = [];
+  bool _isEditing = false;
+  late Visit _initialVisit;
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+  bool _hasMoreData = true;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +50,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
     _dateController = TextEditingController();
     _fetchVisitDetails();
     _fetchPartRequests();
+    _loadTabulators();
   }
 
   Color _getChipColor(int estado) {
@@ -103,12 +110,13 @@ class _RepairLogCardState extends State<RepairLogCard> {
     final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
     final visitData = visitProvider.visitData;
     if (visitData != null) {
-      _loadTabulators();
       setState(() {
         widget.visit = visitData;
+        _initialVisit = Visit.fromJson(visitData.toJson()); // Store initial data
         _tituloController.text = visitData.title;
         _dateController.text =
             visitData.visitDate.toIso8601String().split('T')[0];
+        _initialValues = List<String>.from(visitData.selectedServicios); // Initialize with existing services
       });
     }
   }
@@ -135,19 +143,29 @@ class _RepairLogCardState extends State<RepairLogCard> {
   }
 
   Future<void> _loadTabulators() async {
-    final tabulatorData = await _tabulatorService.fetchTabulators();
+    if (_isLoadingMore || !_hasMoreData) return;
+
+    setState(() {
+      _isLoadingMore = true;
+    });
+
+    final tabulatorData = await _tabulatorService.fetchTabulators(page: _currentPage);
     if (tabulatorData != null && tabulatorData.containsKey('data')) {
       List<dynamic> data = tabulatorData['data'];
 
-      print('services ${widget.visit.services}');
+      if (!mounted) return; // Verificar si el widget sigue montado
+
       setState(() {
-        _items = data
-            .map(
-                (item) => MultiSelectItem<String>(item['n'], item['repuestos']))
-            .toList();
+        _items.addAll(data.map((item) => MultiSelectItem<String>(item['n'], item['repuestos'])).toList());
+        _currentPage++;
+        _isLoadingMore = false;
+        _hasMoreData = data.isNotEmpty;
       });
-      _initialValues =
-          widget.visit.services.map((service) => service.toString()).toList();
+    } else {
+      setState(() {
+        _isLoadingMore = false;
+        _hasMoreData = false;
+      });
     }
   }
 
@@ -155,7 +173,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    print('token ${widget.visit.id}');	
+    print('token ${widget.visit.id}');
     final response = await http.get(
       Uri.parse(
           'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
@@ -188,208 +206,243 @@ class _RepairLogCardState extends State<RepairLogCard> {
     }
   }
 
+  Future<void> _reloadVisits() async {
+    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    await visitProvider.fetchVisitsByTicket(widget.ticketId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SingleChildScrollView(
-      child: Container(
-        width: double.infinity,
-        child: Card(
-          color: Colors.white,
-          elevation: 20,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Chip(
-                          label: Text(_getChipLabel(widget.visit.status)),
-                          backgroundColor: _getChipColor(widget.visit.status),
-                          avatar: Icon(
-                            _getChipIcon(widget.visit.status),
-                            color: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          child: Card(
+            color: Colors.white,
+            elevation: 20,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Chip(
+                            label: Text(_getChipLabel(widget.visit.status)),
+                            backgroundColor: _getChipColor(widget.visit.status),
+                            avatar: Icon(
+                              _getChipIcon(widget.visit.status),
+                              color: Colors.white,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(25.0),
+                              side: const BorderSide(color: Colors.transparent),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(25.0),
-                            side: const BorderSide(color: Colors.transparent),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _tituloController,
-                      decoration: const InputDecoration(
-                        labelText: 'Título de la reparación',
-                        labelStyle:
-                            TextStyle(color: Colors.black54, fontSize: 16),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 1),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Color(0xff051937), width: 1),
-                        ),
+                        ],
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          widget.visit.title = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _dateController,
-                      decoration: InputDecoration(
-                        labelText: 'Fecha de reparación',
-                        labelStyle: const TextStyle(
-                            color: Colors.black54, fontSize: 16),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.calendar_today,
-                              color: Color(0xff051937)),
-                          onPressed: () => _selectDate(context),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _tituloController,
+                        decoration: const InputDecoration(
+                          labelText: 'Título de la visita',
+                          labelStyle:
+                              TextStyle(color: Colors.black54, fontSize: 16),
+                          filled: true,
+                          fillColor: Colors.white,
                         ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.grey, width: 1),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide:
-                              BorderSide(color: Color(0xff051937), width: 1),
-                        ),
-                      ),
-                      readOnly: true,
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Servicios',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              color: Colors.black54),
-                        ),
-                        MultiSelectDialogField(
-                          items: _items,
-                          title: const Text('Servicios realizados'),
-                          backgroundColor: Colors.white,
-                          selectedColor: const Color(0xff051937),
-                          buttonIcon:
-                              const Icon(Icons.list, color: Color(0xff051937)),
-                          buttonText: const Text(
-                            'Seleccione uno o más servicios',
-                            style: TextStyle(
-                                color: Color(0xff051937), fontSize: 16),
-                          ),
-                          initialValue: _initialValues,
-                          onConfirm: (values) {
-                            setState(() {
-                              _initialValues = values.cast<String>();
-                              widget.visit.selectedServicios = _initialValues;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 30),
-                    Center(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff051937),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 10),
-                        ),
-                        onPressed: () async {
-                          var serviceVisit = VisitService();
-                          Map<String, dynamic> params = {
-                            "services": widget.visit.selectedServicios,
-                            "spareparts":
-                                widget.visit.visitDate.toIso8601String(),
-                            "observations":
-                                'Probando el update de la visita deberian estar asociados los servicios por visita',
-                          };
-                          Map<String, dynamic> data = {
-                            "title": widget.visit.title,
-                            "visit_date":
-                                widget.visit.visitDate.toIso8601String(),
-                            "services": widget.visit.selectedServicios,
-                            "observations": widget.visit.observations,
-                            "tabulator_id": 50,
-                            "meta": jsonEncode(params)
-                          };
-                          final Map<String, dynamic> dataVisit = {
-                            'visit_date':
-                                widget.visit.visitDate.toIso8601String(),
-                            'title': widget.visit.title,
-                            "services": widget.visit.selectedServicios,
-                            'ticket_id': widget.ticketId
-                          };
-
-                          var createVisit =
-                              await serviceVisit.sendDataVisit(dataVisit);
-                          await _fetchVisitDetails;
-                          await _loadTabulators();
-
-                          /*if (widget.type == 'Agregar Nueva Visita') {
-                            var createVisit =
-                                await serviceVisit.sendDataVisit(dataVisit);
-                            if (createVisit == true) {
-                              await _fetchVisitDetails;
-                              await _loadTabulators();
-                            }
-
-                            Fluttertoast.showToast(
-                                msg:
-                                    "Detalles de la visita guardados exitosamente",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.green,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
-                          } else {
-                            var res = await serviceVisit.sendUpdateDataVisit(
-                                data, widget.visit.id);
-                            if (res == true) {
-                              await _fetchVisitDetails();
-                              await _loadTabulators();
-                            }
-
-                            Fluttertoast.showToast(
-                                msg: "Visita actualizada exitosamente",
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.green,
-                                textColor: Colors.white,
-                                fontSize: 16.0);
-                          } */
+                        onChanged: (value) {
+                          setState(() {
+                            widget.visit.title = value;
+                          });
                         },
-                        icon: const Icon(Icons.save, color: Colors.white),
-                        label: const Text('Guardar',
-                            style: TextStyle(color: Colors.white)),
+                        enabled: _isEditing || widget.type == 'Agregar Nueva Visita',
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _dateController,
+                        decoration: InputDecoration(
+                          labelText: 'Fecha de reparación',
+                          labelStyle: const TextStyle(
+                              color: Colors.black54, fontSize: 16),
+                          suffixIcon: IconButton(
+                            icon: const Icon(Icons.calendar_today,
+                                color: Color(0xff051937)),
+                            onPressed: () => _selectDate(context),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        readOnly: true,
+                        enabled: _isEditing || widget.type == 'Agregar Nueva Visita',
+                      ),
+                      const SizedBox(height: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Servicios',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black54),
+                          ),
+                          Container(
+                            constraints: BoxConstraints(
+                              maxHeight: 300, // Set the maximum height
+                            ),
+                            child: NotificationListener<ScrollNotification>(
+                              onNotification: (ScrollNotification scrollInfo) {
+                                if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent && !_isLoadingMore) {
+                                  _loadTabulators();
+                                }
+                                return true;
+                              },
+                              child: SingleChildScrollView(
+                                child: MultiSelectDialogField(
+                                  items: _items,
+                                  title: const Text('Servicios realizados'),
+                                  backgroundColor: Colors.white,
+                                  selectedColor: const Color(0xff051937),
+                                  buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
+                                  buttonText: const Text(
+                                    'Seleccione uno o más servicios',
+                                    style: TextStyle(
+                                        color: Color(0xff051937), fontSize: 16),
+                                  ),
+                                  initialValue: _initialValues,
+                                  onConfirm: (values) {
+                                    setState(() {
+                                      _initialValues = values.cast<String>();
+                                      widget.visit.selectedServicios = _initialValues;
+                                    });
+                                  },
+                                  searchable: true,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      color: (_isEditing || widget.type == 'Agregar Nueva Visita') ? Colors.grey : Colors.transparent,
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      Center(
+                        child: _isEditing || widget.type == 'Agregar Nueva Visita'
+                            ? ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
+                                ),
+                                onPressed: () async {
+                                  var serviceVisit = VisitService();
+                                  Map<String, dynamic> params = {
+                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialVisit.selectedServicios,
+                                    "spareparts":
+                                        widget.visit.visitDate.toIso8601String(),
+                                    "observations":
+                                        'Probando el update de la visita deberian estar asociados los servicios por visita',
+                                  };
+                                  Map<String, dynamic> data = {
+                                    "title": widget.visit.title,
+                                    "visit_date":
+                                        widget.visit.visitDate.toIso8601String(),
+                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
+                                    "observations": widget.visit.observations,
+                                    "tabulator_id": 50,
+                                    "meta": jsonEncode(params)
+                                  };
+                                  final Map<String, dynamic> dataVisit = {
+                                    'visit_date':
+                                        widget.visit.visitDate.toIso8601String(),
+                                    'title': widget.visit.title,
+                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
+                                    'ticket_id': widget.ticketId
+                                  };
+
+                                  if (widget.type == 'Agregar Nueva Visita') {
+                                    var createVisit =
+                                        await serviceVisit.sendDataVisit(dataVisit);
+                                    await _fetchVisitDetails();
+                                    await _loadTabulators();
+
+                                    Fluttertoast.showToast(
+                                        msg:
+                                            "Detalles de la visita guardados exitosamente",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                  } else {
+                                    var res = await serviceVisit.sendUpdateDataVisit(
+                                        data, widget.visit.id);
+                                    await _fetchVisitDetails();
+                                    await _loadTabulators();
+
+                                    Fluttertoast.showToast(
+                                        msg: "Visita actualizada exitosamente",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.BOTTOM,
+                                        timeInSecForIosWeb: 1,
+                                        backgroundColor: Colors.green,
+                                        textColor: Colors.white,
+                                        fontSize: 16.0);
+                                  }
+                                  await _reloadVisits(); // Recargar visitas después de guardar
+                                  setState(() {
+                                    _isEditing = false;
+                                  });
+                                },
+                                icon: const Icon(Icons.save, color: Colors.white),
+                                label: const Text('Guardar',
+                                    style: TextStyle(color: Colors.white)),
+                              )
+                            : ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 30, vertical: 10),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _isEditing = true;
+                                  });
+                                },
+                                icon: const Icon(Icons.edit, color: Colors.white),
+                                label: const Text('Editar',
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

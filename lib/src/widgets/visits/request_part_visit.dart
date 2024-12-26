@@ -46,6 +46,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
   final TextEditingController _repuestoController = TextEditingController();
   final TextEditingController _comentariosGeneralesController =
       TextEditingController();
+
   bool _isLoading = true; // Añadir estado de carga
   @override
   void initState() {
@@ -53,47 +54,47 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     _fetchPartRequests();
   }
 
-  Future<void> _fetchPartRequests() async {
-    setState(() {
-      _isLoading = true;
-    });
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+Future<void> _fetchPartRequests() async {
+  setState(() {
+    _isLoading = true;
+  });
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('auth_token');
+  final response = await http.get(
+    Uri.parse(
+        'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
 
-    final responseBody = json.decode(response.body);
-    print('response $responseBody');
+  final responseBody = json.decode(response.body);
+  print('response $responseBody');
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = jsonDecode(response.body);
-      if (data.containsKey('data')) {
-        final List<dynamic> partRequestsJson = data['data'];
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> data = jsonDecode(response.body);
+    if (data.containsKey('data')) {
+      final List<dynamic> partRequestsJson = data['data'];
+      if (mounted) {
         setState(() {
           partRequests =
               partRequestsJson.map((json) => Repuesto.fromJson(json)).toList();
+          _isLoading = false;
         });
       }
-    } else {
-      print('Error fetching part requests: ${response.body}');
+    }
+  } else {
+    print('Error fetching part requests: ${response.body}');
+    if (mounted) {
       setState(() {
         partRequests = [];
-      });
-      setState(() {
         _isLoading = false;
       });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
+}
 
   void _pickImage(int index, ImageProviderSpareParts imageProvider) async {
     if (_isImagePickerActive) return; // No abrir si ya está activo
@@ -192,7 +193,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     }
   }
 
-  Future<void> _submitForm() async {
+  Future<void> _submitForm2() async {
     final imageProvider =
         Provider.of<ImageProviderSparePartsNew>(context, listen: false);
     final List<File> imageFiles =
@@ -228,6 +229,80 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
 
     Navigator.pop(context); // Cerrar el modal después del envío
   }
+
+// Variable para manejar el estado de envío
+
+  void _submitForm() async {
+    setState(() {
+      _isSubmitting = true; // Mostrar indicador de carga
+    });
+
+    final imageProvider =
+        Provider.of<ImageProviderSparePartsNew>(context, listen: false);
+    final List<File> imageFiles =
+        imageProvider.newImagePaths.map((path) => File(path)).toList();
+    if (_repuestoController.text.isEmpty ||
+        _comentariosGeneralesController.text.isEmpty) {
+      _showToast('Por favor, complete todos los campos.');
+      return;
+    }
+    try {
+      // Simulación de envío de datos
+      // Aquí debes agregar tu lógica de envío, por ejemplo:
+      // final response = await sendRequest({...});
+
+      // Simular una breve espera para el ejemplo
+
+      var serviceVisit = VisitService();
+      print('iamges files ${imageFiles}');
+
+      Map<String, dynamic> repuestos = {
+        "technical_visit_id": widget.visit.id,
+        "name": _repuestoController.text,
+        "observation": _comentariosGeneralesController.text,
+      };
+      var res = await serviceVisit.sendUpdateDataVisitPartRequest(
+          repuestos, widget.visit.id, imageFiles);
+      // Luego de obtener la respuesta del servicio, limpiar los controladores
+      _repuestoController.clear();
+      _comentariosGeneralesController.clear();
+      // Limpiar las imágenes cargadas
+      Provider.of<ImageProviderSparePartsNew>(context, listen: false)
+          .clearImages();
+
+      // Mostrar un mensaje de éxito
+      Fluttertoast.showToast(
+        msg: "Solicitud enviada exitosamente",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Manejo de errores
+      print('Error al enviar la solicitud: $e');
+      Fluttertoast.showToast(
+        msg: "Error al enviar la solicitud",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } finally {
+      setState(() {
+        _isSubmitting = false; // Ocultar indicador de carga
+      });
+
+      // Cerrar el modal bottom sheet
+      Navigator.of(context).pop();
+    }
+  }
+
+
 
   void _openRepuestoForm() {
     showModalBottomSheet(
@@ -488,7 +563,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               requestId: request.id.toString(),
                                               initialImages: [],
                                               budgetAmount:
-                                              request.budgetAmount ?? 0.0,
+                                                  request.budgetAmount ?? 0.0,
                                             ),
                                         ],
                                       ),

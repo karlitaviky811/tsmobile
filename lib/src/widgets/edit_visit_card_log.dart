@@ -61,7 +61,7 @@ class _EditVisitPageState extends State<EditVisitPage> {
             title: Text(
                 widget.type == 'Nuevo'
                     ? 'Agregar Nueva Visita'
-                    : 'Editar Vista',
+                    : 'Editar Visita',
                 style: AppStyle.txtPoppinsRegular18Black),
             bottom: const TabBar(
               tabs: [
