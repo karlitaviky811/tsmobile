@@ -116,7 +116,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
         _tituloController.text = visitData.title;
         _dateController.text =
             visitData.visitDate.toIso8601String().split('T')[0];
-        _initialValues = List<String>.from(visitData.selectedServicios); // Initialize with existing services
+        _initialValues = List<String>.from(visitData.services); // Initialize with existing services
       });
     }
   }
@@ -354,7 +354,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                 onPressed: () async {
                                   var serviceVisit = VisitService();
                                   Map<String, dynamic> params = {
-                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialVisit.selectedServicios,
+                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
                                     "spareparts":
                                         widget.visit.visitDate.toIso8601String(),
                                     "observations":

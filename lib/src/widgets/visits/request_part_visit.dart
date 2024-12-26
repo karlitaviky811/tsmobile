@@ -531,7 +531,7 @@ Future<void> _fetchPartRequests() async {
                                             Column(
                                               children: [
                                                 BuySparePartPresupuest(
-                                                  visitId: request.id,
+                                                  requestId: request.id,
                                                   status: 1,
                                                   name:
                                                       _repuestoController.text,

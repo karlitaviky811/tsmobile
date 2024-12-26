@@ -15,7 +15,7 @@ import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.d
 
 class BuySparePartPresupuest extends StatefulWidget {
   final Map<String, dynamic> reparacion;
-  final int visitId;
+  final int requestId;
   final String name;
   final String observation;
   final double montoRepuesto;
@@ -23,7 +23,7 @@ class BuySparePartPresupuest extends StatefulWidget {
 
   BuySparePartPresupuest({
     required this.reparacion,
-    required this.visitId,
+    required this.requestId,
     required this.name,
     required this.observation,
     required this.montoRepuesto,
@@ -50,8 +50,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
     super.initState();
     _montoController =
         TextEditingController(text: widget.montoRepuesto.toString());
-    _fetchImages();
-    _fetchImagesBySparts();
+    _fetchAllImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
   }
 
@@ -78,12 +77,13 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
     }
   }
 
-  Future<void> _fetchImages() async {
+  Future<Map<String, List<ImageData>>> _fetchAllImages() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    final response = await http.get(
+
+    final budgetResponse = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=budget'),
+          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=budget'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -91,87 +91,87 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
       },
     );
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      if (mounted) {
-        setState(() {
-          _imagesInital = data.map((item) => ImageData.fromJson(item)).toList();
-        });
-      }
+    final partResponse = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=part'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (budgetResponse.statusCode == 200 && partResponse.statusCode == 200) {
+      List<dynamic> budgetData = json.decode(budgetResponse.body)['data'];
+      List<dynamic> partData = json.decode(partResponse.body)['data'];
+
+      return {
+        'budget': budgetData.map((item) => ImageData.fromJson(item)).toList(),
+        'part': partData.map((item) => ImageData.fromJson(item)).toList(),
+      };
     } else {
-      print('Error fetching images: ${response.statusCode}');
+      throw Exception('Error fetching images');
     }
   }
 
-  Future<void> _fetchImagesBySparts() async {
+  Future<void> sendUpdateDataVisitPartRequestPresupuest(
+      Map<String, dynamic> data, int idTicket, List<String> imagePaths) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.visitId}&collection_name=part'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
+    print('data $data');
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      setState(() {
-        _imagesInitalSpareParts =
-            data.map((item) => ImageData.fromJson(item)).toList();
-      });
-    } else {
-      print('Error fetching images: ${response.statusCode}');
-    }
-  }
+    try {
+      final response = await http.put(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/part-requests/${widget.requestId}'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
 
- Future<void> sendUpdateDataVisitPartRequestPresupuest(
-    Map<String, dynamic> data, int idTicket, List<String> imagePaths) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('auth_token');
-  print('data $data');
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
 
-  try {
-    final response = await http.put(
-      Uri.parse('http://3.137.100.242:3000/api/v1/part-requests/${widget.visitId}'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode(data),
-    );
+      if (response.statusCode == 200) {
+        print('Presupuesto solicitado éxitosamente ${jsonResponse}');
 
-    print('response ${response}');
-    var jsonResponse = jsonDecode(response.body);
+        // Enviar imágenes
+        for (String path in imagePaths) {
+          await sendFile(File(path), 'PartRequest',
+              jsonResponse['data']['id'].toString(), 'budget');
+        }
 
-    if (response.statusCode == 200) {
-      print('Presupuesto solicitado éxitosamente ${jsonResponse}');
+        if (mounted) {
+          setState(() {});
+        }
 
-      // Enviar imágenes
-      for (String path in imagePaths) {
-        await sendFile(File(path), 'PartRequest',
-            jsonResponse['data']['id'].toString(), 'budget');
+        Fluttertoast.showToast(
+            msg: "Presupuesto creado exitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print('Error al enviar los datos: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        Fluttertoast.showToast(
+            msg: "Error al enviar presupuesto",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
       }
-
-      if (mounted) { setState(() {}); }
-
+    } catch (e) {
+      print('Error al enviar la solicitud: $e');
       Fluttertoast.showToast(
-          msg: "Presupuesto creado exitosamente",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
-    } else {
-      print('Error al enviar los datos: ${response.statusCode}');
-      print('Respuesta del servidor: ${response.body}');
-      Fluttertoast.showToast(
-          msg: "Error al enviar presupuesto",
+          msg: "Error al crear la solicitud",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
@@ -179,20 +179,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
           textColor: Colors.white,
           fontSize: 16.0);
     }
-  } catch (e) {
-    print('Error al enviar la solicitud: $e');
-    Fluttertoast.showToast(
-        msg: "Error al crear la solicitud",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0);
   }
-}
-
- 
 
   Future<void> _submitForm() async {
     final data = {
@@ -207,13 +194,12 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
     List<String> imagePaths = imageProvider.newImagePaths;
     List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
     await sendUpdateDataVisitPartRequestPresupuest(
-        data, widget.visitId, imagePaths);
+        data, widget.requestId, imagePaths);
 
     // Realizar reload general y resetear el provider de las imágenes
     imageProvider.clearImages();
     setState(() {
-      _fetchImages();
-      _fetchImagesBySparts();
+      _fetchAllImages();
     });
   }
 
@@ -231,42 +217,58 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ExpansionTile(
-        title: Text('Compra de Repuesto'),
-        children: [
-          TextField(
-            controller: _montoController,
-            decoration: const InputDecoration(labelText: 'Costo del repuesto'),
-            keyboardType: TextInputType.number,
-            readOnly: widget.status ==
-                6, // Deshabilitar para edición si el estado es 6
-            onChanged: (value) {
-              if (mounted) {
-                setState(() {
-                  reparacion['montoRepuesto'] = value;
-                });
-              }
-            },
-          ),
-          ImageUploaderSpareParts(
-            initialImages: _imagesInitalSpareParts,
-            showAddButton: false,
-          ),
-          ImageUploaderBuySparePartTechnical(
-            initialImages: _imagesInital,
-            showAddButton:
-                widget.status != 7, // Ocultar botón si el estado es 6
-          ),
-          const SizedBox(height: 10),
-          if (widget.status != 7)
-            ElevatedButton(
-              onPressed: _submitForm,
-              child: const Text('Enviar presupuesto'),
+    return FutureBuilder<Map<String, List<ImageData>>>(
+      future: _fetchAllImages(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No hay imágenes disponibles.'));
+        } else {
+          final budgetImages = snapshot.data!['budget']!;
+          final partImages = snapshot.data!['part']!;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ExpansionTile(
+              title: const Text('Compra de Repuesto'),
+              children: [
+                ImageUploaderSpareParts(
+                  initialImages: partImages,
+                  showAddButton: false,
+                ),
+                TextField(
+                  controller: _montoController,
+                  decoration:
+                      const InputDecoration(labelText: 'Costo del repuesto'),
+                  keyboardType: TextInputType.number,
+                  readOnly: widget.status ==
+                      6, // Deshabilitar para edición si el estado es 6
+                  onChanged: (value) {
+                    if (mounted) {
+                      setState(() {
+                        reparacion['montoRepuesto'] = value;
+                      });
+                    }
+                  },
+                ),
+                ImageUploaderBuySparePartTechnical(
+                  initialImages: budgetImages,
+                  showAddButton:
+                      widget.status != 7, // Ocultar botón si el estado es 6
+                ),
+                const SizedBox(height: 10),
+                if (widget.status != 7)
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    child: const Text('Enviar presupuesto'),
+                  ),
+              ],
             ),
-        ],
-      ),
+          );
+        }
+      },
     );
   }
 }

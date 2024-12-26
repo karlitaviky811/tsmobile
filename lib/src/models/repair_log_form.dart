@@ -42,7 +42,7 @@ class RepairLog {
       titulo: json['titulo'] ?? 'Cambio de Pantalla',
       estado: json['estado'] ?? 'Solicitud de Repuesto',
       selectedDate: DateTime.parse(json['selectedDate']),
-      selectedServicios: List<String>.from(json['selectedServicios'] ?? []),
+      selectedServicios: List<String>.from(json['services'] ?? []),
       necesitaRepuesto: json['necesitaRepuesto'] ?? false,
       selectedRepuestos: List<String>.from(json['selectedRepuestos'] ?? []),
       presupuestoRepuesto: json['presupuestoRepuesto'] ?? '',

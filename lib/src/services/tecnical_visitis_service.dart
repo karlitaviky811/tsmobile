@@ -157,7 +157,7 @@ class VisitService {
       print('response ${response}');
       var jsonResponse = jsonDecode(response.body);
 
-      if (jsonResponse['status'] == true) {
+      if (jsonResponse['success'] == true) {
         print('Datos enviados exitosamente.');
         return true;
       } else {

@@ -124,9 +124,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                   buttonIcon: const Icon(Icons.list),
                   buttonText: const Text('Seleccione uno o más servicios'),
                   initialValue:
-                      widget.reparacion['selectedServicios'].cast<String>(),
+                      widget.reparacion['services'].cast<String>(),
                   onConfirm: (values) {
-                    widget.reparacion['selectedServicios'] = values.cast<String>();
+                    widget.reparacion['services'] = values.cast<String>();
                   },
                 ),
               ],

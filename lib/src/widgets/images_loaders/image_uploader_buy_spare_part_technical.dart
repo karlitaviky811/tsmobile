@@ -53,7 +53,7 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderBuySparePartTechn
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
+                child: const Text('Añadir imágenes presupuesto', style: TextStyle(color: Colors.white)),
               ),
             if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
               Column(
