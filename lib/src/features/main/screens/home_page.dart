@@ -1,3 +1,5 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,25 @@ class _HomeScreenState extends State<HomeScreen> {
   void main() async {
     final userService = new UserProvider();
     Future<void> fetchedUser = userService.obatinUserData();
+
+    await dotenv.load(fileName: ".env");
+    final oneSignalAppId = dotenv.env['APP_ID'];
+    String _debugLabelString = "";
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+
+    OneSignal.initialize(oneSignalAppId as String);
+    Future<void> taguser =
+    // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
+    // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
+    OneSignal.User.addAlias('external_id', "technical- userService.user['id']");
+    OneSignal.User.addTagWithKey('external_id', 'technical-20');
+    OneSignal.login('technical-20');
+    if ((OneSignal.User.pushSubscription.id == null)) {
+      OneSignal.Notifications.requestPermission(true);
+    }
+
     fetchedUser.then((_) {
       setState(() {
         user = userService.user;

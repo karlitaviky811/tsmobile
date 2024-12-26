@@ -18,6 +18,8 @@ class ImageUploaderSparePartsNew extends StatefulWidget {
 }
 
 class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew> {
+    bool _isPickerActive = false;
+      final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
@@ -29,11 +31,25 @@ class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew>
     });
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null && mounted) {
-      final imageProvider = Provider.of<ImageProviderSparePartsNew>(context, listen: false);
-      imageProvider.addImage(pickedFile.path);
+    Future<void> _pickImage() async {
+    if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
+
+    setState(() {
+      _isPickerActive = true;
+    });
+
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedFile != null && mounted) {
+        final imageProvider = Provider.of<ImageProviderSparePartsNew>(context, listen: false);
+        imageProvider.addImage(pickedFile.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    } finally {
+      setState(() {
+        _isPickerActive = false;
+      });
     }
   }
 

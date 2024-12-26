@@ -105,21 +105,20 @@ class _RepairLogCardState extends State<RepairLogCard> {
   }
 
   Future<void> _fetchVisitDetails() async {
-    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-    await visitProvider.fetchVisitById(widget.visit.id.toString());
-    final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
-    final visitData = visitProvider.visitData;
-    if (visitData != null) {
-      setState(() {
-        widget.visit = visitData;
-        _initialVisit = Visit.fromJson(visitData.toJson()); // Store initial data
-        _tituloController.text = visitData.title;
-        _dateController.text =
-            visitData.visitDate.toIso8601String().split('T')[0];
-        _initialValues = List<String>.from(visitData.services); // Initialize with existing services
-      });
-    }
+  final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+  await visitProvider.fetchVisitById(widget.visit.id.toString());
+  final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
+  final visitData = visitProvider.visitData;
+  if (visitData != null && mounted) {
+    setState(() {
+      widget.visit = visitData;
+      _initialVisit = Visit.fromJson(visitData.toJson()); // Store initial data
+      _tituloController.text = visitData.title;
+      _dateController.text = visitData.visitDate.toIso8601String().split('T')[0];
+      _initialValues = List<String>.from(visitData.services); // Initialize with existing services
+    });
   }
+}
 
   Future<void> fetchVisitsById() async {
     var providerVisit = Provider.of<VisitProvider>(context, listen: false);
@@ -376,8 +375,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
                                     'ticket_id': widget.ticketId
                                   };
-
-                                  if (widget.type == 'Agregar Nueva Visita') {
+                                  print('Data: ${widget.type}');
+                                  if (widget.type == 'Nuevo') {
                                     var createVisit =
                                         await serviceVisit.sendDataVisit(dataVisit);
                                     await _fetchVisitDetails();

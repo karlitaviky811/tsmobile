@@ -9,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 import 'package:tsmobile/src/services/send_file_service.dart';
-import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_buy_spare_part_technical.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 
@@ -19,7 +18,7 @@ class BuySparePartPresupuest extends StatefulWidget {
   final String name;
   final String observation;
   final double montoRepuesto;
-  final int status; // Agregando el parámetro status
+  final int status;
 
   BuySparePartPresupuest({
     required this.reparacion,
@@ -27,7 +26,7 @@ class BuySparePartPresupuest extends StatefulWidget {
     required this.name,
     required this.observation,
     required this.montoRepuesto,
-    required this.status, // Nuevo parámetro
+    required this.status,
   });
 
   @override
@@ -48,8 +47,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
   @override
   void initState() {
     super.initState();
-    _montoController =
-        TextEditingController(text: widget.montoRepuesto.toString());
+    _montoController = TextEditingController(text: widget.montoRepuesto.toString());
     _fetchAllImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
   }
@@ -67,8 +65,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
         setState(() {
           if (imagePaths.length < 5) {
             imagePaths.add(pickedFile.path);
-            reparacion[imageType] =
-                pickedFile.path; // Actualizar el mapa mutable
+            reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
           } else {
             _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
           }
@@ -240,11 +237,9 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                 ),
                 TextField(
                   controller: _montoController,
-                  decoration:
-                      const InputDecoration(labelText: 'Costo del repuesto'),
+                  decoration: const InputDecoration(labelText: 'Costo del repuesto'),
                   keyboardType: TextInputType.number,
-                  readOnly: widget.status ==
-                      6, // Deshabilitar para edición si el estado es 6
+                  readOnly: widget.status == 6, // Deshabilitar para edición si el estado es 6
                   onChanged: (value) {
                     if (mounted) {
                       setState(() {
@@ -255,8 +250,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                 ),
                 ImageUploaderBuySparePartTechnical(
                   initialImages: budgetImages,
-                  showAddButton:
-                      widget.status != 7, // Ocultar botón si el estado es 6
+                  showAddButton: widget.status != 7, // Ocultar botón si el estado es 6
                 ),
                 const SizedBox(height: 10),
                 if (widget.status != 7)

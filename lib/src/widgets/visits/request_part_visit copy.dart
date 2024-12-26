@@ -216,6 +216,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     });
     //_fetchPartRequests();
     Navigator.pop(context); // Cerrar el modal después del envío
+    _fetchPartRequests();
   }
 
   void _openRepuestoForm() {
@@ -409,7 +410,6 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                           Column(
                                             children: [
                                               BuySparePartPresupuest(
-                                                visitId: request.id,
                                                 status: 1,
                                                 name: _repuestoController.text,
                                                 montoRepuesto:
@@ -424,6 +424,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                                       request.budgetAmount,
                                                   'presupuestoRepuesto': '',
                                                 },
+                                                requestId: request.id,
                                                 //status: request.status,
                                               ),
                                               FutureBuilder<List<ImageData>>(
@@ -465,7 +466,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                             children: [
                                               BuySparePartPresupuest(
                                                 status: 6,
-                                                visitId: request.id,
+                                                requestId: request.id,
                                                 name: _repuestoController.text,
                                                 observation:
                                                     _comentariosGeneralesController
@@ -489,7 +490,8 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               initialImages: []),
                                         if (request.status == 8)
                                           InvoiceSparePartFinal(
-                                            budgetAmount: request.budgetAmount ?? 0.0,
+                                            budgetAmount:
+                                                request.budgetAmount ?? 0.0,
                                             requestId: request.id.toString(),
                                             initialImages: [],
                                           ),
