@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Visit {
   final int id;
   String title;
@@ -43,8 +45,9 @@ class Visit {
 
   factory Visit.fromJson(Map<String, dynamic> json) {
     var reprogrammingList = json['reprogramming'] != null &&
-            json['reprogramming'] is List
-        ? json['reprogramming'] as List<dynamic>
+            json['reprogramming']['other'] != null &&
+            json['reprogramming']['other'] is List
+        ? json['reprogramming']['other'] as List<dynamic>
         : [];
 
     return Visit(
@@ -84,7 +87,9 @@ class Visit {
       'ticket_id': ticketId,
       'visit_date': visitDate.toIso8601String(),
       'observations': observations,
-      'reprogramming': reprogramming.map((item) => item.toJson()).toList(),
+      'reprogramming': {
+        'other': reprogramming.map((item) => item.toJson()).toList(),
+      },
       'meta': meta,
       'deleted_at': deletedAt?.toIso8601String(),
       'created_at': createdAt.toIso8601String(),
@@ -130,5 +135,13 @@ class Reprogramming {
       'extend_reason': extendReason,
       'old_date': oldDate.toIso8601String(),
     };
+  }
+
+  String formattedNewDate() {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(newDate);
+  }
+
+  String formattedOldDate() {
+    return DateFormat('yyyy-MM-dd HH:mm:ss').format(oldDate);
   }
 }

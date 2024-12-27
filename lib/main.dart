@@ -25,9 +25,22 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:dart_pusher_channels/dart_pusher_channels.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_invoice_spare_parts.dart';
 // Importa la pantalla de splash
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
- 
+   tz.initializeTimeZones();
+
+  // Fecha y hora en UTC
+  final utcDateTime = tz.TZDateTime.parse(tz.UTC, '2024-12-28T18:30:00.000000Z');
+
+  // Zona horaria de Caracas
+  final caracas = tz.getLocation('America/Caracas');
+
+  // Convertir a la zona horaria de Caracas
+  final caracasDateTime = tz.TZDateTime.from(utcDateTime, caracas);
+
+  print(caracasDateTime);
   runApp(
     MultiProvider(
       providers: [
