@@ -329,7 +329,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
                       _saveDetailsUpdateReprogramming(
                           visit.id, visit, _selectedReason);
-                          Navigator.pop(context);
+
+                      // Close the loading dialog
                     },
                     child: const Text('Reprogramar Visita'),
                   ),
@@ -367,24 +368,30 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(visitDate);
 
     Map<String, dynamic> data = {
-      "new_date": visitDate.toString(),
+      "new_date": formattedDate,
       "extend_reason": reason,
       "reason": "3"
     };
     var visitService = VisitService();
-    Visit? visit = await visitService.sendDataVisitReprogramming(data, visitId.toString());
-    await visitProvider.fetchVisitsByTicket(widget.ticketId);
-    await ticketProvider.loadTicketById(widget.ticketId);
+    Visit? visit =
+        await visitService.sendDataVisitReprogramming(data, visitId.toString());
 
     if (visit != null) {
       // Maneja la visita recibida en la respuesta
       print('Visita recibida: ${visit.title}');
-      
     } else {
       print('Error al enviar y recibir la visita.');
     }
 
+    // Close the loading dialog
+    Navigator.pop(context);
 
+    await visitProvider.fetchVisitsByTicket(widget.ticketId);
+    await ticketProvider.loadTicketById(widget.ticketId);
+
+    if (mounted) {
+      _fetchVisits(); // Refrescar las visitas después de reprogramar
+    }
   }
 
   void _saveDetails(Visit newVisit) async {
@@ -420,6 +427,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     Navigator.pop(context); // Close the loading dialog
 
     if (visit != null) {
+      Navigator.pop(context); // Close the modal bottom sheet
+ // Close the loading dialog
       print('Visita recibida:');
     } else {
       print('Error al enviar y recibir la visita.');
@@ -558,7 +567,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                       ),
                                       IconButton(
                                         icon: Icon(Icons.delete),
-                                        onPressed: () => _eliminarVisita(index),
+                                        onPressed: () =>
+                                            _eliminarVisita(visit.id),
                                       ),
                                     ],
                                   ),
@@ -618,11 +628,59 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
   }
 
   void _eliminarVisita(int index) {
-    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-    visitProvider.deleteVisits(index);
-    setState(() {
-      visitProvider.visits.removeAt(index);
-    });
-    _fetchVisits();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar eliminación'),
+          content:
+              const Text('¿Estás seguro de que deseas eliminar esta visita?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancelar'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Aceptar'),
+              onPressed: () async {
+                Navigator.of(context)
+                    .pop(); // Cerrar el diálogo de confirmación
+
+                // Mostrar el diálogo de "Eliminando..." en un nuevo contexto
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext context) {
+                    return const AlertDialog(
+                      content: Row(
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(width: 20),
+                          Text("Eliminando..."),
+                        ],
+                      ),
+                    );
+                  },
+                );
+
+                final visitProvider =
+                    Provider.of<VisitProvider>(context, listen: false);
+                await visitProvider.deleteVisits(index);
+
+                // Usar un nuevo contexto para cerrar el diálogo de "Eliminando..."
+                if (mounted) {
+                  Navigator.of(context)
+                      .pop(); // Cerrar el diálogo de "Eliminando..."
+                }
+
+                _fetchVisits(); // Refrescar las visitas después de eliminar
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
