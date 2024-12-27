@@ -27,61 +27,7 @@ import 'package:tsmobile/src/widgets/images_loaders/image_uploader_invoice_spare
 // Importa la pantalla de splash
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
-  final oneSignalAppId = dotenv.env['APP_ID'];
-  String _debugLabelString = "";
-  WidgetsFlutterBinding.ensureInitialized();
-
-  await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-
-  OneSignal.initialize(oneSignalAppId as String);
-
-  // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
-  // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
-  OneSignal.User.addAlias('external_id', 'technical-20');
-  OneSignal.User.addTagWithKey('external_id', 'technical-20');
-  OneSignal.login('technical-20');
-  if ((OneSignal.User.pushSubscription.id == null)) {
-    OneSignal.Notifications.requestPermission(true);
-  }
-
-  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    print(
-        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
-
-    /// Display Notification, preventDefault to not display
-    event.preventDefault();
-
-    /// Do async work
-
-    /// notification.display() to display after preventing default
-    event.notification.display();
-  });
-  PusherChannelsPackageLogger.enableLogs();
-
-  const testOptions = PusherChannelsOptions.fromCluster(
-    scheme: 'wss',
-    cluster: 'mt1',
-    key: 'a0173cd5499b34d93109',
-    port: 443,
-  );
-  // Create an instance of PusherChannelsClient
-  final client = PusherChannelsClient.websocket(
-    options: testOptions,
-    // Connection exceptions are handled here
-    connectionErrorHandler: (exception, trace, refresh) async {
-      // This method allows you to reconnect if any error is occurred.
-      refresh();
-    },
-  );
-  PublicChannel myPublicChannel = client.publicChannel(
-    'public-channel',
-  );
-
-  StreamSubscription<ChannelReadEvent> somePublicChannelEventSubs =
-      myPublicChannel.bind('public-MyEvent').listen((event) {
-    print('Event from the public channel fired!');
-  });
+ 
   runApp(
     MultiProvider(
       providers: [

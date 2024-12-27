@@ -33,28 +33,29 @@ class _HomeScreenState extends State<HomeScreen> {
   void main() async {
     final userService = new UserProvider();
     Future<void> fetchedUser = userService.obatinUserData();
-
     await dotenv.load(fileName: ".env");
-    final oneSignalAppId = dotenv.env['APP_ID'];
-    String _debugLabelString = "";
-    WidgetsFlutterBinding.ensureInitialized();
-
     await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-
-    OneSignal.initialize(oneSignalAppId as String);
-    Future<void> taguser =
-    // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
-    // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
-    OneSignal.User.addAlias('external_id', "technical- userService.user['id']");
-    OneSignal.User.addTagWithKey('external_id', 'technical-20');
-    OneSignal.login('technical-20');
-    if ((OneSignal.User.pushSubscription.id == null)) {
-      OneSignal.Notifications.requestPermission(true);
-    }
-
     fetchedUser.then((_) {
       setState(() {
         user = userService.user;
+
+        final oneSignalAppId = dotenv.env['APP_ID'];
+        String _debugLabelString = "";
+        WidgetsFlutterBinding.ensureInitialized();
+
+        OneSignal.initialize(oneSignalAppId as String);
+          final String userTag = userService.user!.id.toString();
+        // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
+        // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
+        print('epa ${userService.user}');
+        if ((OneSignal.User.pushSubscription.id == null)) {
+          OneSignal.Notifications.requestPermission(true);
+          print('epa $userTag');
+        
+          //OneSignal.User.addAlias('external_id', "technical-userService.user!.id}");
+          //OneSignal.User.addTagWithKey('external_id', 'technical-userService.user!.id');
+          // OneSignal.login('technical-20');
+        }
       });
     });
   }

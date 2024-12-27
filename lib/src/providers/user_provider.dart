@@ -24,7 +24,7 @@ class UserProvider with ChangeNotifier {
       // Simular la obtención de datos del usuario desde un servicio
 
       _user = User(
-          id: 0,
+          id: int.parse(res!.id as String),
           name: res!.name,
           email: res!.email,
           address: res.address,

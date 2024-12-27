@@ -108,35 +108,40 @@ class VisitService {
   }
 
   Future<List<Visit>> fetchVisitsByTicket(int ticketId) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('auth_token');
 
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+  final response = await http.get(
+    Uri.parse(
+        'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
 
-    if (response.statusCode == 200) {
-      // Decodificar el cuerpo de la respuesta
-      Map<String, dynamic> body = json.decode(response.body)['data'];
+  if (response.statusCode == 200) {
+    // Decodificar el cuerpo de la respuesta
+    Map<String, dynamic> body = json.decode(response.body)['data'];
 
-      // Obtener la lista de visitas desde la propiedad 'visits'
-      List<dynamic> visitsData = body['visits'];
+    // Obtener la lista de visitas desde la propiedad 'visits'
+    List<dynamic> visitsData = body['visits'];
 
-      // Mapear cada elemento de visitsData a un objeto Visit
-      List<Visit> visits =
-          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
-
-      return visits;
-    } else {
-      throw Exception('Failed to load visits for ticket');
+    // Verificar si visitsData está vacío
+    if (visitsData.isEmpty) {
+      return [];
     }
+
+    // Mapear cada elemento de visitsData a un objeto Visit
+    List<Visit> visits =
+        visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
+
+    return visits;
+  } else {
+    throw Exception('Failed to load visits for ticket');
   }
+}
 
   Future<bool> sendUpdateDataVisit(
       Map<String, dynamic> data, int idTicket) async {
