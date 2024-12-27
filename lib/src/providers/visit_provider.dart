@@ -126,4 +126,34 @@ Visit? _visitData;
       print('Error fetching repuestos: $e');
     }
   }
+
+
+   Future<void> deleteVisits(int technicalVisitId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final urlRequest =
+        'http://3.137.100.242:3000/api/v1/technical-visits/$technicalVisitId';
+    try {
+      final response = await http.delete(
+        Uri.parse(urlRequest),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['data'] != null) {
+          final data = jsonResponse['data'] as List<dynamic>;
+          _repuestos = data.map((item) => Repuesto.fromJson(item)).toList();
+          notifyListeners();
+        }
+      } else {
+        print('Error fetching repuestos: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching repuestos: $e');
+    }
+  }
 }

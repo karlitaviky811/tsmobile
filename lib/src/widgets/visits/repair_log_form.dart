@@ -329,7 +329,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
                       _saveDetailsUpdateReprogramming(
                           visit.id, visit, _selectedReason);
-                      Navigator.pop(context); // Close the loading dialog
+                          Navigator.pop(context);
                     },
                     child: const Text('Reprogramar Visita'),
                   ),
@@ -367,24 +367,24 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(visitDate);
 
     Map<String, dynamic> data = {
-      "new_date": formattedDate,
+      "new_date": visitDate.toString(),
       "extend_reason": reason,
       "reason": "3"
     };
     var visitService = VisitService();
-    Visit? visit =
-        await visitService.sendDataVisitReprogramming(data, visitId.toString());
+    Visit? visit = await visitService.sendDataVisitReprogramming(data, visitId.toString());
     await visitProvider.fetchVisitsByTicket(widget.ticketId);
     await ticketProvider.loadTicketById(widget.ticketId);
 
     if (visit != null) {
       // Maneja la visita recibida en la respuesta
       print('Visita recibida: ${visit.title}');
+      
     } else {
       print('Error al enviar y recibir la visita.');
     }
 
-    Navigator.pop(context);
+
   }
 
   void _saveDetails(Visit newVisit) async {
@@ -409,7 +409,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(visitDate);
 
     final Map<String, dynamic> dataVisit = {
-      'visit_date': formattedDate,
+      'visit_date': visitDate.toString(),
       'title': newVisit.title,
       'ticket_id': widget.ticketId.toString()
     };
@@ -474,6 +474,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                               TimeOfDay.fromDateTime(visit.visitDate);
                           print('visit $visit');
                           return Card(
+                            color: Colors.white,
                             margin: const EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 16.0),
                             elevation: 5,
@@ -555,10 +556,10 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                                 context, visit)
                                             : null,
                                       ),
-                                      /*IconButton(
+                                      IconButton(
                                         icon: Icon(Icons.delete),
                                         onPressed: () => _eliminarVisita(index),
-                                      ),*/
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -618,6 +619,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
   void _eliminarVisita(int index) {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    visitProvider.deleteVisits(index);
     setState(() {
       visitProvider.visits.removeAt(index);
     });
