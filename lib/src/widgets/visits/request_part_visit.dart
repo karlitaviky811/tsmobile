@@ -560,6 +560,7 @@ Future<void> _fetchPartRequests() async {
                                             ),
                                           if (request.status == 8)
                                             InvoiceSparePartFinal(
+                                              showButtons: false,
                                               requestId: request.id.toString(),
                                               initialImages: [],
                                               budgetAmount:

@@ -7,8 +7,9 @@ import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
 
 class ImageUploaderInvoiceThecnical extends StatefulWidget {
   final List<ImageData> initialImages;
+  final bool showAddButton;
 
-  ImageUploaderInvoiceThecnical({Key? key, this.initialImages = const [], required bool showAddButton}) : super(key: key);
+  ImageUploaderInvoiceThecnical({Key? key, this.initialImages = const [], required this.showAddButton}) : super(key: key);
 
   @override
   _ImageUploaderInvoiceThecnicalState createState() => _ImageUploaderInvoiceThecnicalState();
@@ -71,7 +72,8 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton.icon(
+            if(widget.showAddButton)
+               ElevatedButton.icon(
               onPressed: () => _showPickerOptions(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xff051937),
@@ -81,7 +83,9 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
               ),
               icon: const Icon(Icons.insert_drive_file, color: Colors.white),
               label: const Text('Añadir fotos de la factura', style: TextStyle(color: Colors.white)),
-            ),
+            )
+          
+           ,
             if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +93,7 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'Imágenes cargadas:',
+                      'Facturas cargadas:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),

@@ -490,6 +490,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                               initialImages: []),
                                         if (request.status == 8)
                                           InvoiceSparePartFinal(
+                                            showButtons: false,
                                             budgetAmount:
                                                 request.budgetAmount ?? 0.0,
                                             requestId: request.id.toString(),

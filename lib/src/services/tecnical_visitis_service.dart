@@ -57,7 +57,7 @@ class VisitService {
 
       final responseBody = json.decode(response.body);
       print('response $responseBody');
-      if (responseBody['status'] == true) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
         print('Datos enviados exitosamente.');
         return true;
       } else {

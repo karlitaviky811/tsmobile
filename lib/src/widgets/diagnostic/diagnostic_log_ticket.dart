@@ -34,8 +34,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   DateTime? _selectedDate;
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
-  bool _isFormActive =
-      false; // Variable para controlar el estado del formulario
+  bool _isFormActive = false; // Variable para controlar el estado del formulario
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -53,8 +52,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider =
-        Provider.of<ImagePickerProvider>(context, listen: false);
+    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
 
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -146,11 +144,12 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
                   child: Card(
                     color: Colors.white,
-                    elevation: 20,
+                    elevation: 10,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -159,25 +158,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Diagnóstico',
-                                textAlign: TextAlign.left,
-                                style: AppStyle.txtPoppinsMedium18Black,
-                              ),
-                              IconButton(
-                                icon: Icon(_isFormActive
-                                    ? Icons.edit_off
-                                    : Icons.edit),
-                                onPressed: () {
-                                  setState(() {
-                                    _isFormActive = !_isFormActive;
-                                  });
-                                },
-                              ),
-                            ],
+                          Text(
+                            'Diagnóstico',
+                            textAlign: TextAlign.left,
+                            style: AppStyle.txtPoppinsMedium18Black,
                           ),
                           const SizedBox(height: 16),
                           TextField(
@@ -207,18 +191,30 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                 _isFormActive, // Mostrar o no el botón de añadir imágenes
                           ),
                           const SizedBox(height: 30),
-                          if (_isFormActive) // Mostrar el botón de guardar solo si el formulario está activo
-                            Center(
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xff051937),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
+                          Center(
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isFormActive ? Colors.yellow : Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                icon: const Icon(Icons.save,
-                                    size: 18, color: Colors.white),
-                                onPressed: () async {
+                              ),
+                              icon: Icon(
+                                _isFormActive ? Icons.save : Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () async {
+                                if (_isFormActive) {
+                                  // Validar que los campos no estén vacíos
+                                  if (_dateController.text.isEmpty || _observationsController.text.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Por favor, completa todos los campos.'),
+                                      ),
+                                    );
+                                    return;
+                                  }
+
                                   // Obtener imágenes del proveedor
                                   final imageProvider =
                                       Provider.of<ImageProviderDiagnostic>(
@@ -242,7 +238,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                       _imagesSend.clear();
                                       imageProvider.clearImages();
                                     });
-
+                  
                                     _fetchImages();
                                     final ticketProvider =
                                         Provider.of<TicketProvider>(context,
@@ -252,13 +248,18 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   } else {
                                     print('Por favor, selecciona una fecha.');
                                   }
-                                },
-                                label: const Text(
-                                  'Guardar Información',
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                                } else {
+                                  setState(() {
+                                    _isFormActive = true;
+                                  });
+                                }
+                              },
+                              label: Text(
+                                _isFormActive ? 'Guardar' : 'Editar',
+                                style: const TextStyle(color: Colors.white),
                               ),
                             ),
+                          ),
                           const SizedBox(height: 20),
                         ],
                       ),

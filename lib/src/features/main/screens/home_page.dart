@@ -38,24 +38,36 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchedUser.then((_) {
       setState(() {
         user = userService.user;
+      });
+      final oneSignalAppId = dotenv.env['APP_ID'];
+      String _debugLabelString = "";
+      WidgetsFlutterBinding.ensureInitialized();
 
-        final oneSignalAppId = dotenv.env['APP_ID'];
-        String _debugLabelString = "";
-        WidgetsFlutterBinding.ensureInitialized();
+      OneSignal.initialize(oneSignalAppId as String);
+      final String userTag = userService.user!.id.toString();
+      // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
+      // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
 
-        OneSignal.initialize(oneSignalAppId as String);
-          final String userTag = userService.user!.id.toString();
-        // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
-        // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
-        print('epa ${userService.user}');
-        if ((OneSignal.User.pushSubscription.id == null)) {
-          OneSignal.Notifications.requestPermission(true);
-          print('epa $userTag');
-        
-          //OneSignal.User.addAlias('external_id', "technical-userService.user!.id}");
-          //OneSignal.User.addTagWithKey('external_id', 'technical-userService.user!.id');
-          // OneSignal.login('technical-20');
-        }
+      if ((OneSignal.User.pushSubscription.id == null)) {
+        OneSignal.Notifications.requestPermission(true);
+        print('epa $userTag');
+
+        OneSignal.User.addAlias('external_id', "technical-$userTag");
+        OneSignal.User.addTagWithKey('external_id', "technical-$userTag");
+      }
+
+      OneSignal.login("technical-$userTag");
+      OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+        print(
+            'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+        /// Display Notification, preventDefault to not display
+        event.preventDefault();
+
+        /// Do async work
+
+        /// notification.display() to display after preventing default
+        event.notification.display();
       });
     });
   }
