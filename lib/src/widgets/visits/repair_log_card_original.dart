@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:provider/provider.dart';
@@ -105,20 +106,23 @@ class _RepairLogCardState extends State<RepairLogCard> {
   }
 
   Future<void> _fetchVisitDetails() async {
-  final visitProvider = Provider.of<VisitProvider>(context, listen: false);
-  await visitProvider.fetchVisitById(widget.visit.id.toString());
-  final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
-  final visitData = visitProvider.visitData;
-  if (visitData != null && mounted) {
-    setState(() {
-      widget.visit = visitData;
-      _initialVisit = Visit.fromJson(visitData.toJson()); // Store initial data
-      _tituloController.text = visitData.title;
-      _dateController.text = visitData.visitDate.toIso8601String().split('T')[0];
-      _initialValues = List<String>.from(visitData.services); // Initialize with existing services
-    });
+    final visitProvider = Provider.of<VisitProvider>(context, listen: false);
+    await visitProvider.fetchVisitById(widget.visit.id.toString());
+    final visit = visitProvider.fetchVisitById(widget.visit.id.toString());
+    final visitData = visitProvider.visitData;
+    if (visitData != null && mounted) {
+      setState(() {
+        widget.visit = visitData;
+        _initialVisit =
+            Visit.fromJson(visitData.toJson()); // Store initial data
+        _tituloController.text = visitData.title;
+        _dateController.text =
+            visitData.visitDate.toIso8601String().split('T')[0];
+        _initialValues = List<String>.from(
+            visitData.services); // Initialize with existing services
+      });
+    }
   }
-}
 
   Future<void> fetchVisitsById() async {
     var providerVisit = Provider.of<VisitProvider>(context, listen: false);
@@ -148,14 +152,18 @@ class _RepairLogCardState extends State<RepairLogCard> {
       _isLoadingMore = true;
     });
 
-    final tabulatorData = await _tabulatorService.fetchTabulators(page: _currentPage);
+    final tabulatorData =
+        await _tabulatorService.fetchTabulators(page: _currentPage);
     if (tabulatorData != null && tabulatorData.containsKey('data')) {
       List<dynamic> data = tabulatorData['data'];
 
       if (!mounted) return; // Verificar si el widget sigue montado
 
       setState(() {
-        _items.addAll(data.map((item) => MultiSelectItem<String>(item['n'], item['repuestos'])).toList());
+        _items.addAll(data
+            .map(
+                (item) => MultiSelectItem<String>(item['n'], item['repuestos']))
+            .toList());
         _currentPage++;
         _isLoadingMore = false;
         _hasMoreData = data.isNotEmpty;
@@ -262,7 +270,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                             widget.visit.title = value;
                           });
                         },
-                        enabled: _isEditing || widget.type == 'Agregar Nueva Visita',
+                        enabled:
+                            _isEditing || widget.type == 'Agregar Nueva Visita',
                       ),
                       const SizedBox(height: 10),
                       TextField(
@@ -280,7 +289,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                           fillColor: Colors.white,
                         ),
                         readOnly: true,
-                        enabled: _isEditing || widget.type == 'Agregar Nueva Visita',
+                        enabled:
+                            _isEditing || widget.type == 'Agregar Nueva Visita',
                       ),
                       const SizedBox(height: 10),
                       Column(
@@ -299,7 +309,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                             ),
                             child: NotificationListener<ScrollNotification>(
                               onNotification: (ScrollNotification scrollInfo) {
-                                if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent && !_isLoadingMore) {
+                                if (scrollInfo.metrics.pixels ==
+                                        scrollInfo.metrics.maxScrollExtent &&
+                                    !_isLoadingMore) {
                                   _loadTabulators();
                                 }
                                 return true;
@@ -310,7 +322,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   title: const Text('Servicios realizados'),
                                   backgroundColor: Colors.white,
                                   selectedColor: const Color(0xff051937),
-                                  buttonIcon: const Icon(Icons.list, color: Color(0xff051937)),
+                                  buttonIcon: const Icon(Icons.list,
+                                      color: Color(0xff051937)),
                                   buttonText: const Text(
                                     'Seleccione uno o más servicios',
                                     style: TextStyle(
@@ -320,7 +333,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   onConfirm: (values) {
                                     setState(() {
                                       _initialValues = values.cast<String>();
-                                      widget.visit.selectedServicios = _initialValues;
+                                      widget.visit.selectedServicios =
+                                          _initialValues;
                                     });
                                   },
                                   searchable: true,
@@ -328,9 +342,25 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5),
                                     border: Border.all(
-                                      color: (_isEditing || widget.type == 'Agregar Nueva Visita') ? Colors.grey : Colors.transparent,
+                                      color: (_isEditing ||
+                                              widget.type ==
+                                                  'Agregar Nueva Visita')
+                                          ? Colors.grey
+                                          : Colors.transparent,
                                       width: 1,
                                     ),
+                                  ),
+                                  chipDisplay: MultiSelectChipDisplay(
+                                    chipColor: const Color(0xff051937),
+                                    textStyle:
+                                        const TextStyle(color: Colors.white),
+                                    onTap: (value) {
+                                      setState(() {
+                                        _initialValues.remove(value);
+                                        widget.visit.selectedServicios =
+                                            _initialValues;
+                                      });
+                                    },
                                   ),
                                 ),
                               ),
@@ -340,7 +370,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                       ),
                       const SizedBox(height: 30),
                       Center(
-                        child: _isEditing || widget.type == 'Agregar Nueva Visita'
+                        child: _isEditing ||
+                                widget.type == 'Agregar Nueva Visita'
                             ? ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xff051937),
@@ -353,32 +384,41 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                 onPressed: () async {
                                   var serviceVisit = VisitService();
                                   Map<String, dynamic> params = {
-                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
-                                    "spareparts":
-                                        widget.visit.visitDate.toIso8601String(),
+                                    "services": widget
+                                            .visit.selectedServicios.isNotEmpty
+                                        ? widget.visit.selectedServicios
+                                        : _initialValues,
+                                    "spareparts": widget.visit.visitDate
+                                        .toIso8601String(),
                                     "observations":
                                         'Probando el update de la visita deberian estar asociados los servicios por visita',
                                   };
                                   Map<String, dynamic> data = {
                                     "title": widget.visit.title,
-                                    "visit_date":
-                                        widget.visit.visitDate.toIso8601String(),
-                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
+                                    "visit_date": widget.visit.visitDate
+                                        .toIso8601String(),
+                                    "services": widget
+                                            .visit.selectedServicios.isNotEmpty
+                                        ? widget.visit.selectedServicios
+                                        : _initialValues,
                                     "observations": widget.visit.observations,
                                     "tabulator_id": 50,
                                     "meta": jsonEncode(params)
                                   };
                                   final Map<String, dynamic> dataVisit = {
-                                    'visit_date':
-                                        widget.visit.visitDate.toIso8601String(),
+                                    'visit_date': widget.visit.visitDate
+                                        .toIso8601String(),
                                     'title': widget.visit.title,
-                                    "services": widget.visit.selectedServicios.isNotEmpty ? widget.visit.selectedServicios : _initialValues,
+                                    "services": widget
+                                            .visit.selectedServicios.isNotEmpty
+                                        ? widget.visit.selectedServicios
+                                        : _initialValues,
                                     'ticket_id': widget.ticketId
                                   };
                                   print('Data: ${widget.type}');
                                   if (widget.type == 'Nuevo') {
-                                    var createVisit =
-                                        await serviceVisit.sendDataVisit(dataVisit);
+                                    var createVisit = await serviceVisit
+                                        .sendDataVisit(dataVisit);
                                     await _fetchVisitDetails();
                                     await _loadTabulators();
 
@@ -392,8 +432,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                         textColor: Colors.white,
                                         fontSize: 16.0);
                                   } else {
-                                    var res = await serviceVisit.sendUpdateDataVisit(
-                                        data, widget.visit.id);
+                                    var res =
+                                        await serviceVisit.sendUpdateDataVisit(
+                                            data, widget.visit.id);
                                     await _fetchVisitDetails();
                                     await _loadTabulators();
 
@@ -411,7 +452,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     _isEditing = false;
                                   });
                                 },
-                                icon: const Icon(Icons.save, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.save, color: Colors.white),
                                 label: const Text('Guardar',
                                     style: TextStyle(color: Colors.white)),
                               )
@@ -429,7 +471,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     _isEditing = true;
                                   });
                                 },
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 label: const Text('Editar',
                                     style: TextStyle(color: Colors.white)),
                               ),

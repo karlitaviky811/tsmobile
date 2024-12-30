@@ -54,47 +54,48 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     _fetchPartRequests();
   }
 
-Future<void> _fetchPartRequests() async {
-  setState(() {
-    _isLoading = true;
-  });
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('auth_token');
-  final response = await http.get(
-    Uri.parse(
-        'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
+  Future<void> _fetchPartRequests() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-  final responseBody = json.decode(response.body);
-  print('response $responseBody');
+    final responseBody = json.decode(response.body);
+    print('response $responseBody');
 
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> data = jsonDecode(response.body);
-    if (data.containsKey('data')) {
-      final List<dynamic> partRequestsJson = data['data'];
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      if (data.containsKey('data')) {
+        final List<dynamic> partRequestsJson = data['data'];
+        if (mounted) {
+          setState(() {
+            partRequests = partRequestsJson
+                .map((json) => Repuesto.fromJson(json))
+                .toList();
+            _isLoading = false;
+          });
+        }
+      }
+    } else {
+      print('Error fetching part requests: ${response.body}');
       if (mounted) {
         setState(() {
-          partRequests =
-              partRequestsJson.map((json) => Repuesto.fromJson(json)).toList();
+          partRequests = [];
           _isLoading = false;
         });
       }
     }
-  } else {
-    print('Error fetching part requests: ${response.body}');
-    if (mounted) {
-      setState(() {
-        partRequests = [];
-        _isLoading = false;
-      });
-    }
   }
-}
 
   void _pickImage(int index, ImageProviderSpareParts imageProvider) async {
     if (_isImagePickerActive) return; // No abrir si ya está activo
@@ -246,6 +247,23 @@ Future<void> _fetchPartRequests() async {
       _showToast('Por favor, complete todos los campos.');
       return;
     }
+
+    // Mostrar el diálogo de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          content: Row(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Guardando..."),
+            ],
+          ),
+        );
+      },
+    );
     try {
       // Simulación de envío de datos
       // Aquí debes agregar tu lógica de envío, por ejemplo:
@@ -280,6 +298,7 @@ Future<void> _fetchPartRequests() async {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+      await _fetchPartRequests();
     } catch (e) {
       // Manejo de errores
       print('Error al enviar la solicitud: $e');
@@ -297,12 +316,13 @@ Future<void> _fetchPartRequests() async {
         _isSubmitting = false; // Ocultar indicador de carga
       });
 
+      // Cerrar el diálogo de carga
+      Navigator.of(context).pop();
+
       // Cerrar el modal bottom sheet
       Navigator.of(context).pop();
     }
   }
-
-
 
   void _openRepuestoForm() {
     showModalBottomSheet(
@@ -347,7 +367,7 @@ Future<void> _fetchPartRequests() async {
               ),
               const SizedBox(height: 10),
               ImageUploaderSparePartsNew(
-                initialImages: [],
+                initialImages: const [],
               ),
               const SizedBox(height: 10),
               _isSubmitting // Mostrar el indicador de carga mientras se envía el formulario
@@ -425,8 +445,18 @@ Future<void> _fetchPartRequests() async {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Solicitar nuevo repuesto',
-                    style: TextStyle(color: Colors.white)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.add, color: Colors.white),
+                    SizedBox(
+                        width: 8), // Espacio entre el icono y el texto
+                    Text(
+                      'Solicitar nuevo repuesto',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
               _isLoading
                   ? const CircularProgressIndicator()
@@ -556,13 +586,13 @@ Future<void> _fetchPartRequests() async {
                                           if (request.status == 7)
                                             InvoiceSparePart(
                                               visitId: request.id,
-                                              initialImages: [],
+                                              initialImages: const [],
                                             ),
                                           if (request.status == 8)
                                             InvoiceSparePartFinal(
                                               showButtons: false,
                                               requestId: request.id.toString(),
-                                              initialImages: [],
+                                              initialImages: const [],
                                               budgetAmount:
                                                   request.budgetAmount ?? 0.0,
                                             ),

@@ -3,7 +3,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
@@ -11,7 +10,6 @@ import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'dart:io';
 
 import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
 
@@ -191,7 +189,22 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                       _saveDetails(newVisit);
                       Navigator.pop(context); // Close the loading dialog
                     },
-                    child: const Text('Añadir reparación'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.blue, // Cambiar el color de fondo a azul
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.save, color: Colors.white),
+                        SizedBox(
+                            width: 8), // Espacio entre el icono y el texto
+                        Text(
+                          'Añadir visita',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -276,7 +289,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () async {
+                    onPressed: () {
                       if (_selectedReason.isEmpty ||
                           _dateController.text.isEmpty ||
                           _timeController.text.isEmpty) {
@@ -327,12 +340,24 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                         },
                       );
 
-                      _saveDetailsUpdateReprogramming(
-                          visit.id, visit, _selectedReason);
-
-                      // Close the loading dialog
+                      _handleReprogramVisit(
+                          context, visit.id, visit, _selectedReason);
                     },
-                    child: const Text('Reprogramar Visita'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.blue, // Cambiar el color de fondo a azul
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.save, color: Colors.white),
+                        SizedBox(width: 8), // Espacio entre el icono y el texto
+                        Text(
+                          'Reprogramar Visita',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -343,25 +368,18 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     );
   }
 
-  void _saveDetailsUpdateReprogramming(
+  Future<void> _handleReprogramVisit(
+      BuildContext context, int visitId, Visit visit, String reason) async {
+    await _saveDetailsUpdateReprogramming(visitId, visit, reason);
+
+    Navigator.pop(context); // Close the loading dialog
+    Navigator.pop(context); // Close the bottom sheet
+  }
+
+  Future<void> _saveDetailsUpdateReprogramming(
       int visitId, Visit newVisit, String reason) async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(width: 20),
-              Text("Guardando..."),
-            ],
-          ),
-        );
-      },
-    );
 
     final caracas = tz.getLocation('America/Caracas');
     final visitDate = tz.TZDateTime.from(newVisit.visitDate, caracas);
@@ -377,14 +395,10 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
         await visitService.sendDataVisitReprogramming(data, visitId.toString());
 
     if (visit != null) {
-      // Maneja la visita recibida en la respuesta
       print('Visita recibida: ${visit.title}');
     } else {
       print('Error al enviar y recibir la visita.');
     }
-
-    // Close the loading dialog
-    Navigator.pop(context);
 
     await visitProvider.fetchVisitsByTicket(widget.ticketId);
     await ticketProvider.loadTicketById(widget.ticketId);
@@ -416,7 +430,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(visitDate);
 
     final Map<String, dynamic> dataVisit = {
-      'visit_date': visitDate.toString(),
+      'visit_date': formattedDate.toString(),
       'title': newVisit.title,
       'ticket_id': widget.ticketId.toString()
     };
@@ -427,8 +441,6 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     Navigator.pop(context); // Close the loading dialog
 
     if (visit != null) {
-      Navigator.pop(context); // Close the modal bottom sheet
- // Close the loading dialog
       print('Visita recibida:');
     } else {
       print('Error al enviar y recibir la visita.');
@@ -436,7 +448,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
     if (mounted) {
       _fetchVisits();
-      Navigator.pop(context);
+      Navigator.pop(context); // Close the modal bottom sheet
     }
   }
 
@@ -497,7 +509,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                 children: [
                                   Text(
                                     visit.title.isEmpty
-                                        ? 'Nueva reparación'
+                                        ? 'Nueva visita'
                                         : visit.title,
                                     style: AppStyle.txtPoppinsBold14Black,
                                   ),
@@ -566,7 +578,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                             : null,
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.delete),
+                                        icon: const Icon(Icons.delete),
                                         onPressed: () =>
                                             _eliminarVisita(visit.id),
                                       ),
@@ -589,7 +601,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                         ),
                         onPressed: () => _showAddVisitModal(context),
                         icon: const Icon(Icons.add, color: Colors.white),
-                        label: const Text('Añadir nueva reparación',
+                        label: const Text('Añadir nueva visita',
                             style: TextStyle(color: Colors.white)),
                       ),
                     ),
@@ -609,7 +621,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
       visitProvider.visits.add(
         Visit(
           id: 0,
-          title: 'Nueva reparación',
+          title: 'Nueva visita',
           type: 1,
           status: 1,
           selectedRepuestos: [],
@@ -628,6 +640,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
   }
 
   void _eliminarVisita(int index) {
+    final scaffoldContext = context; // Capturar el contexto del Scaffold
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -650,7 +664,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
 
                 // Mostrar el diálogo de "Eliminando..." en un nuevo contexto
                 showDialog(
-                  context: context,
+                  context: scaffoldContext,
                   barrierDismissible: false,
                   builder: (BuildContext context) {
                     return const AlertDialog(
@@ -665,17 +679,50 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                   },
                 );
 
-                final visitProvider =
-                    Provider.of<VisitProvider>(context, listen: false);
-                await visitProvider.deleteVisits(index);
+                try {
+                  final visitProvider =
+                      Provider.of<VisitProvider>(context, listen: false);
+                  var visit = await visitProvider.deleteVisits(index);
 
-                // Usar un nuevo contexto para cerrar el diálogo de "Eliminando..."
-                if (mounted) {
-                  Navigator.of(context)
-                      .pop(); // Cerrar el diálogo de "Eliminando..."
+                  // Usar el contexto capturado para cerrar el diálogo de "Eliminando..."
+                  if (mounted) {
+                    Navigator.of(scaffoldContext, rootNavigator: true)
+                        .pop(); // Cerrar el diálogo de "Eliminando..."
+                    _fetchVisits(); // Refrescar las visitas después de eliminar
+                  }
+
+                  if (visit != null) {
+                    Fluttertoast.showToast(
+                      msg: "Visita eliminada exitosamente",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.green,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: "Error al eliminar la visita",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0,
+                    );
+                  }
+                } catch (e) {
+                  Fluttertoast.showToast(
+                    msg: "Error al eliminar la visita: $e",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.red,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
                 }
-
-                _fetchVisits(); // Refrescar las visitas después de eliminar
               },
             ),
           ],

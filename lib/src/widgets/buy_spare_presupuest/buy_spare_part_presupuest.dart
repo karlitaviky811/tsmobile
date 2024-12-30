@@ -47,7 +47,8 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
   @override
   void initState() {
     super.initState();
-    _montoController = TextEditingController(text: widget.montoRepuesto.toString());
+    _montoController =
+        TextEditingController(text: widget.montoRepuesto.toString());
     _fetchAllImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
   }
@@ -65,7 +66,8 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
         setState(() {
           if (imagePaths.length < 5) {
             imagePaths.add(pickedFile.path);
-            reparacion[imageType] = pickedFile.path; // Actualizar el mapa mutable
+            reparacion[imageType] =
+                pickedFile.path; // Actualizar el mapa mutable
           } else {
             _showToast(context, 'Solo se pueden cargar hasta 5 imágenes');
           }
@@ -192,12 +194,11 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
     List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
     await sendUpdateDataVisitPartRequestPresupuest(
         data, widget.requestId, imagePaths);
-
-    // Realizar reload general y resetear el provider de las imágenes
-    imageProvider.clearImages();
     setState(() {
       _fetchAllImages();
     });
+    // Realizar reload general y resetear el provider de las imágenes
+    imageProvider.clearImages();
   }
 
   void _showToast(BuildContext context, String message) {
@@ -221,11 +222,9 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No hay imágenes disponibles.'));
         } else {
-          final budgetImages = snapshot.data!['budget']!;
-          final partImages = snapshot.data!['part']!;
+          final budgetImages = snapshot.data!['budget'] ?? [];
+          final partImages = snapshot.data!['part'] ?? [];
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: ExpansionTile(
@@ -237,7 +236,8 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                 ),
                 TextField(
                   controller: _montoController,
-                  decoration: const InputDecoration(labelText: 'Costo del repuesto'),
+                  decoration:
+                      const InputDecoration(labelText: 'Costo del repuesto'),
                   keyboardType: TextInputType.number,
                   readOnly: widget.status == 6, // Deshabilitar para edición si el estado es 6
                   onChanged: (value) {
@@ -250,10 +250,10 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                 ),
                 ImageUploaderBuySparePartTechnical(
                   initialImages: budgetImages,
-                  showAddButton: widget.status != 7, // Ocultar botón si el estado es 6
+                  showAddButton: widget.status != 6 && widget.status != 7, // Ocultar botón si el estado es 6 o 7
                 ),
                 const SizedBox(height: 10),
-                if (widget.status != 7)
+                if (widget.status != 6 && widget.status != 7)
                   ElevatedButton(
                     onPressed: _submitForm,
                     child: const Text('Enviar presupuesto'),

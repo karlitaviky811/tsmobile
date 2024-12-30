@@ -29,6 +29,15 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   bool isDateInitialized = false;
   bool isObservationsInitialized = false;
   bool _isFormActive = false;
+  String? _selectedReason;
+
+  final List<String> _reasons = [
+    'Producto irreparable',
+    'Fuera de garantía',
+    'Cliente no desea reparación',
+    'Repuesto no disponible',
+    'Otro',
+  ];
 
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -120,99 +129,113 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
               isObservationsInitialized = true;
             }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 20,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        color: Colors.white,
+                        elevation: 20,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Cierre del ticket',
                                 textAlign: TextAlign.left,
                                 style: AppStyle.txtPoppinsMedium18Black,
                               ),
-                              IconButton(
-                                icon: Icon(_isFormActive ? Icons.edit_off : Icons.edit),
-                                onPressed: () {
-                                  setState(() {
-                                    _isFormActive = !_isFormActive;
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: _dateController,
-                            decoration: InputDecoration(
-                              labelText: 'Fecha',
-                              prefixIcon: IconButton(
-                                icon: const Icon(Icons.calendar_today),
-                                onPressed: _isFormActive ? () => _pickDate(context) : null,
-                              ),
-                            ),
-                            readOnly: !_isFormActive,
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: _observationsController,
-                            decoration: const InputDecoration(labelText: 'Observaciones'),
-                            readOnly: !_isFormActive,
-                          ),
-                          const SizedBox(height: 16),
-                          ImageUploaderCloseTicket(
-                            initialImages: [],
-                            showAddButton: _isFormActive,
-                          ),
-                          const SizedBox(height: 30),
-                          if (_isFormActive)
-                            Center(
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xff051937),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                              const SizedBox(height: 16),
+                              TextField(
+                                controller: _dateController,
+                                decoration: InputDecoration(
+                                  labelText: 'Fecha',
+                                  prefixIcon: IconButton(
+                                    icon: const Icon(Icons.calendar_today),
+                                    onPressed: _isFormActive ? () => _pickDate(context) : null,
                                   ),
                                 ),
-                                icon: const Icon(Icons.save, size: 18, color: Colors.white),
-                                onPressed: () async {
-                                  if (_selectedDate != null) {
-                                    serviceUpdateTicket.savecloseTicketFormData(
-                                      _selectedDate!.toIso8601String(),
-                                      _observationsController.text,
-                                      _images,
-                                      widget.idTicket,
-                                    );
-                                  } else {
-                                    print('Por favor, selecciona una fecha.');
-                                  }
-                                },
-                                label: const Text(
-                                  'Guardar Información',
-                                  style: TextStyle(color: Colors.white),
+                                readOnly: !_isFormActive,
+                              ),
+                              const SizedBox(height: 16),
+                              TextField(
+                                controller: _observationsController,
+                                decoration: const InputDecoration(labelText: 'Observaciones'),
+                                readOnly: !_isFormActive,
+                              ),
+                              const SizedBox(height: 16),
+                              DropdownButtonFormField<String>(
+                                decoration: const InputDecoration(labelText: 'Motivo de cierre'),
+                                value: _selectedReason,
+                                items: _reasons.map((String reason) {
+                                  return DropdownMenuItem<String>(
+                                    value: reason,
+                                    child: Text(reason),
+                                  );
+                                }).toList(),
+                                onChanged: _isFormActive ? (String? newValue) {
+                                  setState(() {
+                                    _selectedReason = newValue;
+                                  });
+                                } : null,
+                              ),
+                              const SizedBox(height: 16),
+                              ImageUploaderCloseTicket(
+                                initialImages: [],
+                                showAddButton: _isFormActive,
+                              ),
+                              const SizedBox(height: 30),
+                              Center(
+                                child: ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isFormActive ? Colors.green : const Color(0xff051937),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                  icon: Icon(_isFormActive ? Icons.save : Icons.edit, size: 18, color: Colors.white),
+                                  onPressed: () async {
+                                    if (_isFormActive) {
+                                      if (_selectedDate != null && _selectedReason != null) {
+                                        serviceUpdateTicket.savecloseTicketFormData(
+                                          _selectedDate!.toIso8601String(),
+                                          _observationsController.text,
+                                          _images,
+                                          widget.idTicket,
+                                        );
+                                      } else {
+                                        print('Por favor, selecciona una fecha y un motivo.');
+                                      }
+                                    } else {
+                                      setState(() {
+                                        _isFormActive = true;
+                                      });
+                                    }
+                                  },
+                                  label: Text(
+                                    _isFormActive ? 'Guardar Información' : 'Editar',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
-                            ),
-                          const SizedBox(height: 20),
-                        ],
+                              const SizedBox(height: 20),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           }
         },

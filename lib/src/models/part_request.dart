@@ -7,7 +7,7 @@ class Repuesto {
   final String? name;
   final String observation;
   final DateTime? dateHanded;
-  final List<String>? meta; // Cambiar a List<String>?
+  final List<String>? meta;
   final DateTime? deletedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -24,7 +24,7 @@ class Repuesto {
     this.deletedAt,
     required this.createdAt,
     required this.updatedAt,
-    required this.budgetAmount
+    required this.budgetAmount,
   });
 
   factory Repuesto.fromJson(Map<String, dynamic> json) {
@@ -35,7 +35,7 @@ class Repuesto {
       name: json['name'] ?? '',
       observation: json['observation'] != null ? json['observation'] : 'Sin nombre de repuesto',
       dateHanded: json['date_handed'] != null ? DateTime.parse(json['date_handed']) : null,
-      meta: json['meta'] != null ? List<String>.from(json['meta']) : null, // Ajustar a List<String>?
+      meta: json['meta'] != null ? (json['meta'] as Map<String, dynamic>).values.map((e) => e.toString()).toList() : null,
       deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),

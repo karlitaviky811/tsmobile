@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
+import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 
 class ImageUploaderBuySparePartTechnical extends StatefulWidget {
   final List<ImageData> initialImages;

@@ -10,13 +10,13 @@ import 'package:http/http.dart' as http;
 class VisitProvider with ChangeNotifier {
   final VisitService _visitService = VisitService();
   List<Visit> _visits = [];
-Visit? _visitData;
+  Visit? _visitData;
   bool _isLoading = false;
   String? _errorMessage;
   List<Repuesto> _repuestos = [];
   List<Repuesto> get repuestos => _repuestos;
   List<Visit> get visits => _visits;
- Visit? get visitData => _visitData;
+  Visit? get visitData => _visitData;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -127,8 +127,7 @@ Visit? _visitData;
     }
   }
 
-
-   Future<void> deleteVisits(int technicalVisitId) async {
+  Future<bool> deleteVisits(int technicalVisitId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final urlRequest =
@@ -149,11 +148,14 @@ Visit? _visitData;
           _repuestos = data.map((item) => Repuesto.fromJson(item)).toList();
           notifyListeners();
         }
+        return true;
       } else {
         print('Error fetching repuestos: ${response.statusCode}');
+        return false;
       }
     } catch (e) {
       print('Error fetching repuestos: $e');
+      return false;
     }
   }
 }
