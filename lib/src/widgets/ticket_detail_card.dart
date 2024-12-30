@@ -88,7 +88,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                           _buildDetailRow('Código:', ticket.id.toString()),
                           _buildDetailRow(
                               'Cliente:', ticket.customerName.toString()),
-                          _buildDetailRow('Tipo:', ticket.toString()),
+                          _buildDetailRow('Tipo:', 'Reparación'),
                           _buildDetailRow(
                               'Fecha:', ticket.createdAt.toString()),
                           _buildDetailRowLarge('Título:', ticket.title),

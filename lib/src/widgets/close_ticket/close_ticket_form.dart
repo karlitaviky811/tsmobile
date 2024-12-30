@@ -1,11 +1,17 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
+import 'package:tsmobile/src/models/images_model.dart';
+import 'package:tsmobile/src/providers/image_provider_close_ticket.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
+import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/widgets/images_loaders/image_loader_close_ticket.dart';
 
 class CloseTicketForm extends StatefulWidget {
@@ -21,7 +27,8 @@ class CloseTicketForm extends StatefulWidget {
 class _CloseTicketFormState extends State<CloseTicketForm> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
-  final List<File> _images = [];
+  late List<File> _images = [];
+  late List<ImageData> _imagesSend = [];
   final ImagePicker _picker = ImagePicker();
   bool _isImagePickerActive = false;
   late Future<void> _loadTicketFuture;
@@ -55,31 +62,40 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   }
 
   Future<void> _pickImage() async {
-    if (!_isImagePickerActive) {
-      setState(() {
-        _isImagePickerActive = true;
-      });
+    final imagePickerProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
+    imagePickerProvider.setImagePickerActive(true);
 
-      try {
-        final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-        if (image != null) {
-          setState(() {
-            _images.add(File(image.path));
-          });
-        }
-      } catch (e) {
-        print("Error al seleccionar imagen: $e");
-      } finally {
-        setState(() {
-          _isImagePickerActive = false;
-        });
-      }
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _images.add(File(image.path));
+      });
     }
+
+    imagePickerProvider.setImagePickerActive(false);
   }
 
-  String getFormattedDate(DateTime date) {
-    var outputFormat = DateFormat('dd/MM/yyyy');
-    return outputFormat.format(date);
+  Future<void> _fetchImages() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=close_ticket'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body)['data'];
+      setState(() {
+        _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
+      });
+    } else {
+      print('Error fetching images: ${response.statusCode}');
+    }
   }
 
   void _removeImage(int index) {
@@ -92,9 +108,19 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
     }
   }
 
+  void _resetProvider() {
+    Provider.of<ImageProviderCloseTicketManagement>(context, listen: false).resetImage();
+  }
+
+  String getFormattedDate(DateTime date) {
+    var outputFormat = DateFormat('dd/MM/yyyy');
+    return outputFormat.format(date);
+  }
+
   @override
   void initState() {
     super.initState();
+    _fetchImages();
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
     _loadTicketFuture = ticketProvider.loadTicketById(widget.idTicket);
   }
@@ -161,20 +187,17 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                   labelText: 'Fecha',
                                   prefixIcon: IconButton(
                                     icon: const Icon(Icons.calendar_today),
-                                    onPressed: _isFormActive ? () => _pickDate(context) : null,
+                                    onPressed: _isFormActive
+                                        ? () => _pickDate(context)
+                                        : null,
                                   ),
                                 ),
                                 readOnly: !_isFormActive,
                               ),
                               const SizedBox(height: 16),
-                              TextField(
-                                controller: _observationsController,
-                                decoration: const InputDecoration(labelText: 'Observaciones'),
-                                readOnly: !_isFormActive,
-                              ),
-                              const SizedBox(height: 16),
                               DropdownButtonFormField<String>(
-                                decoration: const InputDecoration(labelText: 'Motivo de cierre'),
+                                decoration: const InputDecoration(
+                                    labelText: 'Motivo de cierre'),
                                 value: _selectedReason,
                                 items: _reasons.map((String reason) {
                                   return DropdownMenuItem<String>(
@@ -182,38 +205,106 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                     child: Text(reason),
                                   );
                                 }).toList(),
-                                onChanged: _isFormActive ? (String? newValue) {
-                                  setState(() {
-                                    _selectedReason = newValue;
-                                  });
-                                } : null,
+                                onChanged: _isFormActive
+                                    ? (String? newValue) {
+                                        setState(() {
+                                          _selectedReason = newValue;
+                                        });
+                                      }
+                                    : null,
+                              ),
+                              const SizedBox(height: 16),
+                              TextField(
+                                controller: _observationsController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Observaciones'),
+                                readOnly: !_isFormActive,
                               ),
                               const SizedBox(height: 16),
                               ImageUploaderCloseTicket(
-                                initialImages: [],
+                                initialImages: _imagesSend,
                                 showAddButton: _isFormActive,
                               ),
                               const SizedBox(height: 30),
                               Center(
                                 child: ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: _isFormActive ? Colors.green : const Color(0xff051937),
+                                    backgroundColor: _isFormActive
+                                        ? Colors.yellow
+                                        : Colors.blue,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                   ),
-                                  icon: Icon(_isFormActive ? Icons.save : Icons.edit, size: 18, color: Colors.white),
+                                  icon: Icon(
+                                      _isFormActive ? Icons.save : Icons.edit,
+                                      size: 18,
+                                      color: Colors.white),
                                   onPressed: () async {
                                     if (_isFormActive) {
-                                      if (_selectedDate != null && _selectedReason != null) {
-                                        serviceUpdateTicket.savecloseTicketFormData(
-                                          _selectedDate!.toIso8601String(),
-                                          _observationsController.text,
-                                          _images,
-                                          widget.idTicket,
-                                        );
+                                      if (_selectedDate != null &&
+                                          _selectedReason != null) {
+                                        // Obtener imágenes del proveedor
+                                        final imageProvider =
+                                            Provider.of<ImageProviderCloseTicketManagement>(
+                                                context,
+                                                listen: false);
+                                        List<String> imagePaths =
+                                            imageProvider.newImagePaths;
+                                        List<File> imageFiles = imagePaths
+                                            .map((path) => File(path))
+                                            .toList();
+                                        _resetProvider();
+                                        try {
+                                          await serviceUpdateTicket
+                                              .savecloseTicketFormData(
+                                            _selectedDate!.toIso8601String(),
+                                            _observationsController.text,
+                                            imageFiles,
+                                            widget.idTicket,
+                                          );
+                                          Fluttertoast.showToast(
+                                            msg: "Datos guardados con éxito",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.green,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0,
+                                          );
+                                          setState(() {
+                                            _isFormActive = false;
+                                            _imagesSend.clear();
+                                            imageProvider.clearImages();
+                                          });
+                                          _fetchImages();
+                                          final ticketProvider =
+                                              Provider.of<TicketProvider>(
+                                                  context,
+                                                  listen: false);
+                                          _loadTicketFuture = ticketProvider
+                                              .loadTicketById(widget.idTicket);
+                                        } catch (e) {
+                                          Fluttertoast.showToast(
+                                            msg: "Error al guardar los datos",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0,
+                                          );
+                                        }
                                       } else {
-                                        print('Por favor, selecciona una fecha y un motivo.');
+                                        Fluttertoast.showToast(
+                                          msg: "Por favor, selecciona una fecha y un motivo.",
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.red,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0,
+                                        );
                                       }
                                     } else {
                                       setState(() {
@@ -222,7 +313,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                     }
                                   },
                                   label: Text(
-                                    _isFormActive ? 'Guardar Información' : 'Editar',
+                                    _isFormActive ? 'Guardar' : 'Editar',
                                     style: const TextStyle(color: Colors.white),
                                   ),
                                 ),

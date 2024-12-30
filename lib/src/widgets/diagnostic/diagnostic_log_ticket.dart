@@ -7,7 +7,6 @@ import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'dart:io';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
@@ -36,6 +35,18 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   bool isObservationsInitialized = false;
   bool _isFormActive = false; // Variable para controlar el estado del formulario
 
+  @override
+  void initState() {
+    super.initState();
+    _loadTicketFuture = _loadTicketData();
+  }
+
+  Future<void> _loadTicketData() async {
+    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
+    await ticketProvider.loadTicketById(widget.idTicket);
+    await _fetchImages();
+  }
+
   Future<void> _pickDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -52,7 +63,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider = Provider.of<ImagePickerProvider>(context, listen: false);
+    final imagePickerProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
 
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -66,25 +77,33 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   Future<void> _fetchImages() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
-      headers: {
-        'Content-Type': 'application/json',
-        "Accept": "application/json",
-        'Authorization': 'Bearer $token',
-      },
-    );
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+      if (token == null) {
+        throw Exception('Token is null');
+      }
 
-    if (response.statusCode == 200) {
-      List<dynamic> data = json.decode(response.body)['data'];
-      setState(() {
-        _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
-      });
-    } else {
-      print('Error fetching images: ${response.statusCode}');
+      final response = await http.get(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body)['data'];
+        setState(() {
+          _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
+        });
+      } else {
+        print('Error fetching images: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching images: $e');
     }
   }
 
@@ -103,11 +122,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _fetchImages();
-    final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    _loadTicketFuture = ticketProvider.loadTicketById(widget.idTicket);
   }
 
   @override
@@ -120,7 +137,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         future: _loadTicketFuture,
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: Center(child: CircularProgressIndicator()));
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -209,7 +226,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   if (_dateController.text.isEmpty || _observationsController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('Por favor, completa todos los campos.'),
+                                        content: const Text('Por favor, completa todos los campos.'),
                                       ),
                                     );
                                     return;
@@ -225,26 +242,24 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   List<File> imageFiles = imagePaths
                                       .map((path) => File(path))
                                       .toList();
-                                  _resetProvider;
+                                  _resetProvider();
                                   if (_selectedDate != null) {
-                                    await serviceUpdateTicket.saveFormData(
+                                    bool success = await serviceUpdateTicket.saveFormData(
                                       _selectedDate!.toIso8601String(),
                                       _observationsController.text,
                                       imageFiles,
                                       widget.idTicket,
                                     );
+                                      await _fetchImages();
+                                    /*if (success) {
+                                      await _fetchImages();
+                                    }*/
                                     setState(() {
                                       _isFormActive = false;
                                       _imagesSend.clear();
                                       imageProvider.clearImages();
                                     });
-                  
-                                    _fetchImages();
-                                    final ticketProvider =
-                                        Provider.of<TicketProvider>(context,
-                                            listen: false);
-                                    _loadTicketFuture = ticketProvider
-                                        .loadTicketById(widget.idTicket);
+                                    await ticketProvider.loadTicketById(widget.idTicket);
                                   } else {
                                     print('Por favor, selecciona una fecha.');
                                   }

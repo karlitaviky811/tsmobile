@@ -448,9 +448,12 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                         fontSize: 16.0);
                                   }
                                   await _reloadVisits(); // Recargar visitas después de guardar
-                                  setState(() {
-                                    _isEditing = false;
-                                  });
+
+                                  if (mounted) {
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                  }
                                 },
                                 icon:
                                     const Icon(Icons.save, color: Colors.white),

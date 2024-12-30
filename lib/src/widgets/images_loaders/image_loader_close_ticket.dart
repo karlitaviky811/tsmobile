@@ -5,19 +5,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider_close_ticket.dart';
-import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 
 class ImageUploaderCloseTicket extends StatefulWidget {
   final List<ImageData> initialImages;
-  final bool showAddButton; // Nuevo parámetro
+  final bool showAddButton;
 
   ImageUploaderCloseTicket({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
 
   @override
-  _ImageUploaderSparePartsState createState() => _ImageUploaderSparePartsState();
+  _ImageUploaderCloseTicketState createState() => _ImageUploaderCloseTicketState();
 }
 
-class _ImageUploaderSparePartsState extends State<ImageUploaderCloseTicket> {
+class _ImageUploaderCloseTicketState extends State<ImageUploaderCloseTicket> {
   @override
   void initState() {
     super.initState();
@@ -42,7 +41,7 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderCloseTicket> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.showAddButton) // Mostrar condicionalmente el botón
+            if (widget.showAddButton)
               ElevatedButton(
                 onPressed: _pickImage,
                 style: ElevatedButton.styleFrom(
@@ -81,7 +80,7 @@ class _ImageUploaderSparePartsState extends State<ImageUploaderCloseTicket> {
                           ],
                         );
                       }).toList(),
-                      ...imageProvider.newImagePaths.map((path) {
+                      ...?imageProvider.newImagePaths.map((path) {
                         return Stack(
                           children: [
                             Padding(

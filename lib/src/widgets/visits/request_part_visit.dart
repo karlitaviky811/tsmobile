@@ -583,14 +583,14 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                                 )
                                               ],
                                             ),
-                                          if (request.status == 7)
+                                          /*if (request.status == 7)
                                             InvoiceSparePart(
                                               visitId: request.id,
                                               initialImages: const [],
-                                            ),
-                                          if (request.status == 8)
+                                            ),*/
+                                          if (request.status == 8 || request.status == 7)
                                             InvoiceSparePartFinal(
-                                              showButtons: false,
+                                              showButtons: request.status == 7 ? true : false,
                                               requestId: request.id.toString(),
                                               initialImages: const [],
                                               budgetAmount:

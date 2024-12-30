@@ -19,7 +19,8 @@ class TicketService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
       final response = await http.get(
-        Uri.parse('http://3.137.100.242:3000/api/v1/tickets?include=serviceCall&page=${index}'),
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/tickets?include=serviceCall&page=${index}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -93,7 +94,7 @@ class TicketService {
     }
   }
 
-  Future<void> sendFile(File file, String modelType, String modelId,
+  Future<bool> sendFile(File file, String modelType, String modelId,
       String collectionName) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -115,23 +116,35 @@ class TicketService {
       final response = await request.send();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Archivo enviado exitosamente.');
+        final responseBody = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseBody);
+        if (jsonResponse['success'] == true) {
+          print('Archivos enviados exitosamente.');
+          return true;
+        } else {
+          print('Error en la respuesta del servidor: $jsonResponse');
+          return false;
+        }
+        return true;
       } else {
         final responseBody = await response.stream.bytesToString();
         print('Error al enviar el archivo: ${response.statusCode}');
         print('Respuesta del servidor: $responseBody');
+        return false;
       }
     } on http.ClientException catch (e) {
       print('ClientException: $e');
+      return false;
     } catch (e) {
       print('Error al enviar la solicitud: $e');
+      return false;
     }
   }
 
-  Future<void> saveFormData(
+  Future<bool> saveFormData(
       String date, String observations, List<File> images, idTicket) async {
     String apiUrl =
-        'http://3.137.100.242:3000/api/v1/tickets/${idTicket}'; // Reemplaza con tu endpoint real
+        'http://3.137.100.242:3000/api/v1/tickets/$idTicket'; // Reemplaza con tu endpoint real
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
@@ -165,6 +178,13 @@ class TicketService {
       if (response.statusCode == 200) {
         print('Datos guardados exitosamente.');
 
+        // Enviar imágenes
+
+        for (File image in images) {
+          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+        }
+
+        
         Fluttertoast.showToast(
             msg: "Datos guardados exitosamente",
             toastLength: Toast.LENGTH_SHORT,
@@ -173,10 +193,8 @@ class TicketService {
             backgroundColor: Colors.green,
             textColor: Colors.white,
             fontSize: 16.0);
-        // Enviar imágenes
-        for (File image in images) {
-          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
-        }
+
+        return true;
       } else {
         Fluttertoast.showToast(
             msg: "Error al guardar los datos",
@@ -187,6 +205,7 @@ class TicketService {
             textColor: Colors.white,
             fontSize: 16.0);
         print('Respuesta del servidor: ${response.body}');
+        return false;
       }
     } catch (e) {
       Fluttertoast.showToast(
@@ -198,6 +217,7 @@ class TicketService {
           textColor: Colors.white,
           fontSize: 16.0);
     }
+    return false;
   }
 
   Future<void> savecloseTicketFormData(
@@ -238,7 +258,7 @@ class TicketService {
       if (response.statusCode == 200) {
         // Enviar imágenes
         for (File image in images) {
-          await sendFile(image, 'Ticket', idTicket.toString(), 'diagnostic');
+          await sendFile(image, 'Ticket', idTicket.toString(), 'closed');
         }
         Fluttertoast.showToast(
             msg: "Datos guardados exitosamente",
@@ -271,10 +291,8 @@ class TicketService {
     }
   }
 
-
   Future<void> obtainDataMediaDiagnostic(
       String date, String observations, List<File> images, idTicket) async {
-   
     String apiUrl =
         '       http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${idTicket}&collection_name=diagnostic'; // Reemplaza con tu endpoint real
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -343,6 +361,4 @@ class TicketService {
           fontSize: 16.0);
     }
   }
-
-
 }
