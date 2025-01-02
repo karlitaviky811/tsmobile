@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -8,10 +7,9 @@ import 'package:tsmobile/src/providers/image_provider_diagnostic.dart';
 
 class ImageUploaderDiagnostic extends StatefulWidget {
   final List<ImageData> initialImages;
-  
-  bool showAddButton;
+  final bool showAddButton;
 
-  ImageUploaderDiagnostic({Key? key, this.initialImages = const [], required bool this.showAddButton}) : super(key: key);
+  ImageUploaderDiagnostic({Key? key, this.initialImages = const [], required this.showAddButton}) : super(key: key);
 
   @override
   _ImageUploaderDiagnosticState createState() => _ImageUploaderDiagnosticState();
@@ -36,13 +34,22 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
   }
 
   @override
+  void didUpdateWidget(covariant ImageUploaderDiagnostic oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialImages != widget.initialImages) {
+      final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
+      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ImageProviderDiagnostic>(
       builder: (context, imageProvider, child) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-           if (widget.showAddButton) // Mostrar condicionalmente el botón
+            if (widget.showAddButton) // Mostrar condicionalmente el botón
               ElevatedButton(
                 onPressed: _pickImage,
                 style: ElevatedButton.styleFrom(

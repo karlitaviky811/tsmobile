@@ -27,7 +27,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _observationsController = TextEditingController();
   late List<File> _images = [];
-  late List<ImageData> _imagesSend = [];
+  final ValueNotifier<List<ImageData>> _imagesSendNotifier = ValueNotifier([]);
   final ImagePicker _picker = ImagePicker();
   late Future<void> _loadTicketFuture;
   DateTime? _selectedDate;
@@ -38,13 +38,15 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
   @override
   void initState() {
     super.initState();
-    _loadTicketFuture = _loadTicketData();
+    _loadTicketFuture = _loadData();
   }
 
-  Future<void> _loadTicketData() async {
+  Future<void> _loadData() async {
     final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-    await ticketProvider.loadTicketById(widget.idTicket);
-    await _fetchImages();
+    await Future.wait([
+      ticketProvider.loadTicketById(widget.idTicket),
+      _fetchImages(),
+    ]);
   }
 
   Future<void> _pickDate(BuildContext context) async {
@@ -96,9 +98,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body)['data'];
-        setState(() {
-          _imagesSend = data.map((item) => ImageData.fromJson(item)).toList();
-        });
+        _imagesSendNotifier.value = data.map((item) => ImageData.fromJson(item)).toList();
       } else {
         print('Error fetching images: ${response.statusCode}');
       }
@@ -127,6 +127,24 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
     _fetchImages();
   }
 
+  Future<void> _showLoadingDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // El usuario no puede cerrar el diálogo tocando fuera de él
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text('Guardando...'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final serviceUpdateTicket = TicketService();
@@ -137,7 +155,14 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
         future: _loadTicketFuture,
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                child: Center(
+                  child: const CircularProgressIndicator(),
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
@@ -202,10 +227,14 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                             readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
-                          ImageUploaderDiagnostic(
-                            initialImages: _imagesSend,
-                            showAddButton:
-                                _isFormActive, // Mostrar o no el botón de añadir imágenes
+                          ValueListenableBuilder<List<ImageData>>(
+                            valueListenable: _imagesSendNotifier,
+                            builder: (context, imagesSend, child) {
+                              return ImageUploaderDiagnostic(
+                                initialImages: imagesSend,
+                                showAddButton: _isFormActive, // Mostrar o no el botón de añadir imágenes
+                              );
+                            },
                           ),
                           const SizedBox(height: 30),
                           Center(
@@ -232,16 +261,14 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                     return;
                                   }
 
+                                  // Mostrar el diálogo de carga
+                                  _showLoadingDialog(context);
+
                                   // Obtener imágenes del proveedor
                                   final imageProvider =
-                                      Provider.of<ImageProviderDiagnostic>(
-                                          context,
-                                          listen: false);
-                                  List<String> imagePaths =
-                                      imageProvider.newImagePaths;
-                                  List<File> imageFiles = imagePaths
-                                      .map((path) => File(path))
-                                      .toList();
+                                      Provider.of<ImageProviderDiagnostic>(context, listen: false);
+                                  List<String> imagePaths = imageProvider.newImagePaths;
+                                  List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
                                   _resetProvider();
                                   if (_selectedDate != null) {
                                     bool success = await serviceUpdateTicket.saveFormData(
@@ -250,19 +277,20 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                       imageFiles,
                                       widget.idTicket,
                                     );
+                                    if (success) {
                                       await _fetchImages();
-                                    /*if (success) {
-                                      await _fetchImages();
-                                    }*/
-                                    setState(() {
-                                      _isFormActive = false;
-                                      _imagesSend.clear();
-                                      imageProvider.clearImages();
-                                    });
+                                      setState(() {
+                                        _isFormActive = false;
+                                        imageProvider.clearImages();
+                                      });
+                                    }
                                     await ticketProvider.loadTicketById(widget.idTicket);
                                   } else {
                                     print('Por favor, selecciona una fecha.');
                                   }
+
+                                  // Cerrar el diálogo de carga
+                                  Navigator.of(context).pop();
                                 } else {
                                   setState(() {
                                     _isFormActive = true;

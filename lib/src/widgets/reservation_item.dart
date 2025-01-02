@@ -3,18 +3,18 @@ import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_
 import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import '../core/theme/app.styles.dart';
-// Asegúrate de importar el modelo correcto
 
 class ReservationItemElement extends StatelessWidget {
-  final ServiceTicket ticket; // Cambiar Item a ServiceTicket
+  final ServiceTicket ticket;
+  final VoidCallback onTap;
 
-  const ReservationItemElement(
-      {super.key, required this.ticket}); // Cambiar item a ticket
+  const ReservationItemElement({super.key, required this.ticket, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        onTap();
         print('ticket----- ${ticket}');
 
         if (ticket.status == 1) {
@@ -35,79 +35,86 @@ class ReservationItemElement extends StatelessWidget {
           );
         }
       },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const _CardScheduledReservationtImage(
-            image: 'assets/images/wrench.png',
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.transparent,
+            width: 2,
           ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  ticket.title, // Mostrar el título del ticket
-                  style: AppStyle.txtPoppinsSemiBold16Black,
-                  overflow: TextOverflow.ellipsis, // Agregar esta línea
-                  maxLines: 1, // Limitar el número de líneas
-                ),
-                const SizedBox(height: 6),
-                _CardScheduledReservationToday(
-                    date: ticket.diagnosisDate ??
-                        DateTime.now()), // Pasar la fecha de diagnóstico
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
-                    Expanded(
-                      child: Text(
-                        ticket.customerName ?? 'Customer name',
-                        style: AppStyle.txtPoppinsRegular12Black,
-                        overflow: TextOverflow.ellipsis, // Agregar esta línea
-                        maxLines: 1, // Limitar el número de líneas
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.schedule_outlined,
-                      size: 12,
-                    ),
-                    Text('${ticket.totalCost} USD',
-                        style: AppStyle
-                            .txtPoppinsRegular12Black), // Mostrar el costo total
-                    const Text(' | '),
-                    Text('50', style: AppStyle.txtPoppinsRegular12Black),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 12,
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Vía Av. Caracas y Av. P.º Caroni',
-                        style: AppStyle.txtPoppinsRegular12Black,
-                        overflow: TextOverflow.ellipsis, // Agregar esta línea
-                        maxLines: 1, // Limitar el número de líneas
-                      ),
-                    ),
-                    const Text(' | '),
-                    Text('50', style: AppStyle.txtPoppinsRegular12Black),
-                  ],
-                ),
-              ],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const _CardScheduledReservationtImage(
+              image: 'assets/images/wrench.png',
             ),
-          ),
-        ],
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    ticket.title,
+                    style: AppStyle.txtPoppinsSemiBold16Black,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  const SizedBox(height: 6),
+                  _CardScheduledReservationToday(
+                      date: ticket.diagnosisDate ?? DateTime.now()),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text('Cliente: ', style: AppStyle.txtPoppinsRegular12Black),
+                      Expanded(
+                        child: Text(
+                          ticket.customerName ?? 'Customer name',
+                          style: AppStyle.txtPoppinsRegular12Black,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.schedule_outlined,
+                        size: 12,
+                      ),
+                      Text('${ticket.totalCost} USD',
+                          style: AppStyle.txtPoppinsRegular12Black),
+                      const Text(' | '),
+                      Text('50', style: AppStyle.txtPoppinsRegular12Black),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 12,
+                      ),
+                      Expanded(
+                        child: Text(
+                          'Vía Av. Caracas y Av. P.º Caroni',
+                          style: AppStyle.txtPoppinsRegular12Black,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                      const Text(' | '),
+                      Text('50', style: AppStyle.txtPoppinsRegular12Black),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -131,7 +138,7 @@ class _CardScheduledReservationToday extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Text(
-          '${date.day} de ${_getMonthName(date.month)} ${date.year}', // Formatear la fecha
+          '${date.day} de ${_getMonthName(date.month)} ${date.year}',
           style: AppStyle.txtPoppinsRegular12Black,
         ),
       ],
@@ -171,10 +178,10 @@ class _CardScheduledReservationtImage extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.transparent),
-          image:
-              DecorationImage(image: AssetImage(image), fit: BoxFit.contain)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.transparent),
+        image: DecorationImage(image: AssetImage(image), fit: BoxFit.contain),
+      ),
     );
   }
 }

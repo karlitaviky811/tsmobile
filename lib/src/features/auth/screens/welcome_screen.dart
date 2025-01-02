@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
@@ -58,13 +56,20 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-class _LoginForm extends StatelessWidget {
+class _LoginForm extends StatefulWidget {
+  @override
+  __LoginFormState createState() => __LoginFormState();
+}
+
+class __LoginFormState extends State<_LoginForm> {
+  bool isPasswordVisible = false;
+
   @override
   Widget build(BuildContext context) {
     final loginForm = Provider.of<LoginFormProvider>(context);
     final authService = AuthService();
 
-    Future<bool> _signIn() async {
+    Future<bool> _signIn(BuildContext context) async {
       try {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.remove('auth_token');
@@ -111,45 +116,41 @@ class _LoginForm extends StatelessWidget {
               },
             ),
             const SizedBox(height: 30),
-            StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                bool isPasswordVisible = false;
-                return TextFormField(
-                  autocorrect: false,
-                  obscureText: !isPasswordVisible,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecorations.authInputDecoration(
-                    hintText: '*****',
-                    labelText: 'Contraseña',
-                    prefixIcon: Icons.lock_outline,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        isPasswordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isPasswordVisible = !isPasswordVisible;
-                        });
-                      },
-                    ),
+            TextFormField(
+              autocorrect: false,
+              obscureText: !isPasswordVisible,
+              keyboardType: TextInputType.text,
+              decoration: InputDecorations.authInputDecoration(
+                hintText: '*****',
+                labelText: 'Contraseña',
+                prefixIcon: Icons.lock_outline,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    isPasswordVisible
+                        ? Icons.visibility_off
+                        : Icons.visibility ,
                   ),
-                  onChanged: (value) => loginForm.password = value,
-                  validator: (value) {
-                    if (value != null && value.length >= 6) return null;
-                    return 'La contraseña debe ser al menos de 6 caracteres';
+                  onPressed: () {
+                    setState(() {
+                      isPasswordVisible = !isPasswordVisible;
+                    });
                   },
-                );
+                ),
+              ),
+              onChanged: (value) => loginForm.password = value,
+              validator: (value) {
+                if (value != null && value.length >= 6) return null;
+                return 'La contraseña debe ser al menos de 6 caracteres';
               },
             ),
             const SizedBox(height: 60),
             MaterialButton(
               onPressed: () async {
                 if (loginForm.isValidForm()) {
-                  bool success = await _signIn();
+                  _showLoadingDialog(context);
+                  bool success = await _signIn(context);
+                  Navigator.pop(context); // Cerrar el diálogo de carga
                   if (success) {
-                    
                     Navigator.pushReplacementNamed(context, TabsPage.route);
                   } else {
                     Fluttertoast.showToast(
@@ -188,6 +189,24 @@ class _LoginForm extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Autenticando..."),
+            ],
+          ),
+        );
+      },
     );
   }
 

@@ -31,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void main() async {
-    final userService = new UserProvider();
+    final userService = UserProvider();
     Future<void> fetchedUser = userService.obatinUserData();
     await dotenv.load(fileName: ".env");
     await OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -45,8 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       OneSignal.initialize(oneSignalAppId as String);
       final String userTag = userService.user!.id.toString();
-      // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt.
-      // We recommend removing the following code and instead using an In-App Message to prompt for notification permission.
 
       if ((OneSignal.User.pushSubscription.id == null)) {
         OneSignal.Notifications.requestPermission(true);
@@ -61,12 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
         print(
             'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
 
-        /// Display Notification, preventDefault to not display
         event.preventDefault();
-
-        /// Do async work
-
-        /// notification.display() to display after preventing default
         event.notification.display();
       });
     });
@@ -76,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
     return user == null
-        ? Center(
+        ? const Center(
             child: CircularProgressIndicator(),
           )
         : Scaffold(
@@ -86,9 +79,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 IconButton(
                   icon: const Icon(Icons.notifications, color: Colors.white),
                   onPressed: () {
-                    // Acción de notificaciones
-                    print('Notificaciones');
-
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -98,48 +88,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
               leading: IconButton(
-                icon:
-                    Image.asset('assets/images/android-chrome-192x192new.png'),
-                color: Colors.white, // Cambiar color aquí
-                onPressed: () {
-                  //_scaffoldKey.currentState?.openDrawer();
-                },
+                icon: Image.asset('assets/images/android-chrome-192x192new.png'),
+                color: Colors.white,
+                onPressed: () {},
               ),
             ),
             body: SingleChildScrollView(
               child: Container(
                 color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(user!.name,
-                          style: AppStyle.txtPoppinsSemiBold20Black),
-                      Text(user!.nameComercial,
-                          style: AppStyle.txtPoppinsSemiBold14Black),
-                      const SizedBox(height: 31),
-                      Text('Ubicación Actual',
-                          style: AppStyle.txtPoppinsSemiBold18Black),
-                      const SizedBox(height: 10),
-                      LocationCard(),
-                      const SizedBox(height: 31),
-                      Text(
-                        'Servicios',
-                        style: AppStyle.txtPoppinsMedium18Black,
-                      ),
-                      const SizedBox(height: 16),
-                      const _ListCourt(),
-                      const SizedBox(height: 40),
-                      Text(
-                        'Servicios programados',
-                        style: AppStyle.txtPoppinsMedium18Black,
-                      ),
-                      const SizedBox(height: 20),
-                      const _ListScheduleReservationItems(),
-                      const SizedBox(height: 40),
-                    ],
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(user!.name, style: AppStyle.txtPoppinsSemiBold20Black),
+                    Text(user!.nameComercial, style: AppStyle.txtPoppinsSemiBold14Black),
+                    const SizedBox(height: 31),
+                    Text('Ubicación Actual', style: AppStyle.txtPoppinsSemiBold18Black),
+                    const SizedBox(height: 10),
+                    LocationCard(),
+                    const SizedBox(height: 31),
+                    Text('Servicios', style: AppStyle.txtPoppinsMedium18Black),
+                    const SizedBox(height: 16),
+                    const _ListCourt(),
+                    const SizedBox(height: 40),
+                    Text('Servicios programados', style: AppStyle.txtPoppinsMedium18Black),
+                    const SizedBox(height: 20),
+                    const _ListScheduleReservationItems(),
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ),
             ),
@@ -148,9 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _ListCourt extends StatelessWidget {
-  const _ListCourt({
-    super.key,
-  });
+  const _ListCourt({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -360,9 +334,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               colors: [
                 Color(0xff051937),
                 Color(0XFF131314),
-
-                //Color(0xff051937),
-                //Color(0XFF131314),
               ],
             ),
           ),

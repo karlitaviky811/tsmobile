@@ -52,42 +52,6 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   TextEditingController _notesController = TextEditingController();
   DateTime? _selectedDate;
 
-  /* void _saveDetails() async {
-    if (_selectedDate == null) {
-      print("Por favor, selecciona una fecha.");
-      return;
-    }
-
-    final Map<String, dynamic> data = {
-      'start_date': _selectedDate!.toIso8601String(),
-      'additional_notes': _notesController.text,
-      'status': 4,
-    };
-
-    print('programado $data');
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final idTicket = widget.ticketId.toString();
-      String? token = prefs.getString('auth_token');
-      final visistService = VisistService();
-      final ticketProvider =
-          Provider.of<TicketProvider>(context, listen: false);
-      final item = ticketProvider.ticketInfo;
-      _loadTicketFuture = ticketProvider.updateTicket(item!, data);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => TicketAcceptedProgressDetailPage(
-              ticketId: item.id.toString()), // Cambiar item a ticket
-        ),
-      );
-      print("Se ha aceptado el ticket exitosamente");
-    } catch (e) {
-      print("Error al conectar con el servidor: $e");
-    }
-  }
-*/
   void _saveDetails() async {
     if (_selectedDate == null) {
       print("Por favor, selecciona una fecha.");
@@ -159,7 +123,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     final Map<String, dynamic> data = {
       'start_date': DateTime.now().toIso8601String(),
       'additional_notes': _notesController.text,
-      'status': 1,
+      'status': 3,
     };
 
     print('programado $data');
@@ -197,29 +161,6 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     }
   }
 
-  /* void _saveDetailsRejected() async {
-    final Map<String, dynamic> data = {
-      'start_date': DateTime.now().toIso8601String(),
-      'additional_notes': _notesController.text,
-      'status': 1,
-    };
-
-    print('programado $data');
-    try {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final idTicket = widget.ticketId.toString();
-      String? token = prefs.getString('auth_token');
-      final ticketProvider =
-          Provider.of<TicketProvider>(context, listen: false);
-      final item = ticketProvider.ticketInfo;
-      _loadTicketFuture = ticketProvider.updateTicket(item!, data);
-
-      print("Error al guardar los detalles:");
-    } catch (e) {
-      print("Error al conectar con el servidor: $e");
-    }
-  }*/
-
   final List<String> _rejectionReasons = [
     'Cliente no disponible',
     'Información insuficiente',
@@ -238,11 +179,13 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2101),
+      initialDate: now,
+      firstDate: now,
+      lastDate: now.add(const Duration(
+          days: 2)), // Cambia a 2 días para incluir la fecha actual
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {
@@ -437,7 +380,8 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
                               status: item.status?.toString() ?? 'N/A',
                               type: 'Reparación',
                               title: item.title ?? 'N/A',
-                              description: item.serviceCallDetail['descrption'],
+                              description:
+                                  item.serviceCallDetail['descrption'] ?? '',
                               creationDateTime: item.createdAt,
                               location: 'Cambiar formato de coordenadas',
                               product: item.serviceCallDetail['itemName'] ?? '',

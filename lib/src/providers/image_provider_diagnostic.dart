@@ -10,8 +10,10 @@ class ImageProviderDiagnostic with ChangeNotifier {
   List<String> get newImagePaths => _newImagePaths;
 
   void setInitialImages(List<String> paths) {
-    _initialImagePaths = paths;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialImagePaths = paths;
+      notifyListeners();
+    });
   }
 
   void setImagePickerActive(bool isActive) {
@@ -20,9 +22,11 @@ class ImageProviderDiagnostic with ChangeNotifier {
   }
 
   void resetImage() {
-    _newImagePaths.clear();
-    _initialImagePaths.clear();
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _newImagePaths.clear();
+      _initialImagePaths.clear();
+      notifyListeners();
+    });
   }
 
   void addImage(String path) {
@@ -40,8 +44,10 @@ class ImageProviderDiagnostic with ChangeNotifier {
   }
 
   void clearImages() {
-    _initialImagePaths.clear();
-    _newImagePaths.clear();
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialImagePaths.clear();
+      _newImagePaths.clear();
+      notifyListeners();
+    });
   }
 }

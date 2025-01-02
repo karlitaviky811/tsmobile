@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
+import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
 import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/widgets/reservation_item.dart';
@@ -29,6 +31,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   final ScrollController _scrollController = ScrollController();
   bool _isLoadingMore = false;
   int _currentPage = 1;
+  int? _selectedCardIndex;
 
   List<Status> tags = [
     Status(0, "Todos"),
@@ -87,6 +90,12 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
     });
   }
 
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedCardIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ticketProvider = Provider.of<TicketProvider>(context);
@@ -116,58 +125,75 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        labelText: "Buscar por título",
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery = value;
-                          updateFilteredItems();
-                        });
-                      },
-                    ),
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: 4.0,
-                      children: tags.map((tag) {
-                        return FilterChip(
-                          label: Text(
-                            tag.title ?? 'Customer name',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              height: 1.4,
-                              fontWeight: FontWeight.normal,
-                              color: selectedTags.contains(tag)
-                                  ? Colors.white
-                                  : const Color(0xff051937),
-                            ),
+                    Container(
+                      height: 40, // Ajustar la altura del input de búsqueda
+                      child: TextField(
+                        decoration: const InputDecoration(
+                          labelText: "Buscar por título",
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          selected: selectedTags.contains(tag),
-                          checkmarkColor: Colors.white,
-                          selectedColor: const Color(0xff051937),
-                          onSelected: (bool selected) {
-                            setState(() {
-                              if (tag.title == "Todos") {
-                                selectedTags.clear();
-                                selectedTags.add(tag);
-                              } else {
-                                if (selectedTags.any((tag) => tag.title == "Todos")) {
-                                  selectedTags.removeWhere((tag) => tag.title == "Todos");
-                                }
-                                if (selected) {
-                                  selectedTags.add(tag);
-                                } else {
-                                  selectedTags.remove(tag);
-                                }
-                              }
-                              updateFilteredItems();
-                            });
-                          },
-                        );
-                      }).toList(),
+                          contentPadding: EdgeInsets.symmetric(vertical: 10.0), // Ajustar el padding del contenido
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value;
+                            updateFilteredItems();
+                          });
+                        },
+                      ),
                     ),
+                    const SizedBox(height: 16),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: tags.map((tag) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                            child: FilterChip(
+                              label: Text(
+                                tag.title ?? 'Customer name',
+                                style: TextStyle(
+                                  fontSize: 14.0, // Tamaño de fuente más pequeño
+                                  height: 1.2,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black, // Color de las letras a negro
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), // Padding más pequeño
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0), // Bordes redondeados
+                                side: BorderSide.none, // Quitar el borde
+                              ),
+                              backgroundColor: selectedTags.contains(tag) ? const Color(0xfffbdb04) : Colors.transparent, // Color de fondo
+                              selectedColor: const Color(0xfffbdb04), // Color de fondo cuando está seleccionado
+                              checkmarkColor: Colors.black, // Color de la marca de verificación
+                              selected: selectedTags.contains(tag),
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  if (tag.title == "Todos") {
+                                    selectedTags.clear();
+                                    selectedTags.add(tag);
+                                  } else {
+                                    if (selectedTags.any((tag) => tag.title == "Todos")) {
+                                      selectedTags.removeWhere((tag) => tag.title == "Todos");
+                                    }
+                                    if (selected) {
+                                      selectedTags.add(tag);
+                                    } else {
+                                      selectedTags.remove(tag);
+                                    }
+                                  }
+                                  updateFilteredItems();
+                                });
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Expanded(
                       child: ListView.builder(
                         controller: _scrollController,
@@ -176,28 +202,59 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                           if (index == filteredItems.length) {
                             return const Center(child: CircularProgressIndicator());
                           }
-                          return Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    left: 18.25,
-                                    top: 14,
-                                    bottom: 14,
-                                    right: 15.75),
-                                width: double.infinity,
-                                decoration: BoxDecoration(
+                          return GestureDetector(
+                            onTap: () {
+                              _onItemTapped(index);
+                              Future.delayed(const Duration(milliseconds: 200), () {
+                                // Navegar al siguiente widget después de un pequeño retraso
+                                if (filteredItems[index].status == 1) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TicketDetailPageView(
+                                          ticketId: filteredItems[index].id.toString()),
+                                    ),
+                                  ).then((_) {
+                                    // Mantener el borde amarillo al volver
+                                    setState(() {});
+                                  });
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TicketAcceptedProgressDetailPage(
+                                          ticketId: filteredItems[index].id.toString()),
+                                    ),
+                                  ).then((_) {
+                                    // Mantener el borde amarillo al volver
+                                    setState(() {});
+                                  });
+                                }
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Card(
+                                color: Colors.white, // Establecer el color del Card a blanco
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                      color: const Color(0xffEEEFF1)),
+                                  side: BorderSide(
+                                    color: _selectedCardIndex == index
+                                        ? const Color(0xfffbdb04)
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
                                 ),
-                                child: ReservationItemElement(
-                                    ticket: filteredItems[index]),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: ReservationItemElement(
+                                    ticket: filteredItems[index],
+                                    onTap: () => _onItemTapped(index),
+                                  ),
+                                ),
                               ),
-                              if (index < filteredItems.length - 1)
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                            ],
+                            ),
                           );
                         },
                       ),

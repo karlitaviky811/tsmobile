@@ -1,14 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
+import 'package:tsmobile/src/models/images_model.dart';
 
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/widgets/client_detail_card.dart';
 import 'package:tsmobile/src/widgets/close_ticket/close_ticket_form.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/widgets/visits/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
 import '../../../widgets/diagnostic/diagnostic_log_ticket.dart';
@@ -24,14 +27,11 @@ class TicketAcceptedProgressDetailPage extends StatefulWidget {
 }
 
 class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
-  // bool _needsReplacement = false;
   DateTime? _selectedDate;
-  //final _inputController1 = TextEditingController();
-  //final _inputController2 = TextEditingController();
-  //final _replacementCodeController = TextEditingController();
   late Future<void> _loadTicketFuture;
   late Future<void> _loadVisitFuture;
   late Future<void> _loadDataFuture;
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +43,32 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
         .loadTicketById(widget.ticketId);
     await Provider.of<VisitProvider>(context, listen: false)
         .fetchVisitsByTicket(widget.ticketId);
+    _fetchAllImages();
+  }
+
+  Future<Map<String, List<ImageData>>> _fetchAllImages() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    final budgetResponse = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
+      headers: {
+        'Content-Type': 'application/json',
+        "Accept": "application/json",
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (budgetResponse.statusCode == 200) {
+      List<dynamic> budgetData = json.decode(budgetResponse.body)['data'];
+      return {
+        'diagnostic':
+            budgetData.map((item) => ImageData.fromJson(item)).toList(),
+      };
+    } else {
+      throw Exception('Error fetching images');
+    }
   }
 
   @override
@@ -79,6 +105,14 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
               style: TextStyle(
                   fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
           bottom: const TabBar(
+            indicatorColor: Color(0xfffbdb04), // Color de la línea de los tabs
+            labelColor: Color.fromRGBO(255, 226, 59, 0.973), // Color de los títulos de los tabs
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.bold, // Mayor negrita para el tab seleccionado
+            ),
+            unselectedLabelStyle: TextStyle(
+              fontWeight: FontWeight.normal, // Negrita normal para los tabs no seleccionados
+            ),
             tabs: [
               Tab(
                 text: 'General',
@@ -100,7 +134,8 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                 _loadDataFuture, // Utiliza el Future inicializado en initState
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Container(
+                    child: const Center(child: CircularProgressIndicator()));
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else {
@@ -114,14 +149,14 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                     _TicketDetailProgress(ticketInfo: item),
                     DiagnosticForm(
                       idTicket: widget.ticketId,
-                      onSave: (DateTime? date, String observations,List<File> images) {
-                      },
+                      onSave: (DateTime? date, String observations,
+                          List<File> images) {},
                     ),
                     RepairLogFormData(ticketId: widget.ticketId),
                     CloseTicketForm(
                       idTicket: widget.ticketId,
-                      onSave: (DateTime? date, String observations,List<File> images) {
-                      },
+                      onSave: (DateTime? date, String observations,
+                          List<File> images) {},
                     )
                   ],
                 );
@@ -194,10 +229,7 @@ class _TicketDetailProgress extends StatelessWidget {
                 const SizedBox(
                   height: 5,
                 ),
-                //Divider(),
                 ClienteHandler(ticketInfo: ticketInfo),
-
-                // Más apartados como Prueba y Cierre pueden ser añadidos aquí...
               ],
             ),
           ),
@@ -232,7 +264,6 @@ class _ClienteHandlerState extends State<ClienteHandler> {
           await placemarkFromCoordinates(latitude, longitude);
       Placemark place = placemarks[0];
       if (mounted) {
-        // Verificar si el widget aún está en el árbol
         setState(() {
           _address =
               "${place.street}, ${place.locality}, ${place.postalCode}, ${place.country}";
@@ -241,7 +272,6 @@ class _ClienteHandlerState extends State<ClienteHandler> {
     } catch (e) {
       print(e);
       if (mounted) {
-        // Verificar si el widget aún está en el árbol
         setState(() {
           _address = "Could not get address";
         });
@@ -263,8 +293,7 @@ class _ClienteHandlerState extends State<ClienteHandler> {
         email: widget.ticketInfo.serviceCallDetail['BPE_Mail'] ?? 'No tiene',
         geolocation: _address ?? 'No tiene',
         latitude: widget.ticketInfo.serviceCallDetail['latitude'] ?? 0.0,
-        longitude: widget.ticketInfo.serviceCallDetail['longitude'] ??
-            0.0, // Ejemplo de coordenadas
+        longitude: widget.ticketInfo.serviceCallDetail['longitude'] ?? 0.0,
         onAddressChanged: _updateAddress,
       ),
     );
