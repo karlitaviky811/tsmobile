@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
 import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
 import 'package:tsmobile/src/features/main/screens/home_page.dart';
 import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
-
-import '../constant/image.constant.dart';
 
 class TabsPage extends StatelessWidget {
   const TabsPage({Key? key}) : super(key: key);
@@ -35,44 +33,41 @@ class _Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final navegationModel = Provider.of<_NavigationModel>(context);
     return BottomNavigationBar(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       selectedItemColor: const Color(0xff051937),
       unselectedItemColor: Colors.grey,
-      type: BottomNavigationBarType.shifting,
+      type: BottomNavigationBarType.fixed,
       currentIndex: navegationModel.paginaActual,
       onTap: (i) => navegationModel.paginaActual = i,
       items: [
         BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            ImageConstant.imgHome,
-             height: 22,
-     width: 22,
+          icon: FaIcon(
+            FontAwesomeIcons.home,
             color: navegationModel.paginaActual == 0 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            ImageConstant.imgSearch,
-            color: navegationModel.paginaActual == 1 ? const Color(0xff051937)  : Colors.grey,
+          icon: FaIcon(
+            FontAwesomeIcons.search,
+            color: navegationModel.paginaActual == 1 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Servicios',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            ImageConstant.imgCalendar,
+          icon: FaIcon(
+            FontAwesomeIcons.calendar,
             color: navegationModel.paginaActual == 2 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Calendario',
         ),
         BottomNavigationBarItem(
-          icon: SvgPicture.asset(
-            ImageConstant.imgUser,
+          icon: FaIcon(
+            FontAwesomeIcons.user,
             color: navegationModel.paginaActual == 3 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Configuración',
         ),
-        
       ],
     );
   }
@@ -93,7 +88,6 @@ class _Pages extends StatelessWidget {
         const HomeScreen(),
         const TicketsListFiltered(),
         const CalendarScreen(),
-        //SettingsPage2(),
         SettingsView(),
       ],
     );
