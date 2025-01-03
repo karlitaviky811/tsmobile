@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +17,9 @@ class ImageUploaderSparePartsNew extends StatefulWidget {
 }
 
 class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew> {
-    bool _isPickerActive = false;
-      final ImagePicker _picker = ImagePicker();
+  bool _isPickerActive = false;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +31,7 @@ class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew>
     });
   }
 
-    Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
 
     setState(() {
@@ -39,7 +39,7 @@ class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew>
     });
 
     try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null && mounted) {
         final imageProvider = Provider.of<ImageProviderSparePartsNew>(context, listen: false);
         imageProvider.addImage(pickedFile.path);
@@ -53,6 +53,36 @@ class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew>
     }
   }
 
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Seleccionar desde la galería'),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Tomar una foto'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ImageProviderSparePartsNew>(
@@ -62,7 +92,7 @@ class _ImageUploaderSparePartsStateNew extends State<ImageUploaderSparePartsNew>
           children: [
             if (widget.showAddButton)
               ElevatedButton(
-                onPressed: _pickImage,
+                onPressed: () => _showPickerOptions(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff051937),
                   shape: RoundedRectangleBorder(

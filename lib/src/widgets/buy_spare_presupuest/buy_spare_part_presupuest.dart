@@ -241,11 +241,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                   keyboardType: TextInputType.number,
                   readOnly: widget.status == 6, // Deshabilitar para edición si el estado es 6
                   onChanged: (value) {
-                    if (mounted) {
-                      setState(() {
-                        reparacion['montoRepuesto'] = value;
-                      });
-                    }
+                    reparacion['montoRepuesto'] = value;
                   },
                 ),
                 ImageUploaderBuySparePartTechnical(

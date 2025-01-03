@@ -80,7 +80,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
     String? token = prefs.getString('auth_token');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=close_ticket'),
+          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=closed'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",

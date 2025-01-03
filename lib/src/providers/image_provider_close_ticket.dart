@@ -1,22 +1,20 @@
+
 import 'package:flutter/material.dart';
 
-class ImageProviderCloseTicketManagement extends ChangeNotifier {
-  List<String> _newImagePaths = [];
+class ImageProviderCloseTicketManagement with ChangeNotifier {
   List<String> _initialImagePaths = [];
+  List<String> _newImagePaths = [];
   bool _isImagePickerActive = false;
-
-  List<String> get newImagePaths => _newImagePaths;
-  List<String> get initialImagePaths => _initialImagePaths;
   bool get isImagePickerActive => _isImagePickerActive;
 
-  void addImage(String path) {
-    _newImagePaths.add(path);
-    notifyListeners();
-  }
+  List<String> get initialImagePaths => _initialImagePaths;
+  List<String> get newImagePaths => _newImagePaths;
 
-  void removeImage(String path) {
-    _newImagePaths.remove(path);
-    notifyListeners();
+  void setInitialImages(List<String> paths) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialImagePaths = paths;
+      notifyListeners();
+    });
   }
 
   void setImagePickerActive(bool isActive) {
@@ -25,17 +23,32 @@ class ImageProviderCloseTicketManagement extends ChangeNotifier {
   }
 
   void resetImage() {
-    _newImagePaths.clear();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _newImagePaths.clear();
+      _initialImagePaths.clear();
+      notifyListeners();
+    });
+  }
+
+  void addImage(String path) {
+    _newImagePaths.add(path);
+    notifyListeners();
+  }
+
+  void removeImage(String path) {
+    if (_initialImagePaths.contains(path)) {
+      _initialImagePaths.remove(path);
+    } else {
+      _newImagePaths.remove(path);
+    }
     notifyListeners();
   }
 
   void clearImages() {
-    _newImagePaths.clear();
-    notifyListeners();
-  }
-
-  void setInitialImages(List<String> initialImages) {
-    _initialImagePaths = initialImages;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initialImagePaths.clear();
+      _newImagePaths.clear();
+      notifyListeners();
+    });
   }
 }

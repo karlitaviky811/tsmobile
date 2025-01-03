@@ -19,6 +19,7 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
   List<String> _initialImagePaths = [];
   List<String> _newImagePaths = [];
   bool _isPickerActive = false;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
     _initialImagePaths = widget.initialImages.map((imgData) => imgData.originalUrl).toList();
   }
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
 
     setState(() {
@@ -34,7 +35,7 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
     });
 
     try {
-      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null && mounted) {
         setState(() {
           _newImagePaths.add(pickedFile.path);
@@ -47,6 +48,36 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
         _isPickerActive = false;
       });
     }
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Seleccionar desde la galería'),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Tomar una foto'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _removeImage(String path) {
@@ -62,7 +93,7 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
       children: [
         if (widget.showAddButton)
           ElevatedButton(
-            onPressed: _pickImage,
+            onPressed: () => _showPickerOptions(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xff051937),
               shape: RoundedRectangleBorder(

@@ -160,6 +160,9 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         statusColor = const Color.fromARGB(143, 80, 37, 87);
         break;
       case '6':
+        statusColor = const Color.fromARGB(101, 89, 68, 180);
+        break;
+      case '7':
         statusColor = const Color.fromARGB(148, 21, 201, 147);
         break;
       default:
@@ -177,7 +180,11 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         case '4':
           return Icons.done;
         case '5':
-          return Icons.close;
+          return Icons.pause;
+        case '6':
+          return Icons.cancel_schedule_send;
+        case '7':
+          return Icons.done_all;
         default:
           return Icons.info;
       }
@@ -246,7 +253,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         data, finalIdVisit.toString());
     await visitProvider.fetchVisitsByTicket(widget.id);
     await ticketProvider.loadTicketById(widget.id);
-   
+
     if (visit != null) {
       // Maneja la visita recibida en la respuest
       print('Visita recibida: ${visit.title}');
@@ -262,13 +269,17 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       case 1:
         return 'Nuevo';
       case 2:
-        return 'Cerrado';
+        return 'Cerrado por el técnico';
       case 3:
         return 'Rechazado';
       case 4:
         return 'En proceso';
       case 5:
-        return 'Otro'; // Puede agregar cualquier otro estado aquí si es necesario
+        return 'En en pausa';
+      case 6:
+        return 'Ticket Cancelado (Por el cliente)';
+      case 7:
+        return 'Resuelto por el técnico'; // Puede agregar cualquier otro estado aquí si es necesario
       default:
         return 'Número inválido';
     }
@@ -323,8 +334,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Agendar Visita',
-                      style: AppStyle.txtPoppinsBold14Black),
+                  Text('Agendar Visita', style: AppStyle.txtPoppinsBold14Black),
                   const SizedBox(height: 10),
                   const Text('Programar primera visita'),
                   TextField(

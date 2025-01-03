@@ -16,6 +16,9 @@ class ImageUploaderDiagnostic extends StatefulWidget {
 }
 
 class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
+  bool _isPickerActive = false;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -25,12 +28,56 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
-      imageProvider.addImage(pickedFile.path);
+  Future<void> _pickImage(ImageSource source) async {
+    if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
+
+    setState(() {
+      _isPickerActive = true;
+    });
+
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null && mounted) {
+        final imageProvider = Provider.of<ImageProviderDiagnostic>(context, listen: false);
+        imageProvider.addImage(pickedFile.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    } finally {
+      setState(() {
+        _isPickerActive = false;
+      });
     }
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Seleccionar desde la galería'),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Tomar una foto'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -51,7 +98,7 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderDiagnostic> {
           children: [
             if (widget.showAddButton) // Mostrar condicionalmente el botón
               ElevatedButton(
-                onPressed: _pickImage,
+                onPressed: () => _showPickerOptions(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff051937),
                   shape: RoundedRectangleBorder(

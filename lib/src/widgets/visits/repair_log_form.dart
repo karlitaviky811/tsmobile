@@ -25,7 +25,7 @@ class RepairLogFormData extends StatefulWidget {
 class _RepairLogFormDataState extends State<RepairLogFormData> {
   final ImagePicker _picker = ImagePicker();
   late Future<void> _fetchVisitsFuture;
-
+  int? _selectedVisitIndex;
   @override
   void initState() {
     super.initState();
@@ -38,7 +38,12 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     await visitProvider.fetchVisitsByTicket(widget.ticketId);
   }
 
-  void _navigateToEditPage(BuildContext context, Visit visit, String tipo) {
+  void _navigateToEditPage(
+      BuildContext context, Visit visit, String tipo, int index) {
+    setState(() {
+      _selectedVisitIndex =
+          index; // Actualiza el índice de la visita seleccionada
+    });
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -197,8 +202,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.save, color: Colors.white),
-                        SizedBox(
-                            width: 8), // Espacio entre el icono y el texto
+                        SizedBox(width: 8), // Espacio entre el icono y el texto
                         Text(
                           'Añadir visita',
                           style: TextStyle(color: Colors.white),
@@ -452,7 +456,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
       future: _fetchVisitsFuture,
@@ -497,10 +501,16 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                           return Card(
                             color: Colors.white,
                             margin: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 16.0),
+                                vertical: 8.0, horizontal: 8.0),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
+                              side: BorderSide(
+                                color: _selectedVisitIndex == index
+                                    ? const Color(0xfffbdb04)
+                                    : Colors.transparent,
+                                width: 2,
+                              ),
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -567,7 +577,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                       IconButton(
                                         icon: const Icon(Icons.edit),
                                         onPressed: () => _navigateToEditPage(
-                                            context, visit, 'Edit'),
+                                            context, visit, 'Edit', index),
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.schedule),
@@ -614,6 +624,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
       },
     );
   }
+
 
   void _agregarNuevaReparacion() {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);

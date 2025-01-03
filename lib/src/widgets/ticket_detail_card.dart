@@ -15,9 +15,7 @@ class TicketDetailCard extends StatefulWidget {
 // Añadimos el campo de visita programada
 
   // Constructor con required
-  TicketDetailCard({
-    required this.ticketId
-  });
+  TicketDetailCard({required this.ticketId});
 
   @override
   _TicketDetailCardState createState() => _TicketDetailCardState();
@@ -179,6 +177,9 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         statusColor = const Color.fromARGB(143, 80, 37, 87);
         break;
       case '6':
+        statusColor = const Color.fromARGB(101, 89, 68, 180);
+        break;
+      case '7':
         statusColor = const Color.fromARGB(148, 21, 201, 147);
         break;
       default:
@@ -196,6 +197,10 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
         case '4':
           return Icons.done;
         case '5':
+          return Icons.pause;
+        case '6':
+          return Icons.cancel_schedule_send;
+        case '7':
           return Icons.close;
         default:
           return Icons.info;
@@ -247,7 +252,6 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       });
     }
   }
-  
 
   void _saveDetails() async {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
@@ -288,7 +292,11 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
       case 4:
         return 'En proceso';
       case 5:
-        return 'Otro'; // Puede agregar cualquier otro estado aquí si es necesario
+        return 'En en pausa';
+      case 6:
+        return 'Ticket Cancelado (Por el cliente)';
+      case 7:
+        return 'Cerrado por el técnico'; // Puede agregar cualquier otro estado aquí si es necesario
       default:
         return 'Número inválido';
     }
@@ -308,7 +316,8 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
           ),
           Expanded(
             child: Text(
-              DateFormat('dd/MM/yyyy').format(visits.length > 0 ? visits[0].visitDate : new DateTime.now()),
+              DateFormat('dd/MM/yyyy').format(
+                  visits.length > 0 ? visits[0].visitDate : new DateTime.now()),
               style: AppStyle.txtPoppinsRegular14Black,
             ),
           ),
@@ -343,8 +352,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text('Agendar visita',
-                      style: AppStyle.txtPoppinsBold14Black),
+                  Text('Agendar visita', style: AppStyle.txtPoppinsBold14Black),
                   const SizedBox(height: 10),
                   const Text('Programar primera visita'),
                   TextField(

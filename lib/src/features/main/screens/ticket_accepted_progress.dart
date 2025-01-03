@@ -90,16 +90,16 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                       )),
             );
           },
-          backgroundColor: Colors.blueAccent,
-          child: const FaIcon(
-            FontAwesomeIcons.comments,
-            color: Colors.white,
-            size: 30,
-          ),
+          backgroundColor: const Color(0xffFFD43B),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
           elevation: 10,
+          child: const FaIcon(
+            FontAwesomeIcons.comments, // Ícono de chat
+            color: Colors.white,
+            size: 24, // Ajusta el tamaño del ícono aquí
+          ),
         ),
         appBar: AppBar(
           leading: IconButton(
@@ -111,13 +111,22 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
               style: TextStyle(
                   fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
           bottom: const TabBar(
-            indicatorColor: Color(0xfffbdb04), // Color de la línea de los tabs
-            labelColor: Color.fromRGBO(255, 226, 59, 0.973), // Color de los títulos de los tabs
+            // Permite que los tabs se desplacen horizontalmente
+            indicatorColor: const Color(0xff051937), // Color de la línea de los tabs
+            labelColor: const Color(0xff051937), // Color de los títulos de los tabs
             labelStyle: TextStyle(
-              fontWeight: FontWeight.bold, // Mayor negrita para el tab seleccionado
+              fontFamily: 'Poppins',
+              fontSize: 14,
+              color: Colors.black,
+              fontWeight:
+                  FontWeight.bold, // Estilo de fuente para el tab seleccionado
             ),
             unselectedLabelStyle: TextStyle(
-              fontWeight: FontWeight.normal, // Negrita normal para los tabs no seleccionados
+              fontFamily: 'Poppins',
+              fontSize: 12,
+              color: Colors.black,
+              fontWeight: FontWeight
+                  .normal, // Estilo de fuente para los tabs no seleccionados
             ),
             tabs: [
               Tab(

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -10,13 +9,16 @@ class ImageUploaderCloseTicket extends StatefulWidget {
   final List<ImageData> initialImages;
   final bool showAddButton;
 
-  ImageUploaderCloseTicket({Key? key, this.initialImages = const [], this.showAddButton = true}) : super(key: key);
+  ImageUploaderCloseTicket({Key? key, this.initialImages = const [], required this.showAddButton}) : super(key: key);
 
   @override
-  _ImageUploaderCloseTicketState createState() => _ImageUploaderCloseTicketState();
+  _ImageUploaderClosedState createState() => _ImageUploaderClosedState();
 }
 
-class _ImageUploaderCloseTicketState extends State<ImageUploaderCloseTicket> {
+class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
+  bool _isPickerActive = false;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
@@ -26,11 +28,64 @@ class _ImageUploaderCloseTicketState extends State<ImageUploaderCloseTicket> {
     });
   }
 
-  Future<void> _pickImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+  Future<void> _pickImage(ImageSource source) async {
+    if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
+
+    setState(() {
+      _isPickerActive = true;
+    });
+
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null && mounted) {
+        final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
+        imageProvider.addImage(pickedFile.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    } finally {
+      setState(() {
+        _isPickerActive = false;
+      });
+    }
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Seleccionar desde la galería'),
+                onTap: () {
+                  _pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_camera),
+                title: Text('Tomar una foto'),
+                onTap: () {
+                  _pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant ImageUploaderCloseTicket oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialImages != widget.initialImages) {
       final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
-      imageProvider.addImage(pickedFile.path);
+      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     }
   }
 
@@ -41,9 +96,9 @@ class _ImageUploaderCloseTicketState extends State<ImageUploaderCloseTicket> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.showAddButton)
+            if (widget.showAddButton) // Mostrar condicionalmente el botón
               ElevatedButton(
-                onPressed: _pickImage,
+                onPressed: () => _showPickerOptions(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff051937),
                   shape: RoundedRectangleBorder(
@@ -80,7 +135,7 @@ class _ImageUploaderCloseTicketState extends State<ImageUploaderCloseTicket> {
                           ],
                         );
                       }).toList(),
-                      ...?imageProvider.newImagePaths.map((path) {
+                      ...imageProvider.newImagePaths.map((path) {
                         return Stack(
                           children: [
                             Padding(
