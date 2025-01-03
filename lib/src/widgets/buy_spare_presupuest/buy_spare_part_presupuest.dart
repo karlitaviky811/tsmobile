@@ -49,8 +49,8 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
     super.initState();
     _montoController =
         TextEditingController(text: widget.montoRepuesto.toString());
-    _fetchAllImages();
     reparacion = Map<String, dynamic>.from(widget.reparacion);
+    _fetchAllImages();
   }
 
   @override

@@ -10,7 +10,7 @@ class UserService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    const String url = 'http://3.137.100.242:3000/api/v1/user';
+    const String url = 'http://3.137.100.242:3000/api/v1/user?ticketsCount=true&partRequestCount=true';
 
     try {
       final response = await http.get(
@@ -50,6 +50,7 @@ class UserService {
           geographicalcoordinates: '',
           latitude: '0.0',
           longitude: '0.0',
+          nparts: 0,
           phone: '+58phone'
           // añade más campos predeterminados si es necesario
           );
@@ -69,7 +70,8 @@ class UserService {
           geographicalcoordinates: '',
           latitude: '0.0',
           longitude: '0.0',
-          phone: '+58phone'
+          phone: '+58phone',
+          nparts: 0,
           // añade más campos predeterminados si es necesario
           );
     }

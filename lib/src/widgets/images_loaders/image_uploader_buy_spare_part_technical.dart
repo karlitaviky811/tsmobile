@@ -25,6 +25,8 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
   void initState() {
     super.initState();
     _initialImagePaths = widget.initialImages.map((imgData) => imgData.originalUrl).toList();
+    final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+    _newImagePaths = imageProvider.newImagePaths;
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -38,7 +40,10 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
       final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null && mounted) {
         setState(() {
-          _newImagePaths.add(pickedFile.path);
+          if (!_newImagePaths.contains(pickedFile.path)) {
+            final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+            imageProvider.addImage(pickedFile.path);
+          }
         });
       }
     } catch (e) {
@@ -83,87 +88,93 @@ class _ImageUploaderBuySparePartTechnicalState extends State<ImageUploaderBuySpa
   void _removeImage(String path) {
     setState(() {
       _newImagePaths.remove(path);
+      final imageProvider = Provider.of<ImageProviderTechnicalBuySpareParts>(context, listen: false);
+      imageProvider.removeImage(path);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.showAddButton)
-          ElevatedButton(
-            onPressed: () => _showPickerOptions(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xff051937),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            child: const Text('Añadir imágenes presupuesto', style: TextStyle(color: Colors.white)),
-          ),
-        if (_initialImagePaths.isNotEmpty || _newImagePaths.isNotEmpty)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  'Imágenes de presupuesto:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+    return Consumer<ImageProviderTechnicalBuySpareParts>(
+      builder: (context, imageProvider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (widget.showAddButton)
+              ElevatedButton(
+                onPressed: () => _showPickerOptions(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff051937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
+                child: const Text('Añadir imágenes presupuesto', style: TextStyle(color: Colors.white)),
               ),
-              Wrap(
+            if (_initialImagePaths.isNotEmpty || _newImagePaths.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ..._initialImagePaths.map((path) {
-                    return Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image.network(
-                            path,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                  ..._newImagePaths.map((path) {
-                    return Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: _isUrl(path)
-                              ? Image.network(
-                                  path,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.file(
-                                  File(path),
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
-                        Positioned(
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: () => _removeImage(path),
-                            child: const Icon(Icons.remove_circle, color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Imágenes de presupuesto:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Wrap(
+                    children: [
+                      ..._initialImagePaths.map((path) {
+                        return Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: Image.network(
+                                path,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                      ..._newImagePaths.map((path) {
+                        return Stack(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: _isUrl(path)
+                                  ? Image.network(
+                                      path,
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      File(path),
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: () => _removeImage(path),
+                                child: const Icon(Icons.remove_circle, color: Colors.red),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-      ],
+          ],
+        );
+      },
     );
   }
 

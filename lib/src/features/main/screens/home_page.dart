@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 31),
                     Text('Servicios', style: AppStyle.txtPoppinsMedium18Black),
                     const SizedBox(height: 16),
-                    const _ListCourt(),
+                    _ListCourt(user: user),
                     const SizedBox(height: 40),
                     Text('Servicios programados', style: AppStyle.txtPoppinsMedium18Black),
                     const SizedBox(height: 20),
@@ -124,7 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _ListCourt extends StatelessWidget {
-  const _ListCourt({super.key});
+  final dynamic user;
+
+  const _ListCourt({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +149,7 @@ class _ListCourt extends StatelessWidget {
             imageUrl: 'assets/images/air-conditioning.png',
             name: 'Nuevos',
             type: '',
-            rainyPercentage: '30',
+            rainyPercentage: user.ntickets.toString(),
             image: 'assets/images/call-service2.png',
             gradientColors: [
               Colors.lightBlue.shade100,
@@ -166,7 +168,7 @@ class _ListCourt extends StatelessWidget {
             imageUrl: 'assets/images/settings.png',
             name: 'En proceso',
             type: '',
-            rainyPercentage: '10',
+            rainyPercentage:  user.ntickets.toString(),
             image: 'assets/images/court1.png',
             gradientColors: [Colors.blue.shade100, Colors.blue.shade200],
             onTap: () {

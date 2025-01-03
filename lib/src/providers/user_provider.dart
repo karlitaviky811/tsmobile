@@ -31,11 +31,12 @@ class UserProvider with ChangeNotifier {
           nameComercial: res.nameComercial,
           agency: res.agency,
           phone: res.phone,
-          latitude: '10.20',
-          longitude: '10.20',
+          latitude: res.latitude,
+          longitude: res.longitude,
           geographicalcoordinates: '',
-          ntickets: 0,
+          ntickets: res.ntickets,
           nrejectedtickets: 0,
+          nparts: res.nparts,
           qualification: 0);
 
       _isLoading = false;

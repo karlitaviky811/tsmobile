@@ -157,6 +157,8 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
           fontSize: 16.0);
       print("Error al conectar con el servidor: $e");
     } finally {
+      Navigator.pop(context);
+      Navigator.pop(context);
       _hideLoadingDialog(context); // Ocultar el diálogo de carga
     }
   }
