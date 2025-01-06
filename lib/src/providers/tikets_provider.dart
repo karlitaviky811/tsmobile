@@ -82,6 +82,21 @@ class TicketProvider with ChangeNotifier {
     }
   }
 
+    Future<void> searchTicketByTag(String searchQuery, String filter) async {
+    _isLoading = true;
+
+    try {
+      // Obtener el ticket como un objeto ServiceTicket
+      ServiceTicket ticket = await _ticketService.fetchServiceTicketById(searchQuery);
+      _ticketInfo = ticket;
+      notifyListeners();
+    } catch (e) {
+      print('Error al cargar el ticket: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
   Future<void> updateTicket(
       ServiceTicket ticket, Map<String, dynamic> data) async {
     try {

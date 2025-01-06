@@ -69,6 +69,37 @@ class TicketService {
     }
   }
 
+
+
+
+ Future<ServiceTicket> searchTicketByTag(String searchQuery, String filter ) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+      final response = await http.get(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/tickets?filter[$filter]=$searchQuery&page=1'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        Map<String, dynamic> data = jsonResponse['data'];
+        print('data $data');
+
+        return ServiceTicket.fromJson(data);
+      } else {
+        throw Exception('Failed to load service ticket');
+      }
+    } catch (e) {
+      throw Exception('Error fetching service ticket: $e');
+    }
+  }
+
   Future<dynamic> updateTickets(idTicket, data, token) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();

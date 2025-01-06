@@ -55,4 +55,21 @@ class ServiceTicket {
       serviceCallDetail: json['service_call'] ?? {},
     );
   }
+
+  // Método para validar campos null
+  bool isValid() {
+    return diagnosisDate != null &&
+        diagnosisDetail != null &&
+        solutionDate != null &&
+        solutionDetail != null;
+  }
+
+  // Métodos para obtener detalles con valores por defecto
+  String getDiagnosisDetail() {
+    return diagnosisDetail ?? "No diagnosis detail provided.";
+  }
+
+  String getSolutionDetail() {
+    return solutionDetail ?? "No solution detail provided.";
+  }
 }

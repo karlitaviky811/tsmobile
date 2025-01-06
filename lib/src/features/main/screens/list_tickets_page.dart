@@ -154,7 +154,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                             child: FilterChip(
                               label: Text(
                                 tag.title ?? 'Customer name',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 14.0, // Tamaño de fuente más pequeño
                                   height: 1.2,
                                   fontWeight: FontWeight.normal,
@@ -268,10 +268,32 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
 }
 
 List<ServiceTicket> filterItems(List<ServiceTicket> items, List<Status> selectedTags, String searchQuery) {
+  List<ServiceTicket> filteredItems;
   if (selectedTags.any((tag) => tag.title == "Todos")) {
-    return items.where((item) => item.title.contains(searchQuery)).toList();
+    filteredItems = items.where((item) => item.title.contains(searchQuery)).toList() ;
+  }else{
+     filteredItems = items.where((item) {
+      return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery);
+    }).toList();
   }
-  return items.where((item) {
-    return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery);
-  }).toList();
+
+  /*if(filteredItems.isEmpty){
+    filteredItems = fetchFilteredItems(searchQuery);
+  }*/
+
+  return filteredItems;
 }
+
+
+/*
+List<ServiceTicket> fetchFilteredItems(String searchQuery) {
+  // Aquí puedes implementar la lógica para hacer la petición y obtener los elementos filtrados
+  // Este es solo un ejemplo
+  var providerTickets = Provider.of<TicketProvider>(context, listen: false);
+  List<ServiceTicket> fetchedItems = [
+    // Elementos obtenidos de la petición
+  ];
+
+  return fetchedItems;
+}
+*/

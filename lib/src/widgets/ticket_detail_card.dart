@@ -89,11 +89,11 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
                           _buildDetailRow('Tipo:', 'Reparación'),
                           _buildDetailRow(
                               'Fecha:', ticket.createdAt.toString()),
-                          _buildDetailRowLarge('Título:', ticket.title),
+                          _buildDetailRowLarge('Título:', ticket.title ?? ''),
                           _buildDetailRowLarge('Producto:',
-                              ticket.serviceCallDetail['itemName']),
+                              ticket.serviceCallDetail['itemName'] ?? ''),
                           _buildDetailRowLarge('Detalle:',
-                              ticket.serviceCallDetail['descrption']),
+                              ticket.serviceCallDetail['descrption'] ?? ''),
                           _buildScheduledVisitRow(visits),
                         ],
                       ),
@@ -316,8 +316,9 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
           ),
           Expanded(
             child: Text(
-              DateFormat('dd/MM/yyyy').format(
-                  visits.length > 0 ? visits[0].visitDate : new DateTime.now()),
+              visits.isNotEmpty && visits[0].visitDate != null
+                  ? DateFormat('dd/MM/yyyy').format(visits[0].visitDate!)
+                  : ' - ',
               style: AppStyle.txtPoppinsRegular14Black,
             ),
           ),
