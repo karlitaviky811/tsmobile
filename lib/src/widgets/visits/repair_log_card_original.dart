@@ -166,8 +166,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
       _isLoadingMore = true;
     });
 
-    final tabulatorData =
-        await _tabulatorService.fetchTabulators(page: _currentPage, ticketId: int.parse(widget.ticketId));
+    final tabulatorData = await _tabulatorService.fetchTabulators(
+        page: _currentPage, ticketId: int.parse(widget.ticketId));
     if (tabulatorData != null && tabulatorData.containsKey('data')) {
       List<dynamic> data = tabulatorData['data'];
 
@@ -378,8 +378,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     ),
                                     Container(
                                       constraints: const BoxConstraints(
-                                        maxHeight:
-                                            300, // Set the maximum height
+                                        maxHeight: 300, // Altura máxima
                                       ),
                                       child: NotificationListener<
                                           ScrollNotification>(
@@ -397,7 +396,12 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                           child: MultiSelectDialogField(
                                             items: _items,
                                             title: const Text(
-                                                'Servicios realizados'),
+                                              'Servicios realizados',
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                  ),
+                                            ),
                                             backgroundColor: Colors.white,
                                             selectedColor:
                                                 const Color(0xff051937),
@@ -407,7 +411,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                               'Seleccione uno o más servicios',
                                               style: TextStyle(
                                                   color: Color(0xff051937),
-                                                  fontSize: 16),
+                                                  fontSize: 16,
+                                                  fontFamily:
+                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                  ),
                                             ),
                                             initialValue: _initialValues,
                                             onConfirm: (values) {
@@ -421,8 +428,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                             searchable: true,
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
+                                              borderRadius: BorderRadius.circular(
+                                                  10), // Cambiado a 10 para chips más redondeados
                                               border: Border.all(
                                                 color: (_isEditing ||
                                                         widget.type ==
@@ -436,7 +443,16 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                               chipColor:
                                                   const Color(0xff051937),
                                               textStyle: const TextStyle(
-                                                  color: Colors.white),
+                                                  color: Colors.white,
+                                                  fontFamily:
+                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                    10), // Cambiado a 10 para chips más redondeados
+                                              ),
+                                              scroll:
+                                                  true, // Habilita el desplazamiento
                                               onTap: (value) {
                                                 setState(() {
                                                   _initialValues.remove(value);
@@ -456,10 +472,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   valueListenable: _imagesSendNotifier,
                                   builder: (context, imagesSend, child) {
                                     return ImageUploaderVisits(
-                                      initialImages: imagesSend,
-                                        showAddButton: _isEditing 
-                                      // Mostrar o no el botón de añadir imágenes
-                                    );
+                                        initialImages: imagesSend,
+                                        showAddButton: _isEditing
+                                        // Mostrar o no el botón de añadir imágenes
+                                        );
                                   },
                                 ),
                                 const SizedBox(height: 30),
