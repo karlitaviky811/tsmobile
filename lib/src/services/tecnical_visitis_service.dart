@@ -63,7 +63,7 @@ class VisitService {
         var jsonResponse = jsonDecode(response.body);
       if (!images.isEmpty) {
         for (File image in images) {
-          await sendFile(image, 'TechnicalVisit',
+          await sendFile(image, 'Visit',
               jsonResponse['data']['id'].toString(), 'visit');
         }
       }
@@ -177,7 +177,7 @@ class VisitService {
         var jsonResponse = jsonDecode(response.body);
         for (File image in images) {
           if (await image.exists()) {
-            await sendFile(image, 'TechnicalVisit ',
+            await sendFile(image, 'Visit ',
                 jsonResponse['data']['id'].toString(), 'visit');
           } else {
             print('El archivo no existe: ${image.path}');

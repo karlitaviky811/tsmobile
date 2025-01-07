@@ -8,21 +8,26 @@ import 'package:tsmobile/src/providers/image_provider_visit.dart';
 
 class ImageUploaderVisits extends StatefulWidget {
   final List<ImageData> initialImages;
+  final bool showAddButton;
 
-  ImageUploaderVisits({Key? key, this.initialImages = const []}) : super(key: key);
+  ImageUploaderVisits({
+    Key? key,
+    this.initialImages = const [],
+    this.showAddButton = true,  // Nuevo parámetro con valor por defecto
+  }) : super(key: key);
 
   @override
-  _ImageUploaderDiagnosticState createState() => _ImageUploaderDiagnosticState();
+  _ImageUploaderVisitsState createState() => _ImageUploaderVisitsState();
 }
 
-class _ImageUploaderDiagnosticState extends State<ImageUploaderVisits> {
+class _ImageUploaderVisitsState extends State<ImageUploaderVisits> {
   bool _isPickerActive = false;
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       final imageProvider = Provider.of<ImagesVisitProviderModel>(context, listen: false);
       imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     });
@@ -87,16 +92,18 @@ class _ImageUploaderDiagnosticState extends State<ImageUploaderVisits> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: () => _showPickerOptions(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff051937),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+            if (widget.showAddButton)  // Condicional para mostrar o no el botón
+              ElevatedButton.icon(
+                onPressed: () => _showPickerOptions(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff051937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
+                icon: const Icon(Icons.camera_alt, color: Colors.white),  // Icono de cámara añadido
+                label: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
               ),
-              child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
-            ),
             if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

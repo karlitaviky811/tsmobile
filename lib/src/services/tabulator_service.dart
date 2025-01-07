@@ -6,11 +6,11 @@ import 'package:tsmobile/src/models/tabulator_model.dart';
 class TabulatorService {
   final String _baseUrl = 'http://3.137.100.242:3000/api/v1/tabulators';
 
-  Future<Map<String, dynamic>?> fetchTabulators( {required int page}) async {
+  Future<Map<String, dynamic>?> fetchTabulators( {required int page, required int ticketId}) async {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
-      final response = await http.get(Uri.parse('http://3.137.100.242:3000/api/v1/tabulators?page=$page'), headers: {
+      final response = await http.get(Uri.parse('http://3.137.100.242:3000/api/v1/tabulators?filter[by_ticket_id]=$ticketId&perPage=200'), headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
         'Authorization': 'Bearer $token',
