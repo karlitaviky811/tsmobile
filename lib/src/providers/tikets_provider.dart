@@ -114,7 +114,7 @@ class TicketProvider with ChangeNotifier {
         };
         try {
           final visistService = VisitService();
-          await visistService.sendDataVisit(dataVisit);
+          await visistService.sendDataVisit(dataVisit, []);
 
           loadTicketById(ticket.serviceCallId.toString()); // Update the list of tickets after updating a ticket
         } catch (err) {

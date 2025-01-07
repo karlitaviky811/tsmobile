@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +9,8 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tsmobile/src/models/image_provider_visit.dart';
+import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/visit_provider.dart';
@@ -16,6 +19,7 @@ import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_uploader_visits.dart';
 
 class RepairLogCard extends StatefulWidget {
   final String ticketId;
@@ -43,6 +47,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
   int _currentPage = 1;
   bool _isLoadingMore = false;
   bool _hasMoreData = true;
+  final ValueNotifier<List<ImageData>> _imagesSendNotifier = ValueNotifier([]);
 
   @override
   void initState() {
@@ -218,6 +223,36 @@ class _RepairLogCardState extends State<RepairLogCard> {
     await visitProvider.fetchVisitsByTicket(widget.ticketId);
   }
 
+  Future<void> _fetchImages() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('auth_token');
+      if (token == null) {
+        throw Exception('Token is null');
+      }
+
+      final response = await http.get(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/media?model_type=TechnicalVisit&model_id=${widget.visit.id}&collection_name=visit'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body)['data'];
+        _imagesSendNotifier.value =
+            data.map((item) => ImageData.fromJson(item)).toList();
+      } else {
+        print('Error fetching images: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching images: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -368,6 +403,15 @@ class _RepairLogCardState extends State<RepairLogCard> {
                           ),
                         ],
                       ),
+                      ValueListenableBuilder<List<ImageData>>(
+                        valueListenable: _imagesSendNotifier,
+                        builder: (context, imagesSend, child) {
+                          return ImageUploaderVisits(
+                            initialImages: imagesSend,
+                           // Mostrar o no el botón de añadir imágenes
+                          );
+                        },
+                      ),
                       const SizedBox(height: 30),
                       Center(
                         child: _isEditing ||
@@ -383,6 +427,13 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                 ),
                                 onPressed: () async {
                                   var serviceVisit = VisitService();
+
+                                    // Obtener imágenes del proveedor
+                                  final imageProvider =
+                                      Provider.of<ImageProviderVisit>(context, listen: false);
+                                  List<String> imagePaths = imageProvider.newImagePaths;
+                                  List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+                                
                                   Map<String, dynamic> params = {
                                     "services": widget
                                             .visit.selectedServicios.isNotEmpty
@@ -418,7 +469,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   print('Data: ${widget.type}');
                                   if (widget.type == 'Nuevo') {
                                     var createVisit = await serviceVisit
-                                        .sendDataVisit(dataVisit);
+                                        .sendDataVisit(dataVisit, imageFiles);
                                     await _fetchVisitDetails();
                                     await _loadTabulators();
 
@@ -434,7 +485,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   } else {
                                     var res =
                                         await serviceVisit.sendUpdateDataVisit(
-                                            data, widget.visit.id);
+                                            data, widget.visit.id, imageFiles);
                                     await _fetchVisitDetails();
                                     await _loadTabulators();
 

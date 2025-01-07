@@ -40,7 +40,8 @@ class VisitService {
     }
   }
 
-  Future<bool> sendDataVisit(Map<String, dynamic> data) async {
+  Future<bool> sendDataVisit(
+      Map<String, dynamic> data, List<File> images) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     print('data $data');
@@ -57,8 +58,15 @@ class VisitService {
 
       final responseBody = json.decode(response.body);
       print('response $responseBody');
-    if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print('Datos enviados exitosamente.');
+        var jsonResponse = jsonDecode(response.body);
+      if (!images.isEmpty) {
+        for (File image in images) {
+          await sendFile(image, 'TechnicalVisit',
+              jsonResponse['data']['id'].toString(), 'visit');
+        }
+      }
         return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
@@ -108,43 +116,43 @@ class VisitService {
   }
 
   Future<List<Visit>> fetchVisitsByTicket(int ticketId) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('auth_token');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
 
-  final response = await http.get(
-    Uri.parse(
-        'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
 
-  if (response.statusCode == 200) {
-    // Decodificar el cuerpo de la respuesta
-    Map<String, dynamic> body = json.decode(response.body)['data'];
+    if (response.statusCode == 200) {
+      // Decodificar el cuerpo de la respuesta
+      Map<String, dynamic> body = json.decode(response.body)['data'];
 
-    // Obtener la lista de visitas desde la propiedad 'visits'
-    List<dynamic> visitsData = body['visits'];
+      // Obtener la lista de visitas desde la propiedad 'visits'
+      List<dynamic> visitsData = body['visits'];
 
-    // Verificar si visitsData está vacío
-    if (visitsData.isEmpty) {
-      return [];
+      // Verificar si visitsData está vacío
+      if (visitsData.isEmpty) {
+        return [];
+      }
+
+      // Mapear cada elemento de visitsData a un objeto Visit
+      List<Visit> visits =
+          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
+
+      return visits;
+    } else {
+      throw Exception('Failed to load visits for ticket');
     }
-
-    // Mapear cada elemento de visitsData a un objeto Visit
-    List<Visit> visits =
-        visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
-
-    return visits;
-  } else {
-    throw Exception('Failed to load visits for ticket');
   }
-}
 
   Future<bool> sendUpdateDataVisit(
-      Map<String, dynamic> data, int idTicket) async {
+      Map<String, dynamic> data, int idTicket, List<File> images) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     print('data $data $apiUrl');
@@ -164,6 +172,17 @@ class VisitService {
 
       if (jsonResponse['success'] == true) {
         print('Datos enviados exitosamente.');
+
+         // Verificar y enviar las imágenes
+        var jsonResponse = jsonDecode(response.body);
+        for (File image in images) {
+          if (await image.exists()) {
+            await sendFile(image, 'TechnicalVisit ',
+                jsonResponse['data']['id'].toString(), 'visit');
+          } else {
+            print('El archivo no existe: ${image.path}');
+          }
+        }
         return true;
       } else {
         print('Error al enviar los datos: ${response.statusCode}');
@@ -205,10 +224,11 @@ class VisitService {
             fontSize: 16.0);
 
         // Verificar y enviar las imágenes
-          var jsonResponse = jsonDecode(response.body);
+        var jsonResponse = jsonDecode(response.body);
         for (File image in images) {
           if (await image.exists()) {
-            await sendFile(image, 'PartRequest', jsonResponse['data']['id'].toString(), 'part');
+            await sendFile(image, 'PartRequest',
+                jsonResponse['data']['id'].toString(), 'part');
           } else {
             print('El archivo no existe: ${image.path}');
           }

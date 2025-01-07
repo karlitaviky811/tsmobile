@@ -440,7 +440,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     };
 
     final visistService = VisitService();
-    var visit = await visistService.sendDataVisit(dataVisit);
+    
+    var visit = await visistService.sendDataVisit(dataVisit , []);
 
     Navigator.pop(context); // Close the loading dialog
 
