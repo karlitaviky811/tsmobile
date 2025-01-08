@@ -11,6 +11,7 @@ import 'package:tsmobile/src/widgets/image_uploader_new.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_buy_spare_part_technical.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_invoice_spare_parts.dart';
 import 'package:tsmobile/src/services/send_file_service.dart';
+import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 
 class InvoiceSparePartFinal extends StatefulWidget {
   final List<ImageData> initialImages;
@@ -201,7 +202,7 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
                     partImages.isEmpty
                         ? const Text(
                             'No se encontraron imágenes del repuesto solicitado.')
-                        : ImageUploaderSparePartsNew(
+                        : ImageUploaderSpareParts(
                             initialImages: partImages,
                             showAddButton: false,
                           ),
