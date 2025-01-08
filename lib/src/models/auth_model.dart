@@ -42,7 +42,7 @@ class User {
       qualification: json['Qualification'] ?? 0,
       address: json['Address'] ?? '',
       geographicalcoordinates:
-          json['GeographicalCoordinates']['data'].toString() ?? '',
+          json['GeographicalCoordinates']['data'].toString(),
       latitude: json['latitude'] ?? '',
       longitude: json['longitude'] ?? '',
       agency: json['agency'] ?? '',

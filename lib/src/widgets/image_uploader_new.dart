@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider_new.dart';
-import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 
 class ImageUploaderSparePartsNew extends StatefulWidget {
   final List<ImageData> initialImages;

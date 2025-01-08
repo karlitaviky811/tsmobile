@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/models/messages_model.dart';
 import 'package:tsmobile/src/services/map_coordinates.dart';
-import 'package:tsmobile/src/services/messages_service.dart';
 
 class GeolocationProvider with ChangeNotifier {
    GeolocationService _coordinateService = GeolocationService();

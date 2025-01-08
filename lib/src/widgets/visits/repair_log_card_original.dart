@@ -9,7 +9,6 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsmobile/src/models/image_provider_visit.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
@@ -19,7 +18,6 @@ import 'package:tsmobile/src/services/tabulator_service.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_visits.dart';
 
 class RepairLogCard extends StatefulWidget {
@@ -204,7 +202,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
         'Authorization': 'Bearer $token',
       },
     );
-    final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+    jsonDecode(response.body);
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       if (data.containsKey('data')) {
@@ -312,7 +310,10 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                   children: [
                                     Chip(
                                       label: Text(
-                                          _getChipLabel(widget.visit.status)),
+                                        _getChipLabel(widget.visit.status),
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
                                       backgroundColor:
                                           _getChipColor(widget.visit.status),
                                       avatar: Icon(
@@ -393,75 +394,123 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                           return true;
                                         },
                                         child: SingleChildScrollView(
-                                          child: MultiSelectDialogField(
-                                            items: _items,
-                                            title: const Text(
-                                              'Servicios realizados',
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                          child: Column(
+                                            children: [
+                                              MultiSelectDialogField(
+                                                items: _items,
+                                                title: const Text(
+                                                  'Servicios realizados',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
                                                   ),
-                                            ),
-                                            backgroundColor: Colors.white,
-                                            selectedColor:
-                                                const Color(0xff051937),
-                                            buttonIcon: const Icon(Icons.list,
-                                                color: Color(0xff051937)),
-                                            buttonText: const Text(
-                                              'Seleccione uno o más servicios',
-                                              style: TextStyle(
-                                                  color: Color(0xff051937),
-                                                  fontSize: 16,
-                                                  fontFamily:
-                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                ),
+                                                backgroundColor: Colors.white,
+                                                selectedColor:
+                                                    const Color(0xff051937),
+                                                buttonIcon: const Icon(
+                                                    Icons.list,
+                                                    color: Color(0xff051937)),
+                                                buttonText: const Text(
+                                                  'Seleccione uno o más servicios',
+                                                  style: TextStyle(
+                                                    color: Color(0xff051937),
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
                                                   ),
-                                            ),
-                                            initialValue: _initialValues,
-                                            onConfirm: (values) {
-                                              setState(() {
-                                                _initialValues =
-                                                    values.cast<String>();
-                                                widget.visit.selectedServicios =
-                                                    _initialValues;
-                                              });
-                                            },
-                                            searchable: true,
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(
-                                                  10), // Cambiado a 10 para chips más redondeados
-                                              border: Border.all(
-                                                color: (_isEditing ||
-                                                        widget.type ==
-                                                            'Agregar Nueva Visita')
-                                                    ? Colors.grey
-                                                    : Colors.transparent,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            chipDisplay: MultiSelectChipDisplay(
-                                              chipColor:
-                                                  const Color(0xff051937),
-                                              textStyle: const TextStyle(
+                                                ),
+                                                initialValue: _initialValues,
+                                                onConfirm: (values) {
+                                                  setState(() {
+                                                    _initialValues =
+                                                        values.cast<String>();
+                                                    widget.visit
+                                                            .selectedServicios =
+                                                        _initialValues;
+                                                  });
+                                                },
+                                                searchable: true,
+                                                decoration: BoxDecoration(
                                                   color: Colors.white,
-                                                  fontFamily:
-                                                      'Poppins' // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10), // Cambiado a 10 para chips más redondeados
+                                                  border: Border.all(
+                                                    color: (_isEditing ||
+                                                            widget.type ==
+                                                                'Agregar Nueva Visita')
+                                                        ? Colors.grey
+                                                        : Colors.transparent,
+                                                    width: 1,
                                                   ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                    10), // Cambiado a 10 para chips más redondeados
+                                                ),
+                                                chipDisplay:
+                                                    MultiSelectChipDisplay(
+                                                  chipColor:
+                                                      const Color(0xff051937),
+                                                  textStyle: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily:
+                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                  ),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10), // Cambiado a 10 para chips más redondeados
+                                                  ),
+                                                  scroll:
+                                                      true, // Habilita el desplazamiento
+                                                  onTap: (value) {
+                                                    setState(() {
+                                                      _initialValues
+                                                          .remove(value);
+                                                      widget.visit
+                                                              .selectedServicios =
+                                                          _initialValues;
+                                                    });
+                                                  },
+                                                ),
                                               ),
-                                              scroll:
-                                                  true, // Habilita el desplazamiento
-                                              onTap: (value) {
-                                                setState(() {
-                                                  _initialValues.remove(value);
-                                                  widget.visit
-                                                          .selectedServicios =
-                                                      _initialValues;
-                                                });
-                                              },
-                                            ),
+                                              const SizedBox(
+                                                  height:
+                                                      16), // Espaciado entre el selector y los chips
+                                              SingleChildScrollView(
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                child: Row(
+                                                  children: [
+                                                    Wrap(
+                                                      spacing: 8,
+                                                      runSpacing: 4,
+                                                      children: _initialValues
+                                                          .map((value) {
+                                                        return Chip(
+                                                          label: Text(
+                                                            value,
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontFamily:
+                                                                    'Poppins'),
+                                                          ),
+                                                          backgroundColor:
+                                                              const Color(
+                                                                  0xff051937),
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                          ),
+                                                        );
+                                                      }).toList(),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),

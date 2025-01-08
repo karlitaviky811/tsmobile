@@ -130,8 +130,7 @@ class _TicketDetailPageState extends State<TicketDetailPageView> {
     _showLoadingDialog(context); // Mostrar el diálogo de carga
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final idTicket = widget.ticketId.toString();
-      String? token = prefs.getString('auth_token');
+
       final ticketProvider =
           Provider.of<TicketProvider>(context, listen: false);
       final item = ticketProvider.ticketInfo;

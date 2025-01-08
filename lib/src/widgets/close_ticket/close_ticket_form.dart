@@ -30,7 +30,6 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   late List<File> _images = [];
   late List<ImageData> _imagesSend = [];
   final ImagePicker _picker = ImagePicker();
-  bool _isImagePickerActive = false;
   late Future<void> _loadTicketFuture;
   DateTime? _selectedDate;
   bool isDateInitialized = false;

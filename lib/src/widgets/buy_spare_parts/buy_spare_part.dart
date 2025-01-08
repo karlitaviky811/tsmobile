@@ -2,15 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/providers/image_provider_new.dart';
 import 'package:tsmobile/src/providers/image_provider_spare_parts.dart';
 import 'package:tsmobile/src/services/send_file_service.dart';
-import 'package:tsmobile/src/services/service_ticket_service.dart';
 import 'package:tsmobile/src/widgets/images_loaders/image_uploader_spare_parts.dart';
 
 class BuySparePartInitial extends StatefulWidget {
@@ -31,7 +28,6 @@ class BuySparePartInitial extends StatefulWidget {
 }
 
 class _BuySparePartInitialState extends State<BuySparePartInitial> {
-  final ImagePicker _picker = ImagePicker();
   List<String> imagePaths = [];
   late Map<String, dynamic> reparacion;
 

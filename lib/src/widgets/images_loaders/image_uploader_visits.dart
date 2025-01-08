@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:tsmobile/src/models/image_provider_visit.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
 

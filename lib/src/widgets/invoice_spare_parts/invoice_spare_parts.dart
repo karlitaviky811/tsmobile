@@ -109,7 +109,7 @@ class _InvoiceSparePartState extends State<InvoiceSparePart> {
     final imageProvider =
         Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
 
-    sendUpdateDataVisitPartRequestPresupuest(
+    await sendUpdateDataVisitPartRequestPresupuest(
         data, widget.visitId, imageProvider.newImagePaths);
   }
 

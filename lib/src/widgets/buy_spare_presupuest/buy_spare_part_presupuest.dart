@@ -36,12 +36,7 @@ class BuySparePartPresupuest extends StatefulWidget {
 class _BuySparePartState extends State<BuySparePartPresupuest> {
   final ImagePicker _picker = ImagePicker();
   List<String> imagePaths = [];
-  List<String> _imagesSend = [];
-
   late Map<String, dynamic> reparacion;
-  late List<ImageData> _imagesInital = [];
-  late List<ImageData> _imagesInitalSpareParts = [];
-
   late TextEditingController _montoController;
 
   @override
@@ -191,7 +186,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
         listen: false);
 
     List<String> imagePaths = imageProvider.newImagePaths;
-    List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+    imagePaths.map((path) => File(path)).toList();
     await sendUpdateDataVisitPartRequestPresupuest(
         data, widget.requestId, imagePaths);
     setState(() {

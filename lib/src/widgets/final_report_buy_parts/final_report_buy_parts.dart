@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
@@ -27,6 +28,7 @@ class InvoiceSparePartFinal extends StatefulWidget {
   @override
   _InvoiceSparePartState createState() => _InvoiceSparePartState();
 }
+
 class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
   List<ImageData> _partImages = [];
   List<ImageData> _budgetImages = [];
@@ -85,7 +87,9 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
       },
     );
 
-    if (budgetResponse.statusCode == 200 && partResponse.statusCode == 200 && invoiceResponse.statusCode == 200) {
+    if (budgetResponse.statusCode == 200 &&
+        partResponse.statusCode == 200 &&
+        invoiceResponse.statusCode == 200) {
       List<dynamic> budgetData = json.decode(budgetResponse.body)['data'];
       List<dynamic> partData = json.decode(partResponse.body)['data'];
       List<dynamic> invoiceData = json.decode(invoiceResponse.body)['data'];
@@ -100,17 +104,82 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
   }
 
   Future<void> _submitForm() async {
+    final data = {
+      'status': 8,
+    };
     final imageProvider =
         Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
-    for (String path in imageProvider.newImagePaths) {
-      await sendFile(
-          File(path), 'PartRequest', widget.requestId.toString(), 'invoice');
+
+    await sendUpdateDataVisitPartRequestPresupuest(
+        data, int.parse(widget.requestId), imageProvider.newImagePaths);
+    _fetchImagesAndBudget();
+  }
+
+  Future<void> sendUpdateDataVisitPartRequestPresupuest(
+      Map<String, dynamic> data, int idTicket, List<String> imagePaths) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    print('data $data');
+
+    try {
+      final response = await http.put(
+        Uri.parse(
+            'http://3.137.100.242:3000/api/v1/part-requests/${widget.requestId}'),
+        headers: {
+          'Content-Type': 'application/json',
+          "Accept": "application/json",
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
+
+      print('response ${response}');
+      var jsonResponse = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        print('Factura enviada éxitosamente ${jsonResponse}');
+
+        // Enviar imágenes
+        for (String path in imagePaths) {
+          await sendFile(File(path), 'PartRequest',
+              jsonResponse['data']['id'].toString(), 'invoice');
+        }
+
+        if (mounted) {
+          setState(() {});
+        }
+
+        Fluttertoast.showToast(
+            msg: "Factura enviada éxitosamente",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print('Error al enviar los datos: ${response.statusCode}');
+        print('Respuesta del servidor: ${response.body}');
+        Fluttertoast.showToast(
+            msg: "Error al enviar factura",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
+    } catch (e) {
+      print('Error al enviar la solicitud: $e');
+      Fluttertoast.showToast(
+          msg: "Error al enviar datos",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
     }
-
-    // Limpiar imágenes después de guardarlas
-    imageProvider.clearImages();
-
-    print("Factura comprada y enviada");
   }
 
   @override
@@ -153,11 +222,12 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
                             initialImages: budgetImages,
                             showAddButton: false,
                           ),
-                    invoiceImages.isEmpty
+                    invoiceImages.isEmpty && widget.showButtons == false
                         ? Text('No se encontraron imágenes de la factura.')
                         : ImageUploaderInvoiceThecnical(
                             initialImages: invoiceImages,
-                            showAddButton: widget.showButtons, // Mostrar botón condicionalmente
+                            showAddButton: widget
+                                .showButtons, // Mostrar botón condicionalmente
                           ),
                     if (widget.showButtons)
                       Consumer<ImageProviderTechnicalInvoice>(
@@ -174,7 +244,7 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
                             ),
                             icon: const Icon(Icons.check, color: Colors.white),
                             label: const Text(
-                              'He comprado el repuesto',
+                              'He comprado el repuestooo',
                               style: TextStyle(color: Colors.white),
                             ),
                           );
