@@ -132,9 +132,9 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
       context: context,
       barrierDismissible: false, // El usuario no puede cerrar el diálogo tocando fuera de él
       builder: (BuildContext context) {
-        return AlertDialog(
+        return const AlertDialog(
           content: Row(
-            children: const [
+            children: [
               CircularProgressIndicator(),
               SizedBox(width: 20),
               Text('Guardando...'),
@@ -158,8 +158,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
             return Center(
               child: Container(
                 height: MediaQuery.of(context).size.height,
-                child: Center(
-                  child: const CircularProgressIndicator(),
+                child: const Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
             );
@@ -254,8 +254,8 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   // Validar que los campos no estén vacíos
                                   if (_dateController.text.isEmpty || _observationsController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: const Text('Por favor, completa todos los campos.'),
+                                      const SnackBar(
+                                        content: Text('Por favor, completa todos los campos.'),
                                       ),
                                     );
                                     return;

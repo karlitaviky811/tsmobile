@@ -13,6 +13,7 @@ import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
+
 import 'package:tsmobile/src/providers/visit_provider.dart';
 import 'package:tsmobile/src/services/tabulator_service.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
@@ -401,8 +402,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                 title: const Text(
                                                   'Servicios realizados',
                                                   style: TextStyle(
-                                                    fontFamily:
-                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                    fontFamily: 'Poppins',
                                                   ),
                                                 ),
                                                 backgroundColor: Colors.white,
@@ -416,8 +416,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                   style: TextStyle(
                                                     color: Color(0xff051937),
                                                     fontSize: 16,
-                                                    fontFamily:
-                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                    fontFamily: 'Poppins',
                                                   ),
                                                 ),
                                                 initialValue: _initialValues,
@@ -434,8 +433,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.white,
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          10), // Cambiado a 10 para chips más redondeados
+                                                      BorderRadius.circular(10),
                                                   border: Border.all(
                                                     color: (_isEditing ||
                                                             widget.type ==
@@ -451,16 +449,14 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                       const Color(0xff051937),
                                                   textStyle: const TextStyle(
                                                     color: Colors.white,
-                                                    fontFamily:
-                                                        'Poppins', // Cambiar 'TuFuenteDeseada' al nombre de la fuente que quieras usar
+                                                    fontFamily: 'Poppins',
                                                   ),
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            10), // Cambiado a 10 para chips más redondeados
+                                                            10),
                                                   ),
-                                                  scroll:
-                                                      true, // Habilita el desplazamiento
+                                                  scroll: true,
                                                   onTap: (value) {
                                                     setState(() {
                                                       _initialValues
@@ -472,44 +468,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                   },
                                                 ),
                                               ),
-                                              const SizedBox(
-                                                  height:
-                                                      16), // Espaciado entre el selector y los chips
-                                              SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: Row(
-                                                  children: [
-                                                    Wrap(
-                                                      spacing: 8,
-                                                      runSpacing: 4,
-                                                      children: _initialValues
-                                                          .map((value) {
-                                                        return Chip(
-                                                          label: Text(
-                                                            value,
-                                                            style: const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontFamily:
-                                                                    'Poppins'),
-                                                          ),
-                                                          backgroundColor:
-                                                              const Color(
-                                                                  0xff051937),
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                          ),
-                                                        );
-                                                      }).toList(),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
+                                              const SizedBox(height: 16),
+                                             
                                             ],
                                           ),
                                         ),
@@ -611,6 +571,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                               await _fetchVisitDetails();
                                               await _loadTabulators();
 
+                                              setState(() {
+                                                imagePaths.clear();
+                                              });
                                               Fluttertoast.showToast(
                                                   msg:
                                                       "Detalles de la visita guardados exitosamente",
@@ -630,6 +593,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                               await _fetchVisitDetails();
                                               await _loadTabulators();
 
+                                              setState(() {
+                                                imagePaths.clear();
+                                              });
                                               Fluttertoast.showToast(
                                                   msg:
                                                       "Visita actualizada exitosamente",

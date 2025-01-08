@@ -234,14 +234,16 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
                   decoration:
                       const InputDecoration(labelText: 'Costo del repuesto'),
                   keyboardType: TextInputType.number,
-                  readOnly: widget.status == 6, // Deshabilitar para edición si el estado es 6
+                  readOnly: widget.status ==
+                      6, // Deshabilitar para edición si el estado es 6
                   onChanged: (value) {
                     reparacion['montoRepuesto'] = value;
                   },
                 ),
                 ImageUploaderBuySparePartTechnical(
                   initialImages: budgetImages,
-                  showAddButton: widget.status != 6 && widget.status != 7, // Ocultar botón si el estado es 6 o 7
+                  showAddButton: widget.status != 6 &&
+                      widget.status != 7, // Ocultar botón si el estado es 6 o 7
                 ),
                 const SizedBox(height: 10),
                 if (widget.status != 6 && widget.status != 7)

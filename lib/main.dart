@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/splash_screen.dart';
-import 'package:tsmobile/src/models/image_provider_visit.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
 import 'package:tsmobile/src/providers/image_provider.dart';
 import 'package:tsmobile/src/providers/image_provider_close_ticket.dart';
@@ -45,7 +44,6 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ImagePickerProvider()),
         ChangeNotifierProvider(create: (_) => VisitProvider()),
         ChangeNotifierProvider(create: (_) => ImageProviderDiagnostic()),
-        ChangeNotifierProvider(create: (_) => ImageProviderVisit()),
         ChangeNotifierProvider(create: (_) => ImagesVisitProviderModel()),
         ChangeNotifierProvider(create: (_) => ImageProviderSpareParts()),
         ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalBuySpareParts()),

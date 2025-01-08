@@ -265,11 +265,6 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
       },
     );
     try {
-      // Simulación de envío de datos
-      // Aquí debes agregar tu lógica de envío, por ejemplo:
-      // final response = await sendRequest({...});
-
-      // Simular una breve espera para el ejemplo
 
       var serviceVisit = VisitService();
       print('iamges files ${imageFiles}');
@@ -500,17 +495,6 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                                   style: AppStyle
                                                       .txtPoppinsRegular12Gray,
                                                 ),
-                                                /*Consumer<ImageProviderSpareParts>(
-                                                  builder: (context, imageProvider, child) {
-                                                    return Wrap(
-                                                      children: imageProvider.initialImagePaths.isEmpty && imageProvider.newImagePaths.isEmpty
-                                                          ? [Text('No hay imágenes disponibles')]
-                                                          : [
-                                                              Container()
-                                                            ],
-                                                    );
-                                                  },
-                                                ),*/
                                               ],
                                             ),
                                             trailing: Chip(
@@ -583,15 +567,11 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                                 )
                                               ],
                                             ),
-                                          /*if (request.status == 7)
-                                            InvoiceSparePart(
-                                              visitId: request.id,
-                                              initialImages: const [],
-                                            ),*/
                                           if (request.status == 8 || request.status == 7)
                                             InvoiceSparePartFinal(
+                                              key: UniqueKey(),
                                               showButtons: request.status == 7 ? true : false,
-                                              requestId: request.id.toString(),
+                                              requestId: request.id,
                                               initialImages: const [],
                                               budgetAmount:
                                                   request.budgetAmount ?? 0.0,
