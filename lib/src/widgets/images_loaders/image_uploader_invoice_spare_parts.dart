@@ -4,34 +4,64 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 import 'package:tsmobile/src/providers/provider_invoice_spare_parts.dart';
+import 'package:tsmobile/src/providers/provider_technical_buy_spare_parts.dart';
 
 class ImageUploaderInvoiceThecnical extends StatefulWidget {
   final List<ImageData> initialImages;
   final bool showAddButton;
 
-  ImageUploaderInvoiceThecnical({Key? key, this.initialImages = const [], required this.showAddButton}) : super(key: key);
+  ImageUploaderInvoiceThecnical(
+      {Key? key, this.initialImages = const [], this.showAddButton = true})
+      : super(key: key);
 
   @override
-  _ImageUploaderInvoiceThecnicalState createState() => _ImageUploaderInvoiceThecnicalState();
+  _ImageUploaderInvoiceThecnicalState createState() =>
+      _ImageUploaderInvoiceThecnicalState();
 }
 
-class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThecnical> {
+class _ImageUploaderInvoiceThecnicalState
+    extends State<ImageUploaderInvoiceThecnical> {
+  List<String> _initialImagePaths = [];
+  List<String> _newImagePaths = [];
+  bool _isPickerActive = false;
+  final ImagePicker _picker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
-      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
-    });
+    _initialImagePaths =
+        widget.initialImages.map((imgData) => imgData.originalUrl).toList();
+    final imageProvider =
+        Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
+    _newImagePaths = imageProvider.newImagePaths;
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
-      if (mounted) {
-        imageProvider.addImage(pickedFile.path);
+    if (_isPickerActive)
+      return; // Evitar abrir el selector de imágenes si ya está activo
+
+    setState(() {
+      _isPickerActive = true;
+    });
+
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null && mounted) {
+        setState(() {
+          if (!_newImagePaths.contains(pickedFile.path)) {
+            final imageProvider = Provider.of<ImageProviderTechnicalInvoice>(
+                context,
+                listen: false);
+            imageProvider.addImage(pickedFile.path);
+          }
+        });
       }
+    } catch (e) {
+      print('Error picking image: $e');
+    } finally {
+      setState(() {
+        _isPickerActive = false;
+      });
     }
   }
 
@@ -43,16 +73,16 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
           child: Wrap(
             children: [
               ListTile(
-                leading: Icon(Icons.photo_library),
-                title: Text('Seleccionar desde la galería'),
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Seleccionar desde la galería'),
                 onTap: () {
                   _pickImage(ImageSource.gallery);
                   Navigator.of(context).pop();
                 },
               ),
               ListTile(
-                leading: Icon(Icons.photo_camera),
-                title: Text('Tomar una foto'),
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Tomar una foto'),
                 onTap: () {
                   _pickImage(ImageSource.camera);
                   Navigator.of(context).pop();
@@ -65,6 +95,15 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
     );
   }
 
+  void _removeImage(String path) {
+    setState(() {
+      _newImagePaths.remove(path);
+      final imageProvider =
+          Provider.of<ImageProviderTechnicalInvoice>(context, listen: false);
+      imageProvider.removeImage(path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ImageProviderTechnicalInvoice>(
@@ -72,34 +111,36 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if(widget.showAddButton)
-               ElevatedButton.icon(
-              onPressed: () => _showPickerOptions(context),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff051937),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+            if (widget.showAddButton)
+            const SizedBox(height: 30,),
+              ElevatedButton.icon(
+                label: const Text('Añadir imágenes de la factura',
+                        style: TextStyle(color: Colors.white)),
+                icon:   const Icon(Icons.attach_money,
+                        color: Colors.white),
+                onPressed: () => _showPickerOptions(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xff051937),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
+                
               ),
-              icon: const Icon(Icons.insert_drive_file, color: Colors.white),
-              label: const Text('Añadir fotos de la factura', style: TextStyle(color: Colors.white)),
-            )
-          
-           ,
-            if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
+            if (_initialImagePaths.isNotEmpty || _newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'Facturas cargadas:',
+                      'Imágenes de la factura:',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   Wrap(
                     children: [
-                      ...imageProvider.initialImagePaths.map((path) {
+                      ..._initialImagePaths.map((path) {
                         return Stack(
                           children: [
                             Padding(
@@ -114,7 +155,7 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
                           ],
                         );
                       }).toList(),
-                      ...imageProvider.newImagePaths.map((path) {
+                      ..._newImagePaths.map((path) {
                         return Stack(
                           children: [
                             Padding(
@@ -136,8 +177,9 @@ class _ImageUploaderInvoiceThecnicalState extends State<ImageUploaderInvoiceThec
                             Positioned(
                               right: 0,
                               child: GestureDetector(
-                                onTap: () => imageProvider.removeImage(path),
-                                child: const Icon(Icons.remove_circle, color: Colors.red),
+                                onTap: () => _removeImage(path),
+                                child: const Icon(Icons.remove_circle,
+                                    color: Colors.red),
                               ),
                             ),
                           ],

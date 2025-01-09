@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
@@ -12,7 +13,7 @@ class ImagesService {
   Future<List<ImageData>> fetchImages(String collectionName) async {
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
+          '${dotenv.env['API_URL']}?model_type=PartRequest&model_id=$requestId&collection_name=$collectionName'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",

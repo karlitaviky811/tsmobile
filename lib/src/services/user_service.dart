@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,8 +10,8 @@ class UserService {
   Future<User?> fetchUserData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-
-    const String url = 'http://3.137.100.242:3000/api/v1/user?ticketsCount=true&partRequestCount=true';
+    await dotenv.load(fileName: ".env");
+    final String url = '${dotenv.env['API_URL']}user?ticketsCount=true&partRequestCount=true';
 
     try {
       final response = await http.get(
@@ -81,7 +82,7 @@ class UserService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    const String url = 'http://3.137.100.242:3000/api/v1/user';
+    final String url = '${dotenv.env['API_URL']}user';
 
     try {
       final response = await http.post(Uri.parse(url),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
@@ -196,7 +197,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
     print('token ${widget.visit.id}');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
+          '${dotenv.env['API_URL']}part-requests?technical_visit_id=${widget.visit.id}&page=1'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -241,7 +242,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
 
       final response = await http.get(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/media?model_type=Visit&model_id=${widget.visit.id}&collection_name=visit'),
+            '${dotenv.env['API_URL']}media?model_type=Visit&model_id=${widget.visit.id}&collection_name=visit'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -469,7 +470,6 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                 ),
                                               ),
                                               const SizedBox(height: 16),
-                                             
                                             ],
                                           ),
                                         ),
@@ -506,114 +506,8 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                             var serviceVisit = VisitService();
 
                                             // Obtener imágenes del proveedor
-                                            final imageProvider = Provider.of<
-                                                    ImagesVisitProviderModel>(
-                                                context,
-                                                listen: false);
-                                            List<String> imagePaths =
-                                                imageProvider.newImagePaths;
-                                            List<File> imageFiles = imagePaths
-                                                .map((path) => File(path))
-                                                .toList();
-
-                                            Map<String, dynamic> params = {
-                                              "services": widget
-                                                      .visit
-                                                      .selectedServicios
-                                                      .isNotEmpty
-                                                  ? widget
-                                                      .visit.selectedServicios
-                                                  : _initialValues,
-                                              "spareparts": widget
-                                                  .visit.visitDate
-                                                  .toIso8601String(),
-                                              "observations":
-                                                  'Probando el update de la visita deberian estar asociados los servicios por visita',
-                                            };
-                                            Map<String, dynamic> data = {
-                                              "title": widget.visit.title,
-                                              "visit_date": widget
-                                                  .visit.visitDate
-                                                  .toIso8601String(),
-                                              "services": widget
-                                                      .visit
-                                                      .selectedServicios
-                                                      .isNotEmpty
-                                                  ? widget
-                                                      .visit.selectedServicios
-                                                  : _initialValues,
-                                              "observations":
-                                                  widget.visit.observations,
-                                              "tabulator_id": 50,
-                                              "meta": jsonEncode(params)
-                                            };
-                                            final Map<String, dynamic>
-                                                dataVisit = {
-                                              'visit_date': widget
-                                                  .visit.visitDate
-                                                  .toIso8601String(),
-                                              'title': widget.visit.title,
-                                              "services": widget
-                                                      .visit
-                                                      .selectedServicios
-                                                      .isNotEmpty
-                                                  ? widget
-                                                      .visit.selectedServicios
-                                                  : _initialValues,
-                                              'ticket_id': widget.ticketId
-                                            };
-                                            print('Data: ${widget.type}');
-                                            if (widget.type == 'Nuevo') {
-                                              var createVisit =
-                                                  await serviceVisit
-                                                      .sendDataVisit(dataVisit,
-                                                          imageFiles);
-                                              await _fetchVisitDetails();
-                                              await _loadTabulators();
-
-                                              setState(() {
-                                                imagePaths.clear();
-                                              });
-                                              Fluttertoast.showToast(
-                                                  msg:
-                                                      "Detalles de la visita guardados exitosamente",
-                                                  toastLength:
-                                                      Toast.LENGTH_SHORT,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                  timeInSecForIosWeb: 1,
-                                                  backgroundColor: Colors.green,
-                                                  textColor: Colors.white,
-                                                  fontSize: 16.0);
-                                            } else {
-                                              var res = await serviceVisit
-                                                  .sendUpdateDataVisit(
-                                                      data,
-                                                      widget.visit.id,
-                                                      imageFiles);
-                                              await _fetchVisitDetails();
-                                              await _loadTabulators();
-
-                                              setState(() {
-                                                imagePaths.clear();
-                                              });
-                                              Fluttertoast.showToast(
-                                                  msg:
-                                                      "Visita actualizada exitosamente",
-                                                  toastLength:
-                                                      Toast.LENGTH_SHORT,
-                                                  gravity: ToastGravity.BOTTOM,
-                                                  timeInSecForIosWeb: 1,
-                                                  backgroundColor: Colors.green,
-                                                  textColor: Colors.white,
-                                                  fontSize: 16.0);
-                                            }
-                                            await _reloadVisits(); // Recargar visitas después de guardar
-
-                                            if (mounted) {
-                                              setState(() {
-                                                _isEditing = false;
-                                              });
-                                            }
+                                            await sendDataVisit(
+                                                context, serviceVisit);
                                           },
                                           icon: const Icon(Icons.save,
                                               color: Colors.white),
@@ -658,5 +552,81 @@ class _RepairLogCardState extends State<RepairLogCard> {
         ),
       ),
     );
+  }
+
+  Future<void> sendDataVisit(
+      BuildContext context, VisitService serviceVisit) async {
+    // Obtener imágenes del proveedor
+    final imageProvider =
+        Provider.of<ImagesVisitProviderModel>(context, listen: false);
+    List<String> imagePaths = imageProvider.newImagePaths;
+    List<File> imageFiles = imagePaths.map((path) => File(path)).toList();
+
+    Map<String, dynamic> params = {
+      "services": widget.visit.selectedServicios.isNotEmpty
+          ? widget.visit.selectedServicios
+          : _initialValues,
+      "spareparts": widget.visit.visitDate.toIso8601String(),
+      "observations":
+          'Probando el update de la visita deberian estar asociados los servicios por visita',
+    };
+    Map<String, dynamic> data = {
+      "title": widget.visit.title,
+      "visit_date": widget.visit.visitDate.toIso8601String(),
+      "services": widget.visit.selectedServicios.isNotEmpty
+          ? widget.visit.selectedServicios
+          : _initialValues,
+      "observations": widget.visit.observations,
+      "tabulator_id": 50,
+      "meta": jsonEncode(params)
+    };
+    final Map<String, dynamic> dataVisit = {
+      'visit_date': widget.visit.visitDate.toIso8601String(),
+      'title': widget.visit.title,
+      "services": widget.visit.selectedServicios.isNotEmpty
+          ? widget.visit.selectedServicios
+          : _initialValues,
+      'ticket_id': widget.ticketId
+    };
+    print('Data: ${widget.type}');
+    if (widget.type == 'Nuevo') {
+      
+      var createVisit = await serviceVisit.sendDataVisit(dataVisit, imageFiles);
+      _loadTicketFuture = _loadData();
+   
+      setState(() {
+        imagePaths.clear();
+      });
+      Fluttertoast.showToast(
+          msg: "Detalles de la visita guardados exitosamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      var res = await serviceVisit.sendUpdateDataVisit(
+          data, widget.visit.id, imageFiles);
+      _loadTicketFuture = _loadData();
+      setState(() {
+        imagePaths.clear();
+      });
+      Fluttertoast.showToast(
+          msg: "Visita actualizada exitosamente",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+    await _reloadVisits(); // Recargar visitas después de guardar
+
+    if (mounted) {
+      setState(() {
+        _isEditing = false;
+      });
+    }
   }
 }

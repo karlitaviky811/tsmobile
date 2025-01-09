@@ -46,7 +46,7 @@ class _Navigation extends StatelessWidget {
           icon: SvgPicture.asset(
             ImageConstant.imgHome,
              height: 22,
-     width: 22,
+             width: 22,
             color: navegationModel.paginaActual == 0 ? const Color(0xff051937) : Colors.grey,
           ),
           label: 'Home',
@@ -93,7 +93,6 @@ class _Pages extends StatelessWidget {
         const HomeScreen(),
         const TicketsListFiltered(),
         const CalendarScreen(),
-        //SettingsPage2(),
         SettingsView(),
       ],
     );

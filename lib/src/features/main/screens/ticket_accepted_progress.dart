@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -52,8 +53,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
     String? token = prefs.getString('auth_token');
 
     final budgetResponse = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
+      Uri.parse('${dotenv.env['API_URL']}media?model_type=Ticket&model_id=${widget.ticketId}&collection_name=diagnostic'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -112,8 +112,10 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                   fontFamily: 'Poppins', fontSize: 18, color: Colors.black)),
           bottom: const TabBar(
             // Permite que los tabs se desplacen horizontalmente
-            indicatorColor: const Color(0xff051937), // Color de la línea de los tabs
-            labelColor: const Color(0xff051937), // Color de los títulos de los tabs
+            indicatorColor:
+                const Color(0xff051937), // Color de la línea de los tabs
+            labelColor:
+                const Color(0xff051937), // Color de los títulos de los tabs
             labelStyle: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
@@ -301,8 +303,8 @@ class _ClienteHandlerState extends State<ClienteHandler> {
         double.parse(widget.ticketInfo.serviceCallDetail['longitude']));
     return Center(
       child: ClienteDetailCard(
-        address:
-            widget.ticketInfo.serviceCallDetail['BPBillAddr'] ?? 'No tiene',
+        address: widget.ticketInfo.serviceCallDetail['REFERENCE_DIRECTORY'] ??
+            'No tiene',
         phoneNumber:
             widget.ticketInfo.serviceCallDetail['BPCellular'] ?? 'No tiene',
         email: widget.ticketInfo.serviceCallDetail['BPE_Mail'] ?? 'No tiene',

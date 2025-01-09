@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/part_request.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
@@ -26,7 +27,7 @@ class VisitProvider with ChangeNotifier {
 
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
+          '${dotenv.env['API_URL']}tickets/$ticketId?include=visits'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -65,7 +66,7 @@ class VisitProvider with ChangeNotifier {
 
     try {
       final response = await http.get(
-        Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits/$visitId'),
+        Uri.parse('${dotenv.env['API_URL']}technical-visits/$visitId'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -102,7 +103,7 @@ class VisitProvider with ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final urlRequest =
-        'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=$technicalVisitId&page=1';
+        '${dotenv.env['API_URL']}part-requests?technical_visit_id=$technicalVisitId&page=1';
     try {
       final response = await http.get(
         Uri.parse(urlRequest),
@@ -131,7 +132,7 @@ class VisitProvider with ChangeNotifier {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
     final urlRequest =
-        'http://3.137.100.242:3000/api/v1/technical-visits/$technicalVisitId';
+        '${dotenv.env['API_URL']}technical-visits/$technicalVisitId';
     try {
       final response = await http.delete(
         Uri.parse(urlRequest),

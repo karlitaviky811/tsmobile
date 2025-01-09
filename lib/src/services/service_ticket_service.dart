@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,8 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
-const String apiUrl =
-    'http://3.137.100.242:3000/api/v1/tickets?include=serviceCall';
 
 class TicketService {
   Future<List<ServiceTicket>> fetchServiceTickets(int index) async {
@@ -20,7 +19,7 @@ class TicketService {
       String? token = prefs.getString('auth_token');
       final response = await http.get(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/tickets?include=serviceCall&page=${index}'),
+            '${dotenv.env['API_URL']}tickets?include=serviceCall&perPage=5000'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -47,7 +46,7 @@ class TicketService {
       String? token = prefs.getString('auth_token');
       final response = await http.get(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/tickets/$idTicket?include=serviceCall'),
+            '${dotenv.env['API_URL']}tickets/$idTicket?include=serviceCall'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -78,7 +77,7 @@ class TicketService {
       String? token = prefs.getString('auth_token');
       final response = await http.get(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/tickets?filter[$filter]=$searchQuery&page=1'),
+            '${dotenv.env['API_URL']}tickets?filter[$filter]=$searchQuery&page=1'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -105,7 +104,7 @@ class TicketService {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('auth_token');
       final response = await http.put(
-        Uri.parse('http://3.137.100.242:3000/api/v1/tickets/${idTicket}'),
+        Uri.parse('${dotenv.env['API_URL']}tickets/${idTicket}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -130,7 +129,7 @@ class TicketService {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
-    final uri = Uri.parse('http://3.137.100.242:3000/api/v1/media');
+    final uri = Uri.parse('${dotenv.env['API_URL']}media');
 
     var request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
@@ -175,7 +174,7 @@ class TicketService {
   Future<bool> saveFormData(
       String date, String observations, List<File> images, idTicket) async {
     String apiUrl =
-        'http://3.137.100.242:3000/api/v1/tickets/$idTicket'; // Reemplaza con tu endpoint real
+        '${dotenv.env['API_URL']}tickets/$idTicket'; // Reemplaza con tu endpoint real
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
@@ -254,7 +253,7 @@ class TicketService {
   Future<void> savecloseTicketFormData(
       String date, String observations, List<File> images, idTicket) async {
     String apiUrl =
-        'http://3.137.100.242:3000/api/v1/tickets/${idTicket}'; // Reemplaza con tu endpoint real
+        '${dotenv.env['API_URL']}tickets/${idTicket}'; // Reemplaza con tu endpoint real
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
@@ -325,7 +324,7 @@ class TicketService {
   Future<void> obtainDataMediaDiagnostic(
       String date, String observations, List<File> images, idTicket) async {
     String apiUrl =
-        '       http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${idTicket}&collection_name=diagnostic'; // Reemplaza con tu endpoint real
+        '       ${dotenv.env['API_URL']}media?model_type=Ticket&model_id=${idTicket}&collection_name=diagnostic'; // Reemplaza con tu endpoint real
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 

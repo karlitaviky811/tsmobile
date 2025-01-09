@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_neat_and_clean_calendar/neat_and_clean_calendar_event.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -9,21 +10,10 @@ import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/services/send_file_service.dart';
 
 class VisitService {
-  String apiUrl = 'http://3.137.100.242:3000/api/v1/technical-visits';
+  final String apiUrl = '${dotenv.env['API_URL']}technical-visits';
 
   Future<List<NeatCleanCalendarEvent>> fetchTechnicalVisits() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    final response = await http.get(
-      Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
+    final response = await _getRequest(apiUrl);
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body)['data'];
       return data.map((eventData) {
@@ -40,291 +30,200 @@ class VisitService {
     }
   }
 
-  Future<bool> sendDataVisit(
-      Map<String, dynamic> data, List<File> images) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    print('data $data');
-    try {
-      final response = await http.post(
-        Uri.parse('http://3.137.100.242:3000/api/v1/technical-visits'),
-        headers: {
-          'Content-Type': 'application/json',
-          "Accept": "application/json",
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(data),
-      );
-
-      final responseBody = json.decode(response.body);
-      print('response $responseBody');
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Datos enviados exitosamente.');
-        var jsonResponse = jsonDecode(response.body);
-      if (!images.isEmpty) {
-        for (File image in images) {
-          await sendFile(image, 'Visit',
-              jsonResponse['data']['id'].toString(), 'visit');
-        }
+  Future<bool> sendDataVisit(Map<String, dynamic> data, List<File> images) async {
+    final response = await _postRequest(apiUrl, data);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final fileService = FileService();
+      var jsonResponse = jsonDecode(response.body);
+      for (File image in images) {
+        await fileService.sendFile(image, 'Visit', jsonResponse['data']['id'].toString(), 'visit');
       }
-        return true;
-      } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error al enviar la solicitud: $e');
+      return true;
+    } else {
+      print('Error al enviar los datos: ${response.statusCode}');
+      print('Respuesta del servidor: ${response.body}');
       return false;
     }
   }
 
-  Future<Visit?> sendDataVisitReprogramming(
-      Map<String, dynamic> data, String idVisit) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    String urlRequest =
-        'http://3.137.100.242:3000/api/v1/technical-visits/$idVisit/reprogramming';
-
-    print('data $data $token $urlRequest');
-    try {
-      final response = await http.patch(
-        Uri.parse(urlRequest),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode(data),
-      );
-
-      final responseBody = json.decode(response.body);
-      print('response ${responseBody['success']}');
-
-      if (responseBody['success'] == true) {
-        print('Datos enviados exitosamente.');
-        return Visit.fromJson(responseBody['data']);
-      } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      print('Error al enviar la solicitud: $e');
+  Future<Visit?> sendDataVisitReprogramming(Map<String, dynamic> data, String idVisit) async {
+    final response = await _patchRequest('$apiUrl/$idVisit/reprogramming', data);
+    final responseBody = json.decode(response.body);
+    if (responseBody['success'] == true) {
+      return Visit.fromJson(responseBody['data']);
+    } else {
+      print('Error al enviar los datos: ${response.statusCode}');
+      print('Respuesta del servidor: ${response.body}');
       return null;
     }
   }
 
   Future<List<Visit>> fetchVisitsByTicket(int ticketId) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-
-    final response = await http.get(
-      Uri.parse(
-          'http://3.137.100.242:3000/api/v1/tickets/$ticketId?include=visits'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-
+    final response = await _getRequest('${dotenv.env['API_URL']}tickets/$ticketId?include=visits');
     if (response.statusCode == 200) {
-      // Decodificar el cuerpo de la respuesta
       Map<String, dynamic> body = json.decode(response.body)['data'];
-
-      // Obtener la lista de visitas desde la propiedad 'visits'
       List<dynamic> visitsData = body['visits'];
-
-      // Verificar si visitsData está vacío
       if (visitsData.isEmpty) {
         return [];
       }
-
-      // Mapear cada elemento de visitsData a un objeto Visit
-      List<Visit> visits =
-          visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
-
-      return visits;
+      return visitsData.map((dynamic item) => Visit.fromJson(item)).toList();
     } else {
       throw Exception('Failed to load visits for ticket');
     }
   }
 
-  Future<bool> sendUpdateDataVisit(
-      Map<String, dynamic> data, int idTicket, List<File> images) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl');
-    try {
-      final response = await http.put(
-        Uri.parse(apiUrl + '/${idTicket}'),
-        headers: {
-          'Content-Type': 'application/json',
-          "Accept": "application/json",
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(data),
-      );
-
-      print('response ${response}');
-      var jsonResponse = jsonDecode(response.body);
-
-      if (jsonResponse['success'] == true) {
-        print('Datos enviados exitosamente.');
-
-         // Verificar y enviar las imágenes
-        var jsonResponse = jsonDecode(response.body);
-        for (File image in images) {
-          if (await image.exists()) {
-            await sendFile(image, 'Visit ',
-                jsonResponse['data']['id'].toString(), 'visit');
-          } else {
-            print('El archivo no existe: ${image.path}');
-          }
+  Future<bool> sendUpdateDataVisit(Map<String, dynamic> data, int idTicket, List<File> images) async {
+    final response = await _putRequest('$apiUrl/$idTicket', data);
+    var jsonResponse = jsonDecode(response.body);
+    if (jsonResponse['success'] == true) {
+      final fileService = FileService();
+      for (File image in images) {
+        if (await image.exists()) {
+          await fileService.sendFile(image, 'Visit', jsonResponse['data']['id'].toString(), 'visit');
+        } else {
+          print('El archivo no existe: ${image.path}');
         }
-        return true;
-      } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
-        return false;
       }
-    } catch (e) {
-      print('Error al enviar la solicitud: $e');
+      return true;
+    } else {
+      print('Error al enviar los datos: ${response.statusCode}');
+      print('Respuesta del servidor: ${response.body}');
       return false;
     }
   }
 
-  Future<bool> sendUpdateDataVisitPartRequest(
-      Map<String, dynamic> data, int idVisit, List<File> images) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    print('data $data $images $idVisit');
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://3.137.100.242:3000/api/v1/part-requests'),
-        headers: {
-          'Content-Type': 'application/json',
-          "Accept": "application/json",
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(data),
-      );
-
-      if (response.statusCode == 200) {
-        print('Datos guardados exitosamente.');
-        Fluttertoast.showToast(
-            msg: "Datos guardados exitosamente",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-            fontSize: 16.0);
-
-        // Verificar y enviar las imágenes
-        var jsonResponse = jsonDecode(response.body);
-        for (File image in images) {
-          if (await image.exists()) {
-            await sendFile(image, 'PartRequest',
-                jsonResponse['data']['id'].toString(), 'part');
-          } else {
-            print('El archivo no existe: ${image.path}');
-          }
-        }
-        return true;
-      } else {
-        print('Respuesta del servidor: ${response.body}');
-        Fluttertoast.showToast(
-            msg: "Error al guardar los datos",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
-        return false;
-      }
-    } catch (e) {
-      print('Error al enviar la solicitud: $e');
+  Future<bool> sendUpdateDataVisitPartRequest(Map<String, dynamic> data, int idVisit, List<File> images) async {
+    final response = await _postRequest('${dotenv.env['API_URL']}part-requests', data);
+    if (response.statusCode == 200) {
       Fluttertoast.showToast(
-          msg: "Error al enviar la solicitud",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-          fontSize: 16.0);
+        msg: "Datos guardados exitosamente",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      var jsonResponse = jsonDecode(response.body);
+      final fileService = FileService();
+      for (File image in images) {
+        if (await image.exists()) {
+          await fileService.sendFile(image, 'PartRequest', jsonResponse['data']['id'].toString(), 'part');
+        } else {
+          print('El archivo no existe: ${image.path}');
+        }
+      }
+      return true;
+    } else {
+      Fluttertoast.showToast(
+        msg: "Error al guardar los datos",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
       return false;
     }
   }
 
-  Future<bool> getDataVisitPartRequest(
-      Map<String, dynamic> data, int idVisit) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl');
-    try {
-      final response = await http.post(
-        Uri.parse(
-            'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${idVisit}'),
-        headers: {
-          'Content-Type': 'application/json',
-          "Accept": "application/json",
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(data),
-      );
-
-      print('response ${response}');
-      var jsonResponse = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        print('repuesto solicitado éxitosamente');
-        return true;
-      } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
-        return false;
-      }
-    } catch (e) {
-      print('Error al enviar la solicitud: $e');
+  Future<bool> getDataVisitPartRequest(Map<String, dynamic> data, int idVisit) async {
+    final response = await _postRequest('${dotenv.env['API_URL']}part-requests?technical_visit_id=$idVisit', data);
+    if (response.statusCode == 200) {
+      print('repuesto solicitado éxitosamente');
+      return true;
+    } else {
+      print('Error al enviar los datos: ${response.statusCode}');
+      print('Respuesta del servidor: ${response.body}');
       return false;
     }
   }
 
-  Future<bool> getDataImagePartRequest(
-      Map<String, dynamic> data, int idPartRequest) async {
+  Future<http.Response> _getRequest(String url) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
-    print('data $data $apiUrl');
+    if (token == null) {
+      print('No se encontró el token de usuario');
+      throw Exception('No se encontró el token de usuario');
+    }
     try {
-      final response = await http.post(
-        Uri.parse(
-            'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${idPartRequest}&collection_name=part'),
+      return await http.get(
+        Uri.parse(url),
         headers: {
-          'Content-Type': 'application/json',
-          "Accept": "application/json",
           'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: json.encode(data),
       );
-
-      print('response ${response}');
-      var jsonResponse = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        print('repuesto solicitado éxitosamente');
-        return true;
-      } else {
-        print('Error al enviar los datos: ${response.statusCode}');
-        print('Respuesta del servidor: ${response.body}');
-        return false;
-      }
     } catch (e) {
-      print('Error al enviar la solicitud: $e');
-      return false;
+      throw Exception('Failed to make GET request: $e');
+    }
+  }
+
+  Future<http.Response> _postRequest(String url, Map<String, dynamic> body) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    if (token == null) {
+      print('No se encontró el token de usuario');
+      throw Exception('No se encontró el token de usuario');
+    }
+    try {
+      return await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+    } catch (e) {
+      throw Exception('Failed to make POST request: $e');
+    }
+  }
+
+  Future<http.Response> _patchRequest(String url, Map<String, dynamic> body) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    if (token == null) {
+      print('No se encontró el token de usuario');
+      throw Exception('No se encontró el token de usuario');
+    }
+    try {
+      return await http.patch(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+    } catch (e) {
+      throw Exception('Failed to make PATCH request: $e');
+    }
+  }
+
+  Future<http.Response> _putRequest(String url, Map<String, dynamic> body) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    if (token == null) {
+      print('No se encontró el token de usuario');
+      throw Exception('No se encontró el token de usuario');
+    }
+    try {
+      return await http.put(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+    } catch (e) {
+      throw Exception('Failed to make PUT request: $e');
     }
   }
 }

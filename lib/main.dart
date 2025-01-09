@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/features/main/screens/splash_screen.dart';
 import 'package:tsmobile/src/providers/geolocation_provider.dart';
@@ -22,10 +23,12 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 Future<void> main() async {
-   tz.initializeTimeZones();
+  await dotenv.load(fileName: ".env");
+  tz.initializeTimeZones();
 
   // Fecha y hora en UTC
-  final utcDateTime = tz.TZDateTime.parse(tz.UTC, '2024-12-28T18:30:00.000000Z');
+  final utcDateTime =
+      tz.TZDateTime.parse(tz.UTC, '2024-12-28T18:30:00.000000Z');
 
   // Zona horaria de Caracas
   final caracas = tz.getLocation('America/Caracas');
@@ -46,10 +49,10 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => ImageProviderDiagnostic()),
         ChangeNotifierProvider(create: (_) => ImagesVisitProviderModel()),
         ChangeNotifierProvider(create: (_) => ImageProviderSpareParts()),
-        ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalBuySpareParts()),
-        ChangeNotifierProvider(create: (_)=> ImageProviderTechnicalInvoice()),
-        ChangeNotifierProvider(create: (_)=> ImageProviderSparePartsNew()),
-        
+        ChangeNotifierProvider(
+            create: (_) => ImageProviderTechnicalBuySpareParts()),
+        ChangeNotifierProvider(create: (_) => ImageProviderTechnicalInvoice()),
+        ChangeNotifierProvider(create: (_) => ImageProviderSparePartsNew()),
         ChangeNotifierProvider(
             create: (_) => ImageProviderCloseTicketManagement())
       ],

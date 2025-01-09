@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -79,7 +80,7 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
     String? token = prefs.getString('auth_token');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=closed'),
+          '${dotenv.env['API_URL']}media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=closed'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",

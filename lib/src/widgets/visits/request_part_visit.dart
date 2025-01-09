@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,7 +63,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     String? token = prefs.getString('auth_token');
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/part-requests?technical_visit_id=${widget.visit.id}&page=1'),
+          '${dotenv.env['API_URL']}part-requests?technical_visit_id=${widget.visit.id}&page=1'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -391,7 +392,7 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
 
     final response = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=$requestPart&collection_name=part'),
+          '${dotenv.env['API_URL']}?model_type=PartRequest&model_id=$requestPart&collection_name=part'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -440,9 +441,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
+                  children: [
                     Icon(Icons.add, color: Colors.white),
                     SizedBox(
                         width: 8), // Espacio entre el icono y el texto

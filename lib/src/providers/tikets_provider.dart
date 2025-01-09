@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:tsmobile/src/services/service_ticket_service.dart';
@@ -146,7 +147,21 @@ class TicketProvider with ChangeNotifier {
   }
 
   Future<List<ServiceTicket>> fetchTicketsFromApi(int page, String query) async {
-    final url = 'http://3.137.100.242:3000/api/v1/tickets?filter[title]=$query&page=$page';
+    final url = '${dotenv.env['API_URL']}tickets?filter[title]=$query&page=$page';
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as List;
+      return data.map((json) => ServiceTicket.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load tickets');
+    }
+  }
+
+
+  
+  Future<List<ServiceTicket>> searchTicketsFromApi(int page, String query) async {
+    final url = '${dotenv.env['API_URL']}tickets?filter[title]=$query&page=$page';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {

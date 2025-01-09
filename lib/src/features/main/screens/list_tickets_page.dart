@@ -50,7 +50,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
     
     ticketProvider.loadTickets(page: _currentPage).then((_) {
       setState(() {
-        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
+        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery, context);
       });
     });
 
@@ -77,7 +77,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
       final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
       await ticketProvider.loadTickets(page: _currentPage);
       setState(() {
-        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
+        filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery, context);
         _isLoadingMore = false;
       });
     }
@@ -86,7 +86,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   void updateFilteredItems() {
     setState(() {
       final ticketProvider = Provider.of<TicketProvider>(context, listen: false);
-      filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery);
+      filteredItems = filterItems(ticketProvider.tickets, selectedTags, searchQuery, context);
     });
   }
 
@@ -248,7 +248,7 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
-                                  child: ReservationItemElement(
+                                  child: TicketItem(
                                     ticket: filteredItems[index],
                                     onTap: () => _onItemTapped(index),
                                   ),
@@ -267,29 +267,27 @@ class _FilteredListScreenState extends State<TicketsListFiltered> {
   }
 }
 
-List<ServiceTicket> filterItems(List<ServiceTicket> items, List<Status> selectedTags, String searchQuery) {
+List<ServiceTicket> filterItems(List<ServiceTicket> items, List<Status> selectedTags, String searchQuery, BuildContext context) {
   List<ServiceTicket> filteredItems;
   if (selectedTags.any((tag) => tag.title == "Todos")) {
-    filteredItems = items.where((item) => item.title.contains(searchQuery)).toList() ;
-  }else{
-     filteredItems = items.where((item) {
-      return selectedTags.any((tag) => item.status == tag.id) && item.title.contains(searchQuery);
-    }).toList();
+    filteredItems = items.where((item) => item.title.toLowerCase().contains(searchQuery.toLowerCase()) || item.id.toString().contains(searchQuery.toLowerCase()) ).toList();
+  } else {
+  filteredItems = items.where((item) { return selectedTags.any((tag) => item.status == tag.id) && (item.title.toLowerCase().contains(searchQuery.toLowerCase()) || item.id.toString().contains(searchQuery)); }).toList();
   }
 
-  /*if(filteredItems.isEmpty){
-    filteredItems = fetchFilteredItems(searchQuery);
+  /*/if (filteredItems.isEmpty) {
+    filteredItems = fetchFilteredItems(searchQuery, context);
   }*/
 
   return filteredItems;
 }
-
-
 /*
-List<ServiceTicket> fetchFilteredItems(String searchQuery) {
+List<ServiceTicket> fetchFilteredItems(String searchQuery, BuildContext context) {
   // Aquí puedes implementar la lógica para hacer la petición y obtener los elementos filtrados
   // Este es solo un ejemplo
   var providerTickets = Provider.of<TicketProvider>(context, listen: false);
+  final filter 
+  providerTickets.searchTicketByTag(searchQuery, filter)
   List<ServiceTicket> fetchedItems = [
     // Elementos obtenidos de la petición
   ];

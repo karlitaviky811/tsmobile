@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -77,7 +78,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
 
     final budgetResponse = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=budget'),
+          '${dotenv.env['API_URL']}media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=budget'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -87,7 +88,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
 
     final partResponse = await http.get(
       Uri.parse(
-          'http://3.137.100.242:3000/api/v1/media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=part'),
+          '${dotenv.env['API_URL']}media?model_type=PartRequest&model_id=${widget.requestId}&collection_name=part'),
       headers: {
         'Content-Type': 'application/json',
         "Accept": "application/json",
@@ -112,12 +113,13 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
       Map<String, dynamic> data, int idTicket, List<String> imagePaths) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
+    final fileService = new FileService();
     print('data $data');
 
     try {
       final response = await http.put(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/part-requests/${widget.requestId}'),
+            '${dotenv.env['API_URL']}part-requests/${widget.requestId}'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
@@ -134,7 +136,7 @@ class _BuySparePartState extends State<BuySparePartPresupuest> {
 
         // Enviar imágenes
         for (String path in imagePaths) {
-          await sendFile(File(path), 'PartRequest',
+          await fileService.sendFile(File(path), 'PartRequest',
               jsonResponse['data']['id'].toString(), 'budget');
         }
 

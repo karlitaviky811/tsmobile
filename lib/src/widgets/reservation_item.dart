@@ -4,11 +4,11 @@ import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart
 import 'package:tsmobile/src/models/tickets_model.dart';
 import '../core/theme/app.styles.dart';
 
-class ReservationItemElement extends StatelessWidget {
+class TicketItem extends StatelessWidget {
   final ServiceTicket ticket;
   final VoidCallback onTap;
 
-  const ReservationItemElement({super.key, required this.ticket, required this.onTap});
+  const TicketItem({super.key, required this.ticket, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -79,16 +79,17 @@ class ReservationItemElement extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Row(
+                    Row(
                     children: [
-                      const Icon(
-                        Icons.schedule_outlined,
-                        size: 12,
+                      Text('# ', style: AppStyle.txtPoppinsRegular12Black),
+                      Expanded(
+                        child: Text(
+                          ticket.id.toString() ?? '-',
+                          style: AppStyle.txtPoppinsRegular12Black,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
-                      Text('${ticket.totalCost} USD',
-                          style: AppStyle.txtPoppinsRegular12Black),
-                      const Text(' | '),
-                      Text('50', style: AppStyle.txtPoppinsRegular12Black),
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -100,14 +101,13 @@ class ReservationItemElement extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                          'Vía Av. Caracas y Av. P.º Caroni',
+                           ticket.serviceCallDetail['REFERENCE_DIRECTORY'],
                           style: AppStyle.txtPoppinsRegular12Black,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                       ),
                       const Text(' | '),
-                      Text('50', style: AppStyle.txtPoppinsRegular12Black),
                     ],
                   ),
                 ],

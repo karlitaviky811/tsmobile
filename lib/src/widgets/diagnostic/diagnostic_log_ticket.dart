@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -88,7 +89,7 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
 
       final response = await http.get(
         Uri.parse(
-            'http://3.137.100.242:3000/api/v1/media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
+            '${dotenv.env['API_URL']}media?model_type=Ticket&model_id=${widget.idTicket}&collection_name=diagnostic'),
         headers: {
           'Content-Type': 'application/json',
           "Accept": "application/json",
