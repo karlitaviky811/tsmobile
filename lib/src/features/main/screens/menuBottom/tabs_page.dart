@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
-import 'package:tsmobile/src/features/main/screens/calendar_services.dart';
-import 'package:tsmobile/src/features/main/screens/configurations_module.dart';
-import 'package:tsmobile/src/features/main/screens/home_page.dart';
-import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
+import 'package:tsmobile/src/features/main/screens/calendar/calendar_services.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/configurations/configurations_module.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/home/home_page.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/list_tickets_page.dart';
 
-import '../constant/image.constant.dart';
+import '../../constant/image.constant.dart';
 
 class TabsPage extends StatelessWidget {
   const TabsPage({Key? key}) : super(key: key);

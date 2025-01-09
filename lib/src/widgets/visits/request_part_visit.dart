@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/models/part_request.dart';
+import 'package:tsmobile/src/models/part_request_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/image_provider_new.dart';

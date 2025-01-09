@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/detail_ticket_accept_decline_view.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/widgets/reservation_item.dart';

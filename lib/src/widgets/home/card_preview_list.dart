@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app.styles.dart';
+import '../../core/theme/app.styles.dart';
 
-class CardPreviewCourt extends StatelessWidget {
+class CardPreview extends StatelessWidget {
   final String name;
   final String image;
   final String type;
@@ -10,7 +10,7 @@ class CardPreviewCourt extends StatelessWidget {
   final List<Color> gradientColors;
   final String imageUrl;
 
-  const CardPreviewCourt({
+  const CardPreview({
     super.key,
     required this.name,
     required this.type,

@@ -11,7 +11,7 @@ import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/models/images_model.dart';
-import 'package:tsmobile/src/models/part_request.dart';
+import 'package:tsmobile/src/models/part_request_model.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/image_provider_visit.dart';
 
@@ -590,7 +590,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
     };
     print('Data: ${widget.type}');
     if (widget.type == 'Nuevo') {
-      
+
       var createVisit = await serviceVisit.sendDataVisit(dataVisit, imageFiles);
       _loadTicketFuture = _loadData();
    

@@ -3,9 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:tsmobile/src/providers/user_provider.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:tsmobile/src/services/user_service.dart';
 
 class ProfileUser extends StatefulWidget {
@@ -26,10 +24,7 @@ class _EditProfileWidgetState extends State<ProfileUser> {
   late TextEditingController _ubicationController;
   late TextEditingController _phoneController;
   final MapController mapController = MapController();
-  bool _isFormEnabled = false;
-  bool _showSaveButton = false; // Variable para controlar la visibilidad del botón de guardar
-  LatLng _selectedLocation =
-      LatLng(10.1807, -68.0034); // Coordenadas de ejemplo
+  bool _showSaveButton = false; 
 
   @override
   void initState() {
@@ -51,8 +46,6 @@ class _EditProfileWidgetState extends State<ProfileUser> {
 
         // Establecer la ubicación seleccionada a partir de las coordenadas del usuario
         setState(() {
-          _selectedLocation = LatLng(double.parse(userProvider.user!.latitude),
-              double.parse(userProvider.user!.longitude));
         });
       }
     });

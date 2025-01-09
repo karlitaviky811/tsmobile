@@ -1,6 +1,6 @@
 
 import 'package:tsmobile/src/features/main/constant/image.constant.dart';
-import 'package:tsmobile/src/interfaces/bottom_navigation_menu.dart';
+import 'package:tsmobile/src/models/bottom_navigation_menu.dart';
 // import 'package:mobile_app/widgets/custom_bottom_bar.dart';
 
 class WidgetConstant {

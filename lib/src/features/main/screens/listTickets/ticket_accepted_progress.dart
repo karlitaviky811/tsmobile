@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsmobile/src/features/main/screens/chat_service_screen.dart';
+import 'package:tsmobile/src/features/main/screens/chat/chat_service_screen.dart';
 import 'package:tsmobile/src/models/images_model.dart';
 
 import 'package:tsmobile/src/providers/tikets_provider.dart';
@@ -16,7 +16,7 @@ import 'package:tsmobile/src/widgets/close_ticket/close_ticket_form.dart';
 import 'package:http/http.dart' as http;
 import 'package:tsmobile/src/widgets/visits/repair_log_form.dart';
 import 'package:tsmobile/src/widgets/ticket_detail_card.dart';
-import '../../../widgets/diagnostic/diagnostic_log_ticket.dart';
+import '../../../../widgets/diagnostic/diagnostic_log_ticket.dart';
 import 'package:geocoding/geocoding.dart';
 
 class TicketAcceptedProgressDetailPage extends StatefulWidget {
@@ -30,8 +30,6 @@ class TicketAcceptedProgressDetailPage extends StatefulWidget {
 
 class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   DateTime? _selectedDate;
-  late Future<void> _loadTicketFuture;
-  late Future<void> _loadVisitFuture;
   late Future<void> _loadDataFuture;
 
   @override
@@ -75,8 +73,7 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
   @override
   Widget build(BuildContext context) {
     final ticketProvider = Provider.of<TicketProvider>(context);
-    final visitProvider = Provider.of<VisitProvider>(context);
-    final ValueNotifier<void> reparacionesNotifier = ValueNotifier(null);
+
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -113,9 +110,9 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
           bottom: const TabBar(
             // Permite que los tabs se desplacen horizontalmente
             indicatorColor:
-                const Color(0xff051937), // Color de la línea de los tabs
+                Color(0xff051937), // Color de la línea de los tabs
             labelColor:
-                const Color(0xff051937), // Color de los títulos de los tabs
+                Color(0xff051937), // Color de los títulos de los tabs
             labelStyle: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
@@ -308,7 +305,7 @@ class _ClienteHandlerState extends State<ClienteHandler> {
         phoneNumber:
             widget.ticketInfo.serviceCallDetail['BPCellular'] ?? 'No tiene',
         email: widget.ticketInfo.serviceCallDetail['BPE_Mail'] ?? 'No tiene',
-        geolocation: _address ?? 'No tiene',
+        geolocation: _address,
         latitude: widget.ticketInfo.serviceCallDetail['latitude'] ?? 0.0,
         longitude: widget.ticketInfo.serviceCallDetail['longitude'] ?? 0.0,
         onAddressChanged: _updateAddress,

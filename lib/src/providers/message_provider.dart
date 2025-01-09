@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsmobile/src/models/message_send.dart';
+import 'package:tsmobile/src/models/message_send_model.dart';
 import 'package:tsmobile/src/models/messages_model.dart';
 import 'package:tsmobile/src/services/messages_service.dart';
 

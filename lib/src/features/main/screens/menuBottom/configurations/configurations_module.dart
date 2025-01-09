@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/profile_user.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/features/main/screens/tecnico_rating_card.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/configurations/profile_user.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/configurations/tecnico_rating_card.dart';
+
 
 class SettingsView extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {

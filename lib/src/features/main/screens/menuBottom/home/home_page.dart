@@ -3,14 +3,14 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/list_tickets_page.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/list_tickets_page.dart';
 import 'package:tsmobile/src/features/main/screens/notifications_screen.dart';
-import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
-import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/ticket_accepted_progress.dart';
+import 'package:tsmobile/src/models/ticket_model.dart';
 import 'package:tsmobile/src/models/auth_model.dart';
 import 'package:tsmobile/src/providers/user_provider.dart';
-import 'package:tsmobile/src/services/user_service.dart';
-import '../../../widgets/index.dart';
+import 'package:tsmobile/src/widgets/home/card_preview_list.dart';
+import '../../../../../widgets/index.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String route = 'main-tabs-route';
@@ -40,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
         user = userService.user;
       });
       final oneSignalAppId = dotenv.env['APP_ID'];
-      String _debugLabelString = "";
       WidgetsFlutterBinding.ensureInitialized();
 
       OneSignal.initialize(oneSignalAppId as String);
@@ -145,7 +144,7 @@ class _ListCourt extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          CardPreviewCourt(
+          CardPreview(
             imageUrl: 'assets/images/air-conditioning.png',
             name: 'Nuevos',
             type: '',
@@ -164,7 +163,7 @@ class _ListCourt extends StatelessWidget {
             },
           ),
           const SizedBox(width: 20),
-          CardPreviewCourt(
+          CardPreview(
             imageUrl: 'assets/images/settings.png',
             name: 'En proceso',
             type: '',
@@ -180,7 +179,7 @@ class _ListCourt extends StatelessWidget {
             },
           ),
           const SizedBox(width: 20),
-          CardPreviewCourt(
+          CardPreview(
             imageUrl: 'assets/images/inspection.png',
             name: 'Histórico',
             type: '',

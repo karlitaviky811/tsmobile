@@ -1,11 +1,11 @@
-import 'package:tsmobile/src/features/main/screens/chat_screen.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
-import 'package:tsmobile/src/features/main/screens/profile_user.dart';
+import 'package:tsmobile/src/features/main/screens/chat/chat_screen.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/detail_ticket_accept_decline_view.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/configurations/profile_user.dart';
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
-import 'package:tsmobile/src/interfaces/ticket.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/tabs_page.dart';
+import 'package:tsmobile/src/models/ticket_model.dart';
 
-import '../screens/ticket_accepted_progress.dart';
+import '../screens/listTickets/ticket_accepted_progress.dart';
 
 class MainRouter {
   static Map<String, Widget Function(BuildContext)> getRoutes() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/tabs_page.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 
 class CalendarScreen extends StatefulWidget {

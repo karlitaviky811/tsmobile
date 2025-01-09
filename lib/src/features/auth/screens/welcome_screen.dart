@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsmobile/src/features/main/screens/tabs_page.dart';
+import 'package:tsmobile/src/features/main/screens/menuBottom/tabs_page.dart';
 import 'package:tsmobile/src/providers/login_form_provider.dart';
 import 'package:tsmobile/src/services/auth_service.dart';
 import 'package:tsmobile/src/ui/input_decoration.dart';

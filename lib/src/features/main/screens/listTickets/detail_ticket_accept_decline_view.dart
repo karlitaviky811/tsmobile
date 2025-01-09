@@ -6,11 +6,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
-import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/providers/tikets_provider.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:tsmobile/src/widgets/new_ticket_detail_client_info.dart';
-import 'location_map_distance.dart';
+import '../location_map_distance.dart';
 
 class TicketDetailPageView extends StatefulWidget {
   static const String route = 'detail-view-ticket-route';

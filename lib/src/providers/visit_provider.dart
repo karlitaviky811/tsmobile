@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tsmobile/src/models/part_request.dart';
+import 'package:tsmobile/src/models/part_request_model.dart';
 import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:http/http.dart' as http;

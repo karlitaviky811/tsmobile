@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tsmobile/src/features/main/screens/detail_ticket_accept_decline_view.dart';
-import 'package:tsmobile/src/features/main/screens/ticket_accepted_progress.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/detail_ticket_accept_decline_view.dart';
+import 'package:tsmobile/src/features/main/screens/listTickets/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/tickets_model.dart';
 import '../core/theme/app.styles.dart';
 
@@ -101,13 +101,12 @@ class TicketItem extends StatelessWidget {
                       ),
                       Expanded(
                         child: Text(
-                           ticket.serviceCallDetail['REFERENCE_DIRECTORY'],
+                           ticket.serviceCallDetail['REFERENCE_DIRECTORY']?? '',
                           style: AppStyle.txtPoppinsRegular12Black,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
                       ),
-                      const Text(' | '),
                     ],
                   ),
                 ],

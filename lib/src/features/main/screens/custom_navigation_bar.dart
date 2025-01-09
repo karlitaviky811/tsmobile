@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tsmobile/src/core/constants/color.constant.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/auth/widgets/custom_image_view.dart';
-import 'package:tsmobile/src/interfaces/bottom_navigation_menu.dart';
+import 'package:tsmobile/src/models/bottom_navigation_menu.dart';
 import 'package:tsmobile/src/utils/size.utils.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {

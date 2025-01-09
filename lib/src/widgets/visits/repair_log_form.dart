@@ -11,7 +11,7 @@ import 'package:tsmobile/src/services/tecnical_visitis_service.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'package:tsmobile/src/widgets/edit_visit_card_log.dart';
+import 'package:tsmobile/src/widgets/visits/edit_visit_card_log.dart';
 
 class RepairLogFormData extends StatefulWidget {
   final String ticketId;
