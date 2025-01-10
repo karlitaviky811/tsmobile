@@ -78,10 +78,10 @@ class ClienteDetailCard extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
+          /*IconButton(
             icon: const Icon(Icons.edit, color: Colors.blue),
             onPressed: () => _editarDireccion(context),
-          ),
+          ),*/
         ],
       ),
     );

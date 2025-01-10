@@ -185,7 +185,7 @@ class _LocationCardState extends State<LocationCard> {
                   ],
                 ),
               ),
-              Padding(
+              /*Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
                   onPressed: _saveLocation,
@@ -204,7 +204,7 @@ class _LocationCardState extends State<LocationCard> {
                     ),
                   ),
                 ),
-              ),
+              )*/
             ],
           ),
         ),

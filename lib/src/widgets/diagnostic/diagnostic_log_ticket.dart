@@ -213,19 +213,15 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                               labelText: 'Fecha',
                               prefixIcon: IconButton(
                                 icon: const Icon(Icons.calendar_today),
-                                onPressed: _isFormActive
-                                    ? () => _pickDate(context)
-                                    : null,
+                                onPressed: () => _pickDate(context),
                               ),
                             ),
-                            readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
                           TextField(
                             controller: _observationsController,
                             decoration: const InputDecoration(
                                 labelText: 'Observaciones'),
-                            readOnly: !_isFormActive,
                           ),
                           const SizedBox(height: 16),
                           ValueListenableBuilder<List<ImageData>>(
@@ -233,25 +229,26 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                             builder: (context, imagesSend, child) {
                               return ImageUploaderDiagnostic(
                                 initialImages: imagesSend,
-                                showAddButton: _isFormActive, // Mostrar o no el botón de añadir imágenes
+                                showAddButton: true, // Mostrar el botón de añadir imágenes
                               );
                             },
                           ),
-                          const SizedBox(height: 30),
+                          const SizedBox(height: 60),
                           Center(
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isFormActive ? Colors.yellow : Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                            child: SizedBox(
+                              width: 300,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff051937),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
-                              ),
-                              icon: Icon(
-                                _isFormActive ? Icons.save : Icons.edit,
-                                color: Colors.white,
-                              ),
-                              onPressed: () async {
-                                if (_isFormActive) {
+                                icon: const Icon(
+                                  Icons.save,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () async {
                                   // Validar que los campos no estén vacíos
                                   if (_dateController.text.isEmpty || _observationsController.text.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -261,10 +258,10 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                     );
                                     return;
                                   }
-
+                              
                                   // Mostrar el diálogo de carga
                                   _showLoadingDialog(context);
-
+                              
                                   // Obtener imágenes del proveedor
                                   final imageProvider =
                                       Provider.of<ImageProviderDiagnostic>(context, listen: false);
@@ -281,7 +278,6 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                     if (success) {
                                       await _fetchImages();
                                       setState(() {
-                                        _isFormActive = false;
                                         imageProvider.clearImages();
                                       });
                                     }
@@ -289,18 +285,14 @@ class _DiagnosticFormState extends State<DiagnosticForm> {
                                   } else {
                                     print('Por favor, selecciona una fecha.');
                                   }
-
+                              
                                   // Cerrar el diálogo de carga
                                   Navigator.of(context).pop();
-                                } else {
-                                  setState(() {
-                                    _isFormActive = true;
-                                  });
-                                }
-                              },
-                              label: Text(
-                                _isFormActive ? 'Guardar' : 'Editar',
-                                style: const TextStyle(color: Colors.white),
+                                },
+                                label: const Text(
+                                  'Guardar',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
                             ),
                           ),

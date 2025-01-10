@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tsmobile/src/core/theme/app.styles.dart';
 import 'package:tsmobile/src/features/main/screens/location_card.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +12,11 @@ import 'package:tsmobile/src/features/main/screens/notifications_screen.dart';
 import 'package:tsmobile/src/features/main/screens/listTickets/ticket_accepted_progress.dart';
 import 'package:tsmobile/src/models/ticket_model.dart';
 import 'package:tsmobile/src/models/auth_model.dart';
+import 'package:tsmobile/src/models/visit_model.dart';
 import 'package:tsmobile/src/providers/user_provider.dart';
 import 'package:tsmobile/src/widgets/home/card_preview_list.dart';
 import '../../../../../widgets/index.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   static const String route = 'main-tabs-route';
@@ -87,7 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
               leading: IconButton(
-                icon: Image.asset('assets/images/android-chrome-192x192new.png'),
+                icon:
+                    Image.asset('assets/images/android-chrome-192x192new.png'),
                 color: Colors.white,
                 onPressed: () {},
               ),
@@ -95,14 +102,17 @@ class _HomeScreenState extends State<HomeScreen> {
             body: SingleChildScrollView(
               child: Container(
                 color: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(user!.name, style: AppStyle.txtPoppinsSemiBold20Black),
-                    Text(user!.nameComercial, style: AppStyle.txtPoppinsSemiBold14Black),
+                    Text(user!.nameComercial,
+                        style: AppStyle.txtPoppinsSemiBold14Black),
                     const SizedBox(height: 31),
-                    Text('Ubicación Actual', style: AppStyle.txtPoppinsSemiBold18Black),
+                    Text('Ubicación Actual',
+                        style: AppStyle.txtPoppinsSemiBold18Black),
                     const SizedBox(height: 10),
                     LocationCard(),
                     const SizedBox(height: 31),
@@ -110,7 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16),
                     _ListCourt(user: user),
                     const SizedBox(height: 40),
-                    Text('Servicios programados', style: AppStyle.txtPoppinsMedium18Black),
+                    Text('Servicios programados',
+                        style: AppStyle.txtPoppinsMedium18Black),
                     const SizedBox(height: 20),
                     const _ListScheduleReservationItems(),
                     const SizedBox(height: 40),
@@ -167,7 +178,7 @@ class _ListCourt extends StatelessWidget {
             imageUrl: 'assets/images/settings.png',
             name: 'En proceso',
             type: '',
-            rainyPercentage:  user.ntickets.toString(),
+            rainyPercentage: user.ntickets.toString(),
             image: 'assets/images/court1.png',
             gradientColors: [Colors.blue.shade100, Colors.blue.shade200],
             onTap: () {
@@ -196,44 +207,93 @@ class _ListCourt extends StatelessWidget {
   }
 }
 
-class _ListScheduleReservationItems extends StatelessWidget {
+class _ListScheduleReservationItems extends StatefulWidget {
   const _ListScheduleReservationItems();
 
   @override
+  __ListScheduleReservationItemsState createState() =>
+      __ListScheduleReservationItemsState();
+}
+
+class __ListScheduleReservationItemsState
+    extends State<_ListScheduleReservationItems> {
+  Future<List<Visit>>? _visitsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _visitsFuture = fetchVisitsByTicket();
+  }
+
+  Future<List<Visit>> fetchVisitsByTicket() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+    final response = await http.get(
+      Uri.parse(
+          'http://3.137.100.242:3000/api/v1/technical-visits?sort=visit_date'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> visitsData = json.decode(response.body)['data'];
+      if (visitsData.isEmpty) {
+        return [];
+      }
+      return visitsData
+          .map<Visit>(
+              (dynamic item) => Visit.fromJson(item as Map<String, dynamic>))
+          .toList();
+    } else {
+      throw Exception('Failed to load visits for ticket');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final List<Ticket> tickets = [
-      Ticket(
-          id: '1',
-          title: 'Problema con la conexión',
-          description: 'No puedo conectar a internet.'),
-      Ticket(
-          id: '2',
-          title: 'Error en la aplicación',
-          description: 'La aplicación se cierra inesperadamente.'),
-    ];
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 2,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () => {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TicketAcceptedProgressDetailPage(
-                      ticketId: tickets[0].id)),
-            )
+    return FutureBuilder<List<Visit>>(
+      future: _visitsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No visits found.'));
+        }
+
+        final visits = snapshot.data!;
+
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: visits.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+              onTap: () => {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TicketAcceptedProgressDetailPage(
+                          ticketId: visits[index]
+                              .ticketId
+                              .toString())), // Ensure toString() is used here
+                )
+              },
+              child: ReservationItem(
+                title: 'Ticket ${visits[index].ticketId}',
+                description: visits[index].observations ?? '',
+                date: DateFormat('yyyy-MM-dd').format(visits[index].visitDate),
+                time: DateFormat('hh:mm a').format(visits[index].visitDate),
+              ),
+            );
           },
-          child: ReservationItem(
-            title: 'Título del Ticket $index',
-            description: 'Descripción del Ticket $index',
-            date: '2024-11-1${index + 7}',
-            time: '${10 + index}:00 AM',
-          ),
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
         );
       },
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
     );
   }
 }
@@ -263,6 +323,12 @@ class ReservationItem extends StatelessWidget {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+            const Row(
+            children: [
+              SizedBox(width: 5),
+              Text('Visita programada', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, ),),
+            ],
+          ),
           Row(
             children: [
               const Icon(Icons.calendar_today, size: 16),

@@ -353,7 +353,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                 TextField(
                                   controller: _dateController,
                                   decoration: InputDecoration(
-                                    labelText: 'Fecha de reparación',
+                                    labelText: 'Fecha de visita',
                                     labelStyle: const TextStyle(
                                         color: Colors.black54, fontSize: 16),
                                     suffixIcon: IconButton(
@@ -447,9 +447,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                 chipDisplay:
                                                     MultiSelectChipDisplay(
                                                   chipColor:
-                                                      const Color(0xff051937),
+                                                      const Color(0xffdd00),
                                                   textStyle: const TextStyle(
-                                                    color: Colors.white,
+                                                    color: Colors.black,
                                                     fontFamily: 'Poppins',
                                                   ),
                                                   shape: RoundedRectangleBorder(
@@ -457,7 +457,7 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                                         BorderRadius.circular(
                                                             10),
                                                   ),
-                                                  scroll: true,
+                                                  scroll: false,
                                                   onTap: (value) {
                                                     setState(() {
                                                       _initialValues
@@ -477,67 +477,43 @@ class _RepairLogCardState extends State<RepairLogCard> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 30),
                                 ValueListenableBuilder<List<ImageData>>(
                                   valueListenable: _imagesSendNotifier,
                                   builder: (context, imagesSend, child) {
                                     return ImageUploaderVisits(
                                         initialImages: imagesSend,
-                                        showAddButton: _isEditing
+                                        showAddButton: true
                                         // Mostrar o no el botón de añadir imágenes
                                         );
                                   },
                                 ),
                                 const SizedBox(height: 30),
                                 Center(
-                                  child: _isEditing ||
-                                          widget.type == 'Agregar Nueva Visita'
-                                      ? ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xff051937),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 30, vertical: 10),
-                                          ),
-                                          onPressed: () async {
-                                            var serviceVisit = VisitService();
+                                    child: SizedBox(
+                                  width: 300,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xff051937),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 30, vertical: 10),
+                                    ),
+                                    onPressed: () async {
+                                      var serviceVisit = VisitService();
 
-                                            // Obtener imágenes del proveedor
-                                            await sendDataVisit(
-                                                context, serviceVisit);
-                                          },
-                                          icon: const Icon(Icons.save,
-                                              color: Colors.white),
-                                          label: const Text('Guardar',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                        )
-                                      : ElevatedButton.icon(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xff051937),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 30, vertical: 10),
-                                          ),
-                                          onPressed: () {
-                                            setState(() {
-                                              _isEditing = true;
-                                            });
-                                          },
-                                          icon: const Icon(Icons.edit,
-                                              color: Colors.white),
-                                          label: const Text('Editar',
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                        ),
-                                ),
+                                      // Obtener imágenes del proveedor
+                                      await sendDataVisit(
+                                          context, serviceVisit);
+                                    },
+                                    icon: const Icon(Icons.save,
+                                        color: Colors.white),
+                                    label: const Text('Guardar',
+                                        style: TextStyle(color: Colors.white)),
+                                  ),
+                                )),
                               ],
                             ),
                           ),
@@ -590,10 +566,9 @@ class _RepairLogCardState extends State<RepairLogCard> {
     };
     print('Data: ${widget.type}');
     if (widget.type == 'Nuevo') {
-
       var createVisit = await serviceVisit.sendDataVisit(dataVisit, imageFiles);
       _loadTicketFuture = _loadData();
-   
+
       setState(() {
         imagePaths.clear();
       });

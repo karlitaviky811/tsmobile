@@ -9,7 +9,9 @@ class ImageUploaderCloseTicket extends StatefulWidget {
   final List<ImageData> initialImages;
   final bool showAddButton;
 
-  ImageUploaderCloseTicket({Key? key, this.initialImages = const [], required this.showAddButton}) : super(key: key);
+  ImageUploaderCloseTicket(
+      {Key? key, this.initialImages = const [], required this.showAddButton})
+      : super(key: key);
 
   @override
   _ImageUploaderClosedState createState() => _ImageUploaderClosedState();
@@ -23,13 +25,17 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
-      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
+      final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(
+          context,
+          listen: false);
+      imageProvider.setInitialImages(
+          widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     });
   }
 
   Future<void> _pickImage(ImageSource source) async {
-    if (_isPickerActive) return; // Evitar abrir el selector de imágenes si ya está activo
+    if (_isPickerActive)
+      return; // Evitar abrir el selector de imágenes si ya está activo
 
     setState(() {
       _isPickerActive = true;
@@ -38,7 +44,9 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
     try {
       final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null && mounted) {
-        final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
+        final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(
+            context,
+            listen: false);
         imageProvider.addImage(pickedFile.path);
       }
     } catch (e) {
@@ -84,8 +92,11 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
   void didUpdateWidget(covariant ImageUploaderCloseTicket oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.initialImages != widget.initialImages) {
-      final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
-      imageProvider.setInitialImages(widget.initialImages.map((imgData) => imgData.originalUrl).toList());
+      final imageProvider = Provider.of<ImageProviderCloseTicketManagement>(
+          context,
+          listen: false);
+      imageProvider.setInitialImages(
+          widget.initialImages.map((imgData) => imgData.originalUrl).toList());
     }
   }
 
@@ -97,7 +108,7 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (widget.showAddButton) // Mostrar condicionalmente el botón
-              ElevatedButton(
+              ElevatedButton.icon(
                 onPressed: () => _showPickerOptions(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff051937),
@@ -105,9 +116,15 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: const Text('Añadir imágenes', style: TextStyle(color: Colors.white)),
+                icon: const Icon(Icons.camera_alt,
+                    color: Colors.white), // Added camera icon
+                label: const Text(
+                  'Añadir imágenes',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
-            if (imageProvider.initialImagePaths.isNotEmpty || imageProvider.newImagePaths.isNotEmpty)
+            if (imageProvider.initialImagePaths.isNotEmpty ||
+                imageProvider.newImagePaths.isNotEmpty)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -158,7 +175,8 @@ class _ImageUploaderClosedState extends State<ImageUploaderCloseTicket> {
                               right: 0,
                               child: GestureDetector(
                                 onTap: () => imageProvider.removeImage(path),
-                                child: const Icon(Icons.remove_circle, color: Colors.red),
+                                child: const Icon(Icons.remove_circle,
+                                    color: Colors.red),
                               ),
                             ),
                           ],

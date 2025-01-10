@@ -19,13 +19,14 @@ class InvoiceSparePartFinal extends StatefulWidget {
   final double budgetAmount;
   final int requestId;
   final bool showButtons;
-
+  final VoidCallback getParts;
   InvoiceSparePartFinal({
     Key? key,
     required this.initialImages,
     required this.budgetAmount,
     required this.requestId,
     required this.showButtons,
+    required this.getParts,
   }) : super(key: key);
 
   @override
@@ -146,7 +147,7 @@ class _InvoiceSparePartState extends State<InvoiceSparePartFinal> {
         if (mounted) {
           setState(() {});
         }
-
+        widget.getParts();
         Fluttertoast.showToast(
             msg: "Factura enviada éxitosamente",
             toastLength: Toast.LENGTH_SHORT,

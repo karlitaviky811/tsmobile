@@ -225,7 +225,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
     }
 
     return Chip(
-      label: Text(getStatusFromNumber(int.parse(status))),
+      label: Text(getStatusFromNumber(int.parse(status)), style: TextStyle(color: Colors.white)),
       backgroundColor: statusColor,
       avatar: Icon(
         _getChipIcon(status),
@@ -322,6 +322,7 @@ class _TicketDetailCardState extends State<TicketDetailCard> {
               style: AppStyle.txtPoppinsRegular14Black,
             ),
           ),
+          if(visits.isNotEmpty && visits[0].visitDate != null)
           IconButton(
             icon: const Icon(Icons.calendar_today),
             onPressed: () => _showAcceptedFormModal(context),

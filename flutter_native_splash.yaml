@@ -1,20 +1,13 @@
 flutter_native_splash:
-  background_image: "assets/images/daki4.png"
-   android:
-    image: assets/images/daki5.png
-    icon_background_color: "#ffffff"
-    icon_background_color_dark: "#000000"
+  background_image: "assets/images/daki8.png"
   android_12:
-    image: assets/images/daki5.png
-    icon_background_color: "#ffffff"
-    icon_background_color_dark: "#000000"
+    background_image: "assets/images/daki8.png"
+    fullscreen: true
 
-  color_android: "#42a5f5"
-  image_android: assets/images/daki5.png
-  android_gravity: center  # Cambia 'fill' a 'center' para evitar que la imagen se estire
-  background_image_android: assets/images/daki5.png
+  image: assets/images/daki8.png
+  android_gravity: center 
 
-  ios_content_mode: center  # Cambia 'scaleAspectFit' a 'center' para evitar que la imagen se estire en iOS
+  ios_content_mode: center  # Evitar que la imagen se estire en iOS
 
-  # Otras configuraciones opcionales
-  # fullscreen: true
+  # Configuraciones adicionales opcionales
+  fullscreen: true

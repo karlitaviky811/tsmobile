@@ -62,7 +62,8 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   }
 
   Future<void> _pickImage() async {
-    final imagePickerProvider = Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
+    final imagePickerProvider =
+        Provider.of<ImageProviderCloseTicketManagement>(context, listen: false);
     imagePickerProvider.setImagePickerActive(true);
 
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -109,7 +110,8 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
   }
 
   void _resetProvider() {
-    Provider.of<ImageProviderCloseTicketManagement>(context, listen: false).resetImage();
+    Provider.of<ImageProviderCloseTicketManagement>(context, listen: false)
+        .resetImage();
   }
 
   String getFormattedDate(DateTime date) {
@@ -187,12 +189,9 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                   labelText: 'Fecha',
                                   prefixIcon: IconButton(
                                     icon: const Icon(Icons.calendar_today),
-                                    onPressed: _isFormActive
-                                        ? () => _pickDate(context)
-                                        : null,
+                                    onPressed: () => _pickDate(context),
                                   ),
                                 ),
-                                readOnly: !_isFormActive,
                               ),
                               const SizedBox(height: 16),
                               DropdownButtonFormField<String>(
@@ -205,50 +204,44 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                     child: Text(reason),
                                   );
                                 }).toList(),
-                                onChanged: _isFormActive
-                                    ? (String? newValue) {
-                                        setState(() {
-                                          _selectedReason = newValue;
-                                        });
-                                      }
-                                    : null,
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    _selectedReason = newValue;
+                                  });
+                                },
                               ),
                               const SizedBox(height: 16),
                               TextField(
                                 controller: _observationsController,
                                 decoration: const InputDecoration(
                                     labelText: 'Observaciones'),
-                                readOnly: !_isFormActive,
                               ),
                               const SizedBox(height: 16),
                               ImageUploaderCloseTicket(
                                 initialImages: _imagesSend,
-                                showAddButton: _isFormActive,
+                                showAddButton: true,
                               ),
                               const SizedBox(height: 30),
                               Center(
-                                child: ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: _isFormActive
-                                        ? Colors.yellow
-                                        : Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
+                                child: SizedBox(
+                                  width: 300,
+                                  child: ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xff051937),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
                                     ),
-                                  ),
-                                  icon: Icon(
-                                      _isFormActive ? Icons.save : Icons.edit,
-                                      size: 18,
-                                      color: Colors.white),
-                                  onPressed: () async {
-                                    if (_isFormActive) {
+                                    icon: const Icon(Icons.save,
+                                        size: 18, color: Colors.white),
+                                    onPressed: () async {
                                       if (_selectedDate != null &&
                                           _selectedReason != null) {
                                         // Obtener imágenes del proveedor
-                                        final imageProvider =
-                                            Provider.of<ImageProviderCloseTicketManagement>(
-                                                context,
-                                                listen: false);
+                                        final imageProvider = Provider.of<
+                                                ImageProviderCloseTicketManagement>(
+                                            context,
+                                            listen: false);
                                         List<String> imagePaths =
                                             imageProvider.newImagePaths;
                                         List<File> imageFiles = imagePaths
@@ -273,7 +266,6 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                             fontSize: 16.0,
                                           );
                                           setState(() {
-                                            _isFormActive = false;
                                             _imagesSend.clear();
                                             imageProvider.clearImages();
                                           });
@@ -297,7 +289,8 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                         }
                                       } else {
                                         Fluttertoast.showToast(
-                                          msg: "Por favor, selecciona una fecha y un motivo.",
+                                          msg:
+                                              "Por favor, selecciona una fecha y un motivo.",
                                           toastLength: Toast.LENGTH_SHORT,
                                           gravity: ToastGravity.BOTTOM,
                                           timeInSecForIosWeb: 1,
@@ -306,15 +299,11 @@ class _CloseTicketFormState extends State<CloseTicketForm> {
                                           fontSize: 16.0,
                                         );
                                       }
-                                    } else {
-                                      setState(() {
-                                        _isFormActive = true;
-                                      });
-                                    }
-                                  },
-                                  label: Text(
-                                    _isFormActive ? 'Guardar' : 'Editar',
-                                    style: const TextStyle(color: Colors.white),
+                                    },
+                                    label: const Text(
+                                      'Guardar',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
                                   ),
                                 ),
                               ),

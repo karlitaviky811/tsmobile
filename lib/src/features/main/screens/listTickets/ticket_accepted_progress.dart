@@ -132,10 +132,10 @@ class _TicketDetailPageState extends State<TicketAcceptedProgressDetailPage> {
                 text: 'General',
               ),
               Tab(
-                text: 'Evaluación',
+                text: 'Diagnóstico',
               ),
               Tab(
-                text: 'Reparación',
+                text: 'Visitas',
               ),
               Tab(
                 text: 'Cierre',

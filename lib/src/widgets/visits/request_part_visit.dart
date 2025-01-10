@@ -320,18 +320,24 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
     }
   }
 
-  void _openRepuestoForm() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
+void _openRepuestoForm() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          top: 8.0,
+          left: 8.0,
+          right: 8.0,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 8.0,  // Ajuste para EdgeInsets
+        ),
+        child: SingleChildScrollView(  // Añadir SingleChildScrollView
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Solcitud de repuesto',
-                  style: AppStyle.txtPoppinsBold14Black),
+              Text('Solicitud de repuesto',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               const Text('Información necesaria'),
               TextField(
@@ -363,28 +369,35 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
               ),
               const SizedBox(height: 10),
               ImageUploaderSparePartsNew(
-                initialImages: const [],
+                initialImages: [],
               ),
               const SizedBox(height: 10),
               _isSubmitting // Mostrar el indicador de carga mientras se envía el formulario
                   ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xff051937),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  : SizedBox(
+                    width: 300,
+                    child: ElevatedButton(
+                        onPressed: _submitForm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xff051937),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                        child: const Text(
+                          'Enviar solicitud',
+                          style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      child: const Text('Enviar solicitud',
-                          style: TextStyle(color: Colors.white)),
-                    ),
+                  ),
             ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   Future<List<ImageData>> getImagesForRequest(int requestPart) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -570,8 +583,9 @@ class _RepuestoScreenState extends State<RepuestoScreen> {
                                             ),
                                           if (request.status == 8 || request.status == 7)
                                             InvoiceSparePartFinal(
+                                              getParts: _fetchPartRequests,
                                               key: UniqueKey(),
-                                              showButtons: request.status == 7 ? true : false,
+                                              showButtons: request.status == 7 || request.status == 8 ? true : false,
                                               requestId: request.id,
                                               initialImages: const [],
                                               budgetAmount:

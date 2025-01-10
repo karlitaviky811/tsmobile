@@ -56,7 +56,7 @@ class TicketDetails extends StatelessWidget {
         text,
         style: const TextStyle(
             fontStyle: FontStyle.normal,
-            color: Colors.black,
+            color: Colors.transparent,
             fontFamily: 'Poppins'),
       ),
       avatar: const Icon(

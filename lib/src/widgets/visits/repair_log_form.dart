@@ -100,6 +100,11 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  const Text('Nueva visita',
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  const Text('Información necesaria'),
                   TextField(
                     controller: _titleController,
                     decoration: const InputDecoration(labelText: 'Motivo'),
@@ -127,87 +132,90 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                     readOnly: true,
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_titleController.text.isEmpty ||
-                          _dateController.text.isEmpty ||
-                          _timeController.text.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content:
-                                Text('Por favor, completa todos los campos.'),
-                          ),
-                        );
-                        return;
-                      }
-
-                      final date =
-                          DateFormat('dd/MM/yyyy').parse(_dateController.text);
-                      final time = TimeOfDay(
-                        hour: int.parse(_timeController.text.split(':')[0]),
-                        minute: int.parse(
-                            _timeController.text.split(':')[1].split(' ')[0]),
-                      );
-
-                      final caracas = tz.getLocation('America/Caracas');
-                      final visitDate = tz.TZDateTime(
-                        caracas,
-                        date.year,
-                        date.month,
-                        date.day,
-                        time.hour,
-                        time.minute,
-                      );
-
-                      final newVisit = Visit(
-                        id: 0,
-                        title: _titleController.text,
-                        type: 1,
-                        status: 1,
-                        selectedRepuestos: [],
-                        selectedServicios: [],
-                        necesitaRepuesto: false,
-                        ticketId: 0,
-                        visitDate: visitDate,
-                        reprogramming: [],
-                        services: [],
-                        createdAt: DateTime.now(),
-                        updatedAt: DateTime.now(),
-                      );
-
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext context) {
-                          return const AlertDialog(
-                            content: Row(
-                              children: [
-                                CircularProgressIndicator(),
-                                SizedBox(width: 20),
-                                Text("Guardando..."),
-                              ],
+                  SizedBox(
+                    width: 300,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (_titleController.text.isEmpty ||
+                            _dateController.text.isEmpty ||
+                            _timeController.text.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('Por favor, completa todos los campos.'),
                             ),
                           );
-                        },
-                      );
-
-                      _saveDetails(newVisit);
-                      Navigator.pop(context); // Close the loading dialog
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          Colors.blue, // Cambiar el color de fondo a azul
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.save, color: Colors.white),
-                        SizedBox(width: 8), // Espacio entre el icono y el texto
-                        Text(
-                          'Añadir visita',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
+                          return;
+                        }
+                    
+                        final date =
+                            DateFormat('dd/MM/yyyy').parse(_dateController.text);
+                        final time = TimeOfDay(
+                          hour: int.parse(_timeController.text.split(':')[0]),
+                          minute: int.parse(
+                              _timeController.text.split(':')[1].split(' ')[0]),
+                        );
+                    
+                        final caracas = tz.getLocation('America/Caracas');
+                        final visitDate = tz.TZDateTime(
+                          caracas,
+                          date.year,
+                          date.month,
+                          date.day,
+                          time.hour,
+                          time.minute,
+                        );
+                    
+                        final newVisit = Visit(
+                          id: 0,
+                          title: _titleController.text,
+                          type: 1,
+                          status: 1,
+                          selectedRepuestos: [],
+                          selectedServicios: [],
+                          necesitaRepuesto: false,
+                          ticketId: 0,
+                          visitDate: visitDate,
+                          reprogramming: [],
+                          services: [],
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                        );
+                    
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return const AlertDialog(
+                              content: Row(
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(width: 20),
+                                  Text("Guardando..."),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                    
+                        _saveDetails(newVisit);
+                        Navigator.pop(context); // Close the loading dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color(0xff051937), // Cambiar el color de fondo a azul
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.save, color: Colors.white),
+                          SizedBox(width: 8), // Espacio entre el icono y el texto
+                          Text(
+                            'Añadir visita',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -440,8 +448,8 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     };
 
     final visistService = VisitService();
-    
-    var visit = await visistService.sendDataVisit(dataVisit , []);
+
+    var visit = await visistService.sendDataVisit(dataVisit, []);
 
     Navigator.pop(context); // Close the loading dialog
 
@@ -457,7 +465,7 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
     }
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
       future: _fetchVisitsFuture,
@@ -548,30 +556,6 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  Chip(
-                                    label: Text(
-                                      visit.status == 1
-                                          ? 'En progreso'
-                                          : 'Finalizado',
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor: visit.status == 1
-                                        ? Colors.orangeAccent
-                                        : Colors.green,
-                                    avatar: Icon(
-                                      visit.status == 1
-                                          ? Icons.timelapse
-                                          : Icons.check_circle,
-                                      color: Colors.white,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(25.0),
-                                      side: const BorderSide(
-                                          color: Colors.transparent),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
@@ -625,7 +609,6 @@ class _RepairLogFormDataState extends State<RepairLogFormData> {
       },
     );
   }
-
 
   void _agregarNuevaReparacion() {
     final visitProvider = Provider.of<VisitProvider>(context, listen: false);
